@@ -4,7 +4,7 @@
   <property name="gwt.args" value="" />
 
   <!-- Configure path to GWT SDK -->
-  <property name="gwt.sdk" location="../gwt-2.8.2" />
+  <property name="gwt.sdk" location="./gwt-2.8.2" />
 
   <path id="project.class.path">
     <pathelement location="war/WEB-INF/classes"/>
@@ -108,8 +108,8 @@
         <pathelement location="src" />
         <pathelement location="test" />
         <path refid="project.class.path" />
-        <pathelement location="../gwt-2.8.2/validation-api-1.0.0.GA.jar" />
-        <pathelement location="../gwt-2.8.2/validation-api-1.0.0.GA-sources.jar" />
+        <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA.jar" />
+        <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar" />
         <pathelement location="./junit.jar" />
       </classpath>
       <batchtest todir="reports/htmlunit.dev" >
@@ -131,8 +131,8 @@
         <pathelement location="src" />
         <pathelement location="test" />
         <path refid="project.class.path" />
-        <pathelement location="../gwt-2.8.2/validation-api-1.0.0.GA.jar" />
-        <pathelement location="../gwt-2.8.2/validation-api-1.0.0.GA-sources.jar" />
+        <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA.jar" />
+        <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar" />
         <pathelement location="./junit.jar"/>
       </classpath>
       <batchtest todir="reports/htmlunit.prod" >

@@ -23,7 +23,7 @@ public class SimpleTestSuite {
     public void testOneItemCollection() {
         collection.add("itemA");
         assertEquals(1, collection.size());
-        //assertTrue(false);
+        assertTrue(false);
     }
 
 

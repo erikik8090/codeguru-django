@@ -4,18 +4,14 @@ package il.co.codeguru.corewars8086.gui;
 import com.google.gwt.typedarrays.client.Uint8ArrayNative;
 import elemental2.dom.*;
 import elemental2.dom.EventListener;
-import il.co.codeguru.corewars8086.cpu.CpuState;
-import il.co.codeguru.corewars8086.gui.widgets.ActionEvent;
+import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
-import il.co.codeguru.corewars8086.gui.widgets.JButton;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Disassembler;
 import il.co.codeguru.corewars8086.war.*;
-import jsinterop.annotations.JsPackage;
-import jsinterop.annotations.JsType;
 
 
 import java.util.*;

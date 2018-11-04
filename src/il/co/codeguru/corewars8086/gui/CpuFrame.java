@@ -2,7 +2,7 @@ package il.co.codeguru.corewars8086.gui;
 
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
-import il.co.codeguru.corewars8086.cpu.CpuState;
+import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
@@ -14,7 +14,6 @@ import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.gui.widgets.*;
 import il.co.codeguru.corewars8086.war.Warrior;
 
-import java.util.Dictionary;
 import java.util.HashMap;
 //import java.awt.Font;
 //import java.awt.GridLayout;

@@ -39,9 +39,17 @@
   <property name="ant.dir" location="${user.home}/.ant/lib"/>
   <target name="bootstrap" description="Install ivy and jacoco">
     <mkdir dir="${ant.dir}"/>
+
+    <mkdir dir="./ivy-temp-folder"/>
     <get src="https://repository.sonatype.org/service/local/repositories/third-party/content/org/apache/ivy/apache-ivy/2.2.0/apache-ivy-2.2.0.tar.gz"
-         dest="${ant.dir}/ivy.tar.gz"/>
-    <untar src="${ant.dir}/ivy.tar.gz" dest="${ant.dir}" compression="gzip"/>
+         dest="./ivy-temp-folder/ivy.tar.gz"/>
+    <untar src="./ivy-temp-folder/ivy.tar.gz" dest="./ivy-temp-folder" compression="gzip"/>
+    <copy todir="${ant.dir}">
+      <fileset dir="./ivy-temp-folder/apache-ivy-2.2.0/">
+        <include name="**/*.jar"/>
+      </fileset>
+    </copy>
+    <delete dir="./ivy-temp-folder"/>
     
     <mkdir dir="./jacoco-temp-folder"/>
     <get src="https://repository.sonatype.org/service/local/repositories/central-proxy/content/org/jacoco/jacoco/0.8.2/jacoco-0.8.2.zip"

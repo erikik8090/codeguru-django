@@ -35,6 +35,15 @@
     <classpath path="lib/jacocoant.jar"/>
   </taskdef>
 
+  <!-- To install, change the location to your ant-lib dir-->
+  <property name="lib.ivy.dir" location="${user.home}/.ant/lib"/>
+  <target name="bootstrap" description="Install ivy">
+    <mkdir dir="${lib.ivy.dir}"/>
+    <get src="https://repository.sonatype.org/service/local/repositories/third-party/content/org/apache/ivy/apache-ivy/2.2.0/apache-ivy-2.2.0.tar.gz"
+         dest="${lib.ivy.dir}/ivy.tar.gz"/>
+    <untar src="${lib.ivy.dir}/ivy.tar.gz" dest="${lib.ivy.dir}" compression="gzip" overwrite="true"/>
+  </target>
+
   <target name="libs" description="Copy libs to WEB-INF/lib">
     <mkdir dir="war/WEB-INF/lib" />
     <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet.jar" />

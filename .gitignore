@@ -1,3 +1,5 @@
 .idea/
 reports/
+lib/
+gwt-unitCache/
 gwt-2.8.2/

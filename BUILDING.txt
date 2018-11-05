@@ -1,7 +1,7 @@
-install gwt http://www.gwtproject.org/download.html
-  put it in ../gwt-2.8.2
+install gwt http://www.gwtproject.org/download.html and put it in the project directory
 install JDK 1.8
 install ant https://ant.apache.org/bindownload.cgi
+install ivy http://ant.apache.org/ivy/download.cgi and put the ivy.jar into the ant directory
 
 set environment variable 
 JAVA_HOME = C:\Program Files\Java\jdk1.8.0_181

@@ -36,12 +36,24 @@
   </taskdef>
 
   <!-- To install, change the location to your ant-lib dir-->
-  <property name="lib.ivy.dir" location="${user.home}/.ant/lib"/>
-  <target name="bootstrap" description="Install ivy">
-    <mkdir dir="${lib.ivy.dir}"/>
+  <property name="ant.dir" location="${user.home}/.ant/lib"/>
+  <target name="bootstrap" description="Install ivy and jacoco">
+    <mkdir dir="${ant.dir}"/>
     <get src="https://repository.sonatype.org/service/local/repositories/third-party/content/org/apache/ivy/apache-ivy/2.2.0/apache-ivy-2.2.0.tar.gz"
-         dest="${lib.ivy.dir}/ivy.tar.gz"/>
-    <untar src="${lib.ivy.dir}/ivy.tar.gz" dest="${lib.ivy.dir}" compression="gzip" overwrite="true"/>
+         dest="${ant.dir}/ivy.tar.gz"/>
+    <untar src="${ant.dir}/ivy.tar.gz" dest="${ant.dir}" compression="gzip"/>
+    
+    <mkdir dir="./jacoco-temp-folder"/>
+    <get src="https://repository.sonatype.org/service/local/repositories/central-proxy/content/org/jacoco/jacoco/0.8.2/jacoco-0.8.2.zip"
+         dest="./jacoco-temp-folder/jacoco.zip"/>
+    <unzip src="./jacoco-temp-folder/jacoco.zip" dest="./jacoco-temp-folder"/>
+    <copy todir="${ant.dir}">
+      <fileset dir="./jacoco-temp-folder/lib">
+        <include name="jacoco*"/>
+        <exclude name="org.*"/>
+      </fileset>
+    </copy>
+    <delete dir="./jacoco-temp-folder"/>
   </target>
 
   <target name="libs" description="Copy libs to WEB-INF/lib">

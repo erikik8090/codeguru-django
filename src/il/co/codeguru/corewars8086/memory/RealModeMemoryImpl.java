@@ -13,14 +13,16 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
     public MemoryEventListener listener;
 
     /** Actual memory data */
-    //public byte[] m_data;
-    public Int8ArrayNative m_data;
+    public byte[] m_data;
+    //TODO: Remove this and return to byte[] - separate the gwt framework from the core if it doesn't mean too much overhead
+    //public Int8ArrayNative m_data;
 
     /**
      * Constructor.
      */
     public RealModeMemoryImpl() {
-        m_data = Int8ArrayNative.create(RealModeAddress.MEMORY_SIZE);
+        //m_data = Int8ArrayNative.create(RealModeAddress.MEMORY_SIZE);
+        m_data = new byte[RealModeAddress.MEMORY_SIZE];
     }
 
     /**
@@ -32,16 +34,16 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
      * @throws MemoryException  on any error. 
      */
     public byte readByte(RealModeAddress address) {
-        return m_data.get(address.getLinearAddress());
+        return m_data[address.getLinearAddress()];
     }
     public byte readByte(int linearAddress) {
-        return m_data.get(linearAddress % RealModeAddress.MEMORY_SIZE);
+        return m_data[linearAddress % RealModeAddress.MEMORY_SIZE];
     }
 
     public int length() {
-        return m_data.length();
+        return m_data.length;
     }
-
+    public byte[] getMemory() {return m_data;}
     /**
      * Writes a single byte to the specified address.
      *
@@ -51,7 +53,7 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
      * @throws MemoryException  on any error. 
      */
     public void writeByte(RealModeAddress address, byte value) {
-        m_data.set(address.getLinearAddress(), value);
+        m_data[address.getLinearAddress()] = value;
         if (listener != null) {
             listener.onMemoryWrite(address, value);
         }
@@ -68,10 +70,10 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
      * @throws MemoryException  on any error. 
      */
     public byte readExecuteByte(RealModeAddress address) {
-        return m_data.get(address.getLinearAddress());
+        return m_data[address.getLinearAddress()];
     }
     public byte readExecuteByte(int linearAddress) {
-        return m_data.get(linearAddress);
+        return m_data[linearAddress];
     }
 
 

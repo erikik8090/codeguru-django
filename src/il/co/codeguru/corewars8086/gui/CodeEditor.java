@@ -1,6 +1,7 @@
 package il.co.codeguru.corewars8086.gui;
 
 
+import com.google.gwt.typedarrays.client.Int8ArrayNative;
 import com.google.gwt.typedarrays.client.Uint8ArrayNative;
 import elemental2.dom.*;
 import elemental2.dom.EventListener;
@@ -1499,7 +1500,11 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     private void disassembleAddr(int absaddr, int addrInArea)
     {
-        Disassembler dis = new Disassembler.NArrDisassembler(m_mem.m_data, absaddr, m_mem.length()); // TBDTBD
+        //TODO: Check the performance on this - if it is not bad, don't fix it
+        //TODO: Make version like before, but make it special to gwt version
+        Int8ArrayNative memory = Int8ArrayNative.create(m_mem.length());
+        memory.set(m_mem.getMemory());
+        Disassembler dis = new Disassembler.NArrDisassembler(memory , absaddr, m_mem.length()); // TBDTBD
         String text;
         try {
             text = dis.nextOpcode();

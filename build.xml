@@ -115,11 +115,12 @@
         <path refid="project.class.path" />
         <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA.jar" />
         <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar" />
+        <pathelement location="${gwt.sdk}/gwt-codeserver.jar"/>
         <path refid="project.test.path"/>
       </classpath>
       <batchtest todir="reports/htmlunit.dev" >
         <fileset dir="test" >
-          <include name="**/*Suite.java" />
+          <include name="**/*.java" />
         </fileset>
       </batchtest>
       <formatter type="plain" />
@@ -138,11 +139,12 @@
         <path refid="project.class.path" />
         <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA.jar" />
         <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar" />
+        <pathelement location="${gwt.sdk}/gwt-codeserver.jar"/>
         <path refid="project.test.path"/>
       </classpath>
       <batchtest todir="reports/htmlunit.prod" >
         <fileset dir="test" >
-          <include name="**/*Suite.java" />
+          <include name="**/*.java" />
         </fileset>
       </batchtest>
       <formatter type="plain" />

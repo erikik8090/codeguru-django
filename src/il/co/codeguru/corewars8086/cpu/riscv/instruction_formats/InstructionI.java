@@ -9,31 +9,31 @@ public class InstructionI extends InstructionBase {
     public InstructionI(int opcode, int rd, int funct3, int rs1, int imm)
     {
         super(
-       (opcode & mask(6)) |
-            ((rd & mask(5)) << 6) |
-            ((funct3 & mask(3)) << 11) |
-            ((rs1 & mask(5)) << 14) |
-            ((imm & mask(12)) << 19)
+       (opcode & mask(7)) |
+            ((rd & mask(5)) << 7) |
+            ((funct3 & mask(3)) << 12) |
+            ((rs1 & mask(5)) << 15) |
+            ((imm & mask(12)) << 20)
         );
     }
 
     public byte getRd()
     {
-        return (byte)((this.raw >> 6) & mask(5));
+        return (byte)((this.raw >> 7) & mask(5));
     }
 
     public byte getFunct3()
     {
-        return (byte)((this.raw >> 11) & mask(3));
+        return (byte)((this.raw >> 12) & mask(3));
     }
 
     public byte getRs1()
     {
-        return (byte)((this.raw >> 14) & mask(5));
+        return (byte)((this.raw >> 15) & mask(5));
     }
 
     public byte getImmediate()
     {
-        return (byte)(this.raw >> 19);
+        return (byte)(this.raw >> 20);
     }
 }

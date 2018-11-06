@@ -12,7 +12,7 @@ public class InstructionBaseTest {
         assertEquals(0,a.getOpcode());
 
         a = new InstructionBase((short) 0x123456);
-        assertEquals(22, a.getOpcode());
+        assertEquals(86, a.getOpcode());
     }
 
     @Test
@@ -24,12 +24,14 @@ public class InstructionBaseTest {
         assertEquals(0,a.getRs1());
         assertEquals(0,a.getImmediate());
 
+        // '0b1 00100 011 01000 1010110'
+
         a = new InstructionI(0x123456);
-        assertEquals(22, a.getOpcode());
-        assertEquals(17,a.getRd());
-        assertEquals(6,a.getFunct3());
-        assertEquals(8,a.getRs1());
-        assertEquals(2,a.getImmediate());
+        assertEquals(86, a.getOpcode());
+        assertEquals(8,a.getRd());
+        assertEquals(3,a.getFunct3());
+        assertEquals(4,a.getRs1());
+        assertEquals(1,a.getImmediate());
     }
 
     @Test
@@ -38,7 +40,10 @@ public class InstructionBaseTest {
         InstructionI a = new InstructionI((byte)0,(byte)0,(byte)0,(byte)0,(byte)0);
         assertEquals(0,a.getRaw());
 
-        a = new InstructionI(22, 17, 6, 8, 2);
+        a = new InstructionI(86, 8, 3, 4, 1);
         assertEquals(0x123456, a.getRaw());
+
+        a = new InstructionI(-1,-1,-1,-1,-1);
+        assertEquals(0xFFFFFFFF, a.getRaw());
     }
 }

@@ -14,7 +14,7 @@ public class InstructionBase {
 
     public byte getOpcode()
     {
-        return (byte)(this.raw & mask(6));
+        return (byte)(this.raw & mask(7));
     }
 
     public int getRaw()

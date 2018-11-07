@@ -2,7 +2,7 @@ package il.co.codeguru.corewars8086.cpu.riscv;
 
 public class Memory {
 
-    private byte[] memory;
+    private final byte[] memory;
 
     public Memory(int size)
     {

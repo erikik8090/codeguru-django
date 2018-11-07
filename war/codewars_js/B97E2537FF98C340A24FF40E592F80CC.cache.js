@@ -3,7 +3,7 @@ var __gwtModuleFunction = $wnd.codewars_js;
 var $sendStats = __gwtModuleFunction.__sendStats;
 $sendStats('moduleStartup', 'moduleEvalStart');
 var $gwt_version = "2.8.2";
-var $strongName = 'DC32087F6099A85FF84DB14F663EF2F5';
+var $strongName = 'B97E2537FF98C340A24FF40E592F80CC';
 var $gwt = {};
 var $doc = $wnd.document;
 var $moduleName, $moduleBase;
@@ -3055,69 +3055,44 @@ function CpuException(){
   Exception.call(this);
 }
 
-CpuException.displayName = 'il.co.codeguru.corewars8086.cpu.CpuException.CpuException';
+CpuException.displayName = 'il.co.codeguru.corewars8086.cpu.exceptions.CpuException.CpuException';
 defineClass(26, 7, $intern_14);
-var Lil_co_codeguru_corewars8086_cpu_CpuException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu', 'CpuException', 26);
+var Lil_co_codeguru_corewars8086_cpu_exceptions_CpuException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu.exceptions', 'CpuException', 26);
 function DivisionException(){
   CpuException.call(this);
 }
 
-DivisionException.displayName = 'il.co.codeguru.corewars8086.cpu.DivisionException.DivisionException';
+DivisionException.displayName = 'il.co.codeguru.corewars8086.cpu.exceptions.DivisionException.DivisionException';
 defineClass(72, 26, $intern_14, DivisionException);
-var Lil_co_codeguru_corewars8086_cpu_DivisionException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu', 'DivisionException', 72);
+var Lil_co_codeguru_corewars8086_cpu_exceptions_DivisionException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu.exceptions', 'DivisionException', 72);
 function IntOpcodeException(){
   CpuException.call(this);
 }
 
-IntOpcodeException.displayName = 'il.co.codeguru.corewars8086.cpu.IntOpcodeException.IntOpcodeException';
+IntOpcodeException.displayName = 'il.co.codeguru.corewars8086.cpu.exceptions.IntOpcodeException.IntOpcodeException';
 defineClass(91, 26, $intern_14, IntOpcodeException);
-var Lil_co_codeguru_corewars8086_cpu_IntOpcodeException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu', 'IntOpcodeException', 91);
+var Lil_co_codeguru_corewars8086_cpu_exceptions_IntOpcodeException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu.exceptions', 'IntOpcodeException', 91);
 function InvalidOpcodeException(){
   CpuException.call(this);
 }
 
-InvalidOpcodeException.displayName = 'il.co.codeguru.corewars8086.cpu.InvalidOpcodeException.InvalidOpcodeException';
+InvalidOpcodeException.displayName = 'il.co.codeguru.corewars8086.cpu.exceptions.InvalidOpcodeException.InvalidOpcodeException';
 defineClass(11, 26, $intern_14, InvalidOpcodeException);
-var Lil_co_codeguru_corewars8086_cpu_InvalidOpcodeException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu', 'InvalidOpcodeException', 11);
-function $nextByte(this$static){
-  var ip, linearAddress;
-  ip = this$static.m_state.m_ip;
-  linearAddress = linearAddress_0(this$static.m_state.m_cs, ip);
-  $setIP(this$static.m_state, ip + 1 << 16 >> 16);
-  return $readExecuteByte_1(this$static.m_memory, linearAddress);
-}
-
-$nextByte.displayName = 'il.co.codeguru.corewars8086.cpu.OpcodeFetcher.$nextByte';
-function $nextWord(this$static){
-  var address;
-  address = new RealModeAddress_0(this$static.m_state.m_cs, this$static.m_state.m_ip);
-  $setIP(this$static.m_state, this$static.m_state.m_ip + 2 << 16 >> 16);
-  return $readExecuteWord(this$static.m_memory, address);
-}
-
-$nextWord.displayName = 'il.co.codeguru.corewars8086.cpu.OpcodeFetcher.$nextWord';
-function OpcodeFetcher(state, memory){
-  this.m_state = state;
-  this.m_memory = memory;
-}
-
-OpcodeFetcher.displayName = 'il.co.codeguru.corewars8086.cpu.OpcodeFetcher.OpcodeFetcher';
-defineClass(225, 1, {}, OpcodeFetcher);
-var Lil_co_codeguru_corewars8086_cpu_OpcodeFetcher_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu', 'OpcodeFetcher', 225);
+var Lil_co_codeguru_corewars8086_cpu_exceptions_InvalidOpcodeException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu.exceptions', 'InvalidOpcodeException', 11);
 function UnimplementedOpcodeException(){
   CpuException.call(this);
 }
 
-UnimplementedOpcodeException.displayName = 'il.co.codeguru.corewars8086.cpu.UnimplementedOpcodeException.UnimplementedOpcodeException';
+UnimplementedOpcodeException.displayName = 'il.co.codeguru.corewars8086.cpu.exceptions.UnimplementedOpcodeException.UnimplementedOpcodeException';
 defineClass(39, 26, $intern_14, UnimplementedOpcodeException);
-var Lil_co_codeguru_corewars8086_cpu_UnimplementedOpcodeException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu', 'UnimplementedOpcodeException', 39);
+var Lil_co_codeguru_corewars8086_cpu_exceptions_UnimplementedOpcodeException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu.exceptions', 'UnimplementedOpcodeException', 39);
 function UnsupportedOpcodeException(){
   CpuException.call(this);
 }
 
-UnsupportedOpcodeException.displayName = 'il.co.codeguru.corewars8086.cpu.UnsupportedOpcodeException.UnsupportedOpcodeException';
+UnsupportedOpcodeException.displayName = 'il.co.codeguru.corewars8086.cpu.exceptions.UnsupportedOpcodeException.UnsupportedOpcodeException';
 defineClass(55, 26, $intern_14, UnsupportedOpcodeException);
-var Lil_co_codeguru_corewars8086_cpu_UnsupportedOpcodeException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu', 'UnsupportedOpcodeException', 55);
+var Lil_co_codeguru_corewars8086_cpu_exceptions_UnsupportedOpcodeException_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu.exceptions', 'UnsupportedOpcodeException', 55);
 function $clinit_Cpu(){
   $clinit_Cpu = emptyMethod;
   PARITY_TABLE = stampJavaTypeInfo(getClassLiteralForArray(Z_classLit, 1), $intern_15, 10, 16, [true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true, false, true, true, false, true, false, false, true, true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true, true, false, false, true, false, true, true, false, true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true, false, true, true, false, true, false, false, true, true, false, false, true, false, true, true, false, true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true, true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true, false, true, true, false, true, false, false, true, true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true, true, false, false, true, false, true, true, false, true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true, true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true, false, true, true, false, true, false, false, true, true, false, false, true, false, true, true, false, true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true, false, true, true, false, true, false, false, true, true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true, true, false, false, true, false, true, true, false, true, false, false, true, false, true, true, false, false, true, true, false, true, false, false, true]);
@@ -5410,6 +5385,31 @@ defineClass(226, 1, {}, IndirectAddressingDecoder);
 _.m_memIndex = 0;
 _.m_regIndex = 0;
 var Lil_co_codeguru_corewars8086_cpu_x86_IndirectAddressingDecoder_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu.x86', 'IndirectAddressingDecoder', 226);
+function $nextByte(this$static){
+  var ip, linearAddress;
+  ip = this$static.m_state.m_ip;
+  linearAddress = linearAddress_0(this$static.m_state.m_cs, ip);
+  $setIP(this$static.m_state, ip + 1 << 16 >> 16);
+  return $readExecuteByte_1(this$static.m_memory, linearAddress);
+}
+
+$nextByte.displayName = 'il.co.codeguru.corewars8086.cpu.x86.OpcodeFetcher.$nextByte';
+function $nextWord(this$static){
+  var address;
+  address = new RealModeAddress_0(this$static.m_state.m_cs, this$static.m_state.m_ip);
+  $setIP(this$static.m_state, this$static.m_state.m_ip + 2 << 16 >> 16);
+  return $readExecuteWord(this$static.m_memory, address);
+}
+
+$nextWord.displayName = 'il.co.codeguru.corewars8086.cpu.x86.OpcodeFetcher.$nextWord';
+function OpcodeFetcher(state, memory){
+  this.m_state = state;
+  this.m_memory = memory;
+}
+
+OpcodeFetcher.displayName = 'il.co.codeguru.corewars8086.cpu.x86.OpcodeFetcher.OpcodeFetcher';
+defineClass(225, 1, {}, OpcodeFetcher);
+var Lil_co_codeguru_corewars8086_cpu_x86_OpcodeFetcher_2_classLit = createForClass('il.co.codeguru.corewars8086.cpu.x86', 'OpcodeFetcher', 225);
 function $getReg16_0(this$static, index_0){
   switch (index_0) {
     case 0:
@@ -12403,7 +12403,7 @@ function $setEnergy_0(this$static, value_0){
 
 $setEnergy_0.displayName = 'il.co.codeguru.corewars8086.war.Warrior.$setEnergy';
 function Warrior(name_0, label_0, codeSize, core, loadAddress, initialStack, groupSharedMemory, myIndex){
-  var executeAccessRegions, highestCoreAddress, highestGroupSharedMemoryAddress, lowestCoreAddress, lowestStackAddress, readAccessRegions, writeAccessRegions;
+  var executeAccessRegions, highestCoreAddress, highestGroupSharedMemoryAddress, lowestCoreAddress, lowestStackAddress, m_memory, readAccessRegions, writeAccessRegions;
   this.m_label = label_0;
   this.m_name = name_0;
   this.m_codeSize = codeSize;
@@ -12437,8 +12437,8 @@ function Warrior(name_0, label_0, codeSize, core, loadAddress, initialStack, gro
   readAccessRegions = stampJavaTypeInfo(getClassLiteralForArray(Lil_co_codeguru_corewars8086_memory_RealModeMemoryRegion_2_classLit, 1), $intern_2, 43, 0, [this.m_stackWritableRegion, this.m_codeRegion, this.m_sharedWritableRegion]);
   writeAccessRegions = stampJavaTypeInfo(getClassLiteralForArray(Lil_co_codeguru_corewars8086_memory_RealModeMemoryRegion_2_classLit, 1), $intern_2, 43, 0, [this.m_stackWritableRegion, this.m_codeRegion, this.m_sharedWritableRegion]);
   executeAccessRegions = stampJavaTypeInfo(getClassLiteralForArray(Lil_co_codeguru_corewars8086_memory_RealModeMemoryRegion_2_classLit, 1), $intern_2, 43, 0, [this.m_codeRegion]);
-  this.m_memory = new RestrictedAccessRealModeMemory(core, readAccessRegions, writeAccessRegions, executeAccessRegions);
-  this.m_cpu = new Cpu(this.m_state, this.m_memory);
+  m_memory = new RestrictedAccessRealModeMemory(core, readAccessRegions, writeAccessRegions, executeAccessRegions);
+  this.m_cpu = new Cpu(this.m_state, m_memory);
   this.m_isAlive = true;
 }
 

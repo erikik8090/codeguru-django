@@ -1,4 +1,4 @@
-package il.co.codeguru.corewars8086.cpu;
+package il.co.codeguru.corewars8086.cpu.x86;
 
 import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.memory.MemoryException;

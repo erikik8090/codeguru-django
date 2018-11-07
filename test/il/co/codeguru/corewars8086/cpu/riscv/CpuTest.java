@@ -1,6 +1,6 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
-import il.co.codeguru.corewars8086.cpu.InvalidOpcodeException;
+import il.co.codeguru.corewars8086.cpu.exceptions.InvalidOpcodeException;
 import org.junit.*;
 import static org.junit.Assert.*;
 

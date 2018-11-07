@@ -1,6 +1,6 @@
 package il.co.codeguru.corewars8086.war;
 
-import il.co.codeguru.corewars8086.cpu.CpuException;
+import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.gui.IBreakpointCheck;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;

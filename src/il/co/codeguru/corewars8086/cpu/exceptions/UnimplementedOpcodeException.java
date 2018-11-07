@@ -1,4 +1,4 @@
-package il.co.codeguru.corewars8086.cpu;
+package il.co.codeguru.corewars8086.cpu.exceptions;
 
 /**
  * Thrown when attempting to execute an unimplemented opcode.

@@ -1,7 +1,7 @@
 package il.co.codeguru.corewars8086.war;
 
 import il.co.codeguru.corewars8086.cpu.x86.Cpu;
-import il.co.codeguru.corewars8086.cpu.CpuException;
+import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
@@ -89,7 +89,7 @@ public class Warrior
                 m_codeRegion
             };
 
-        m_memory = new RestrictedAccessRealModeMemory(core, readAccessRegions, writeAccessRegions, executeAccessRegions);
+        RestrictedAccessRealModeMemory m_memory = new RestrictedAccessRealModeMemory(core, readAccessRegions, writeAccessRegions, executeAccessRegions);
 
         m_cpu = new Cpu(m_state, m_memory);
 
@@ -171,7 +171,8 @@ public class Warrior
      * @param groupSharedMemory The warrior's group shared memory.
      */
     private void initializeCpuState(
-        RealModeAddress loadAddress, RealModeAddress initialStack,
+        RealModeAddress loadAddress,
+        RealModeAddress initialStack,
         RealModeAddress groupSharedMemory) {
 
         // initialize registers
@@ -214,8 +215,6 @@ public class Warrior
     private final RealModeAddress m_loadAddress;
     /** Current state of registers & flags */	
     private CpuState m_state;
-    /** Applies restricted access logic on top of the actual core memory */
-    private RestrictedAccessRealModeMemory m_memory;
     /** CPU instance */
     private Cpu m_cpu;
     /** Whether or not the warrior is still alive */

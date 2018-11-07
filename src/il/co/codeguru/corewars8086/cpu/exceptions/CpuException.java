@@ -1,4 +1,4 @@
-package il.co.codeguru.corewars8086.cpu;
+package il.co.codeguru.corewars8086.cpu.exceptions;
 
 /**
  * Base class for all Exceptions thrown by the Cpu class.

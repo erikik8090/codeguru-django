@@ -6,6 +6,11 @@ public class InstructionI extends InstructionBase {
         super(raw);
     }
 
+    public InstructionI(InstructionBase i)
+    {
+        super(i.raw);
+    }
+
     public InstructionI(int opcode, int rd, int funct3, int rs1, int imm)
     {
         super(

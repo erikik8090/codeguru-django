@@ -35,6 +35,11 @@ public class InstructionRunnerTest {
         i = new InstructionI(0,2,0,5,-1);
         InstructionRunner.addi(state, i);
         assertEquals(-1,state.getReg(2));
+
+        state.setReg(5,-1);
+        i = new InstructionI(0,2,0,5,-1);
+        InstructionRunner.addi(state, i);
+        assertEquals(-2, state.getReg(2));
     }
 
 

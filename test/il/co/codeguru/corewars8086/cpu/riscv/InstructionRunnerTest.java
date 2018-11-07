@@ -1,13 +1,12 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionI;
-import org.apache.bcel.generic.Instruction;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class InstructionRunnerTest {
-    CpuState state;
+    private CpuState state;
 
     @Before
     public void setUp()
@@ -37,4 +36,6 @@ public class InstructionRunnerTest {
         InstructionRunner.addi(state, i);
         assertEquals(-1,state.getReg(2));
     }
+
+
 }

@@ -6,3 +6,4 @@ gwt-2.8.2/
 target/
 jacoco.dev.exec
 jacoco.prod.exec
+.sonar/

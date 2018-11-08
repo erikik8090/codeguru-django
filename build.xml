@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<project xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:jacoco="antlib:org.jacoco.ant" name="codewars_riscv" default="build" basedir=".">
+<project xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:jacoco="antlib:org.jacoco.ant"
+         xmlns:sonar="antlib:org.sonar.ant"
+         name="codewars_riscv" default="build" basedir=".">
   <!-- Arguments to gwtc and devmode targets -->
   <property name="gwt.args" value="" />
 
@@ -10,6 +13,21 @@
   <property name="result.classes.dir" location="${result.dir}/classes"/>
   <property name="result.report.dir" location="${result.dir}/site/jacoco"/>
   <property name="result.exec.file" location="${result.dir}/jacoco.exec"/>
+
+  <property name="sonar.projectKey" value="il.co.codeguru:riscv-codeguru" />
+  <property name="sonar.projectName" value="RISC-V CodeGuru" />
+  <property name="sonar.projectVersion" value="0.1" />
+  <property name="sonar.host.url" value="http://kfaswtid02:9000"/>
+
+  <property name="sonar.sources" value="src" />
+  <property name="sonar.java.binaries" value="war/WEB-INF/classes" />
+  <property name="sonar.java.libraries" value="lib/*.jar"/>
+  <property name="sonar.tests" value="test" />
+
+  <property name="sonar.junit.reportsPath" value="reports/htmlunit.dev" />
+  <property name="sonar.dynamicAnalysis" value="reuseReports" />
+  <property name="sonar.java.coveragePlugin" value="jacoco" />
+  <property name="sonar.jacoco.reportPath" value="jacoco.dev.exec" />
 
   <path id="project.class.path">
     <pathelement location="war/WEB-INF/classes"/>
@@ -62,6 +80,9 @@
       </fileset>
     </copy>
     <delete dir="./jacoco-temp-folder"/>
+
+    <get src="https://binaries.sonarsource.com/Distribution/sonarqube-ant-task/sonarqube-ant-task-2.5.jar"
+         dest="${ant.dir}"/>
   </target>
 
   <target name="libs" description="Copy libs to WEB-INF/lib">
@@ -241,6 +262,14 @@
   <target name="report" description="Run coverage on development and production mode tests">
     <antcall target="report.dev"/>
     <antcall target="report.prod"/>
+  </target>
+
+  <target name="sonar">
+    <taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
+    </taskdef>
+
+    <!-- Execute SonarQube Scanner for Ant Analysis -->
+    <sonar:sonar />
   </target>
 
   <target name="build" depends="gwtc" description="Build this project" />

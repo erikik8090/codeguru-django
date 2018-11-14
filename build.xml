@@ -105,7 +105,7 @@
     <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="build.path"/>
     <mkdir dir="${junit.reports.dir}" />
     <jacoco:coverage destfile="${jacoco.exec.file}">
-      <junit fork="yes" printsummary="yes" haltonfailure="yes" maxmemory="256m">
+      <junit fork="yes" forkmode="perTest" printsummary="yes" haltonfailure="yes" maxmemory="256m" threads="4">
         <sysproperty key="gwt.args" value="-devMode -logLevel WARN -war www-test" />
         <sysproperty key="java.awt.headless" value="true" />
         <classpath>
@@ -117,8 +117,7 @@
             <include name="**/*.java" />
           </fileset>
         </batchtest>
-        <formatter type="plain" />
-        <formatter type="xml" />
+        <formatter type="plain"/>
       </junit>
     </jacoco:coverage>
   </target>

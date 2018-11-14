@@ -4,14 +4,12 @@ import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars8086.war.*;
 import com.google.gwt.animation.client.AnimationScheduler;
-import com.google.gwt.user.client.Window;
 
 import il.co.codeguru.corewars8086.gui.widgets.*;
 //import java.awt.*;
 //import java.awt.event.*;
 import java.io.IOException;
-
-import static il.co.codeguru.corewars8086.gui.CompetitionWindow.call_gwtStart;
+import java.util.Arrays;
 //import javax.swing.*;
 
 /**
@@ -174,9 +172,7 @@ public class CompetitionWindow extends JFrame
     {
         if (!m_playersPanel.checkPlayersReady())
             return false;
-        if (!gui_runWar(true, true))
-            return false;
-        return true;
+        return gui_runWar(true, true);
     }
 
     public void j_stopDebug()
@@ -189,9 +185,7 @@ public class CompetitionWindow extends JFrame
     {
         if (!m_playersPanel.checkPlayersReady())
             return false;
-        if (!gui_runWar(false, false))
-            return false;
-        return true;
+        return gui_runWar(false, false);
     }
     public void j_stopCompete()
     {
@@ -208,15 +202,12 @@ public class CompetitionWindow extends JFrame
         stepnum.innerHTML = (competition.compState == null) ? "[null]":Integer.toString(competition.compState.round);
     }
 
-    public AnimationScheduler.AnimationCallback animCallback = new AnimationScheduler.AnimationCallback() {
-        @Override
-        public void execute(double timestamp) {
-            try {
-                callContinueRun();
-			} catch (Exception e) {
-				Console.log("continueRun EXCEPTION " + e.toString());
-				e.printStackTrace();
-			}
+    private AnimationScheduler.AnimationCallback animCallback = timestamp -> {
+        try {
+            callContinueRun();
+        } catch (Exception e) {
+            Console.log("continueRun EXCEPTION " + e.toString());
+            e.printStackTrace();
         }
     };
 
@@ -251,18 +242,9 @@ public class CompetitionWindow extends JFrame
             competition.setSeed(seedValue);
             battlesPerGroup = 0; // in case parseInt fails
             battlesPerGroup = Integer.parseInt(battlesPerGroupField.getText().trim());
-          /*  final int warriorsPerGroup = Integer.parseInt(
-                warriorsPerGroupField.getText().trim());*/
         } catch (NumberFormatException e2) {
             JOptionPane.showMessageDialog(this, "Error in configuration");
         }
-        /*    if (competition.getWarriorRepository().getNumberOfGroups() < warriorsPerGroup) {
-                JOptionPane.showMessageDialog(this,
-                    "Not enough survivors (got " +
-                    competition.getWarriorRepository().getNumberOfGroups() +
-                    " but " + warriorsPerGroup + " are needed)");
-                return false;
-            }*/
 
         // having numItems and groupSize allows having 4 players and running competitions of just any 3 of them
         // this is hardly useful in reality so I just set it to the same size
@@ -273,7 +255,10 @@ public class CompetitionWindow extends JFrame
         }
 
         WarriorRepository repo = competition.getWarriorRepository();
-        if (!repo.readWarriorFilesFromUI( m_playersPanel.getFiles(), m_playersPanel.getZombies(), isInDebug))
+        PlayersPanel.Code[] playerFiles = Arrays.stream(m_playersPanel.getFiles())
+                .filter(code -> code.player.isEnabled)
+                .toArray(PlayersPanel.Code[]::new);
+        if (!repo.loadWarriors(playerFiles , m_playersPanel.getZombies(), isInDebug))
             return false;
         columnGraph.clear(repo.getGroupNames());
 
@@ -286,7 +271,7 @@ public class CompetitionWindow extends JFrame
         try {
             competition.runCompetition(battlesPerGroup, numOfGroups, m_isStartPaused, isBattleShown());
             callContinueRun(); // when runWar() returns we want the War object to be already constructured and ready
-            if (isBattleShown()) { // add breapointchecked only if we're in debugger
+            if (isBattleShown()) { // add breakpointchecked only if we're in debugger
                 War war = competition.getCurrentWar();
                 war.setBreakpointCheck(m_codeEditor);
                 Warrior inEditorWarrior = war.getWarriorByLabel(m_playersPanel.getCodeInEditor().getLabel());
@@ -307,14 +292,6 @@ public class CompetitionWindow extends JFrame
     public void scoreChanged(String name, float addedValue, int groupIndex, int subIndex) {
         columnGraph.addToValue(groupIndex, subIndex, addedValue);
     }
-
-    /*public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == runWarButton) {
-        	showBattleFrameIfNeeded();
-        	gui_runWar(null, null);
-        }
-    }*/
-
 
     public void setDebugMode(boolean v) {
         m_codeEditor.setDebugMode(v);
@@ -359,13 +336,6 @@ public class CompetitionWindow extends JFrame
         battleFrame.cpuframe.setVisible(true); // do this here since the messages need to scroll to the bottom and it needs to be visible
     }
 
-    private void showBattleFrameIfNeeded() {
-    	//if (showBattleCheckBox.isSelected() && battleFrame == null ) {
-    		//showBattleRoom();
-    		//showBattleCheckBox.setSelected(false);
-    	//}
-    }
-    
     private void showBattleRoom() {
         battleFrame = new WarFrame(competition, this);
 
@@ -402,7 +372,6 @@ public class CompetitionWindow extends JFrame
     public void onCompetitionStart() {
         warCounter = 0;
         totalWars = competition.getTotalNumberOfWars();
-		//this.runWarButton.setEnabled(false);
     }
 
     public static native void jsCompeteFinish() /*-{
@@ -412,9 +381,6 @@ public class CompetitionWindow extends JFrame
 
     public void onCompetitionEnd() {
         warCounterDisplay.setText("The competition is over. " + warCounter + " sessions were run.");
-        //warThread = null;
-		//this.runWarButton.setEnabled(true);
-        //runWarButton.setEnabled(true);
 		competitionRunning = false;
         jsCompeteFinish();
     }
@@ -424,7 +390,7 @@ public class CompetitionWindow extends JFrame
 	}
 
 	// when an edit in the registers has parse error
-	public void errorPreventsStep(boolean v, String reason) {
+	public void errorPreventsStep(boolean v) {
 
         battleFrame.btnPause.setEnabled(!v);
         battleFrame.btnSingleRound.setEnabled(!v);

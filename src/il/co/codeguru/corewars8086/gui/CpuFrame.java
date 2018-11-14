@@ -95,14 +95,14 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 				v = Integer.parseInt(value, 16);
 		}
 		catch(NumberFormatException e) {
-			m_mainwnd.errorPreventsStep(true, "Register value parse error");
+			m_mainwnd.errorPreventsStep(true);
 			return (m_base == 10) ? -2000000 : -1000000;
 		}
 		if (v < 0 || v > 0xffff) {
-			m_mainwnd.errorPreventsStep(true, "Register value out out range");
+			m_mainwnd.errorPreventsStep(true);
 			return -3000000;
 		}
-		m_mainwnd.errorPreventsStep(false, null);
+		m_mainwnd.errorPreventsStep(false);
 
 		short sv = (short)v;
 

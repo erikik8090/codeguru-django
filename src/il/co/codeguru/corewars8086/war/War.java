@@ -10,9 +10,9 @@ import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Unsigned;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-//import il.co.codeguru.corewars8086.jsadd.Random;
 
 
 /**
@@ -107,26 +107,6 @@ public class War {
         // set the memory listener (we only do this now, to skip initialization)
         m_core.setListener(memoryListener);
     }
-
-    /**
-     * Loads the given warrior groups to the Arena.
-     * @param warriorGroups The warrior groups to load.
-     * @throws Exception
-     */
-    public void loadWarriorGroups(WarriorGroup[] warriorGroups) throws Exception {
-        m_currentWarrior = 0;
-        ArrayList<WarriorGroup> groupsLeftToLoad = new ArrayList<WarriorGroup>();
-        for (int i = 0; i < warriorGroups.length; ++i)
-        	groupsLeftToLoad.add(warriorGroups[i]);
-
-        while (groupsLeftToLoad.size() > 0)
-        {
-        	int randomInt = rand.nextInt(groupsLeftToLoad.size());
-        	loadWarriorGroup(groupsLeftToLoad.get(randomInt));
-        	groupsLeftToLoad.remove(randomInt);
-        }
-        m_currentWarrior = -1;
-    }
 	
     /**
      * Runs a single round of the war (every living warrior does his turn).
@@ -155,7 +135,8 @@ public class War {
                     }
                 }
                 catch (CpuException e) {
-                    m_warListener.onWarriorDeath(warrior, "CPU exception");
+                    if(m_warListener != null)
+                        m_warListener.onWarriorDeath(warrior, "CPU exception");
                     warrior.kill();
                     warrior.getCpuState().setIP(savedIp); // don't advance IP, show where the exception occured
                     --m_numWarriorsAlive;
@@ -247,16 +228,31 @@ public class War {
             return Math.min(MAX_SPEED, 1 + (int)(Math.log(energy) / Math.log(2)));
         }
     }
-	
+
+    /**
+     * Loads the given warrior groups to the Arena.
+     * @param warriorGroups The warrior groups to load.
+     * @throws Exception
+     */
+    public void loadWarriorGroups(WarriorGroup[] warriorGroups) throws Exception {
+        m_currentWarrior = 0;
+        ArrayList<WarriorGroup> groupsLeftToLoad = new ArrayList<>(Arrays.asList(warriorGroups));
+
+        while (groupsLeftToLoad.size() > 0)
+        {
+            int randomInt = rand.nextInt(groupsLeftToLoad.size());
+            loadWarriorGroup(groupsLeftToLoad.get(randomInt));
+            groupsLeftToLoad.remove(randomInt);
+        }
+        m_currentWarrior = -1;
+    }
+
     private void loadWarriorGroup(WarriorGroup warriorGroup) throws Exception {
         List<WarriorData> warriors = warriorGroup.getWarriors();
 
         RealModeAddress groupSharedMemory = allocateCoreMemory(GROUP_SHARED_MEMORY_SIZE);
 
-        for (int i = 0; i < warriors.size(); ++i) {
-
-            WarriorData warrior = warriors.get(i);
-
+        for (WarriorData warrior : warriors) {
             String warriorName = warrior.getName();
             byte[] warriorData = warrior.getCode();
 
@@ -264,39 +260,41 @@ public class War {
             if (warrior.m_debugFixedLoadAddress < 0)
                 loadOffset = getLoadOffset(warriorData.length);
             else
-                loadOffset = (short)warrior.m_debugFixedLoadAddress;
+                loadOffset = (short) warrior.m_debugFixedLoadAddress;
 
             RealModeAddress loadAddress =
-                    new RealModeAddress(ARENA_SEGMENT, loadOffset); 
+                    new RealModeAddress(ARENA_SEGMENT, loadOffset);
             RealModeAddress stackMemory = allocateCoreMemory(STACK_SIZE);
             RealModeAddress initialStack =
-                new RealModeAddress(stackMemory.getSegment(), STACK_SIZE);
+                    new RealModeAddress(stackMemory.getSegment(), STACK_SIZE);
 
             Warrior w = new Warrior(
-                warriorName,
-                warrior.getLabel(),
-                warriorData.length,
-                m_core,
-                loadAddress,
-                initialStack,
-                groupSharedMemory,
-                GROUP_SHARED_MEMORY_SIZE,
-                m_numWarriors);
+                    warriorName,
+                    warrior.getLabel(),
+                    warriorData.length,
+                    m_core,
+                    loadAddress,
+                    initialStack,
+                    groupSharedMemory,
+                    GROUP_SHARED_MEMORY_SIZE,
+                    m_numWarriors);
             m_warriors[m_numWarriors++] = w;
 
             // load warrior to arena
-            m_core.listener.onWriteState(MemoryEventListener.EWriteState.ADD_WARRIORS);
+            if (m_core.getListener() != null)
+                m_core.getListener().onWriteState(MemoryEventListener.EWriteState.ADD_WARRIORS);
             for (int offset = 0; offset < warriorData.length; ++offset) {
-                RealModeAddress tmp = new RealModeAddress(ARENA_SEGMENT, (short)(loadOffset + offset));
-                m_core.writeByte(tmp, warriorData[offset]);			
+                RealModeAddress tmp = new RealModeAddress(ARENA_SEGMENT, (short) (loadOffset + offset));
+                m_core.writeByte(tmp, warriorData[offset]);
             }
-
-            m_core.listener.onWriteState(MemoryEventListener.EWriteState.RUN);
+            if (m_core.getListener() != null)
+                m_core.getListener().onWriteState(MemoryEventListener.EWriteState.RUN);
             ++m_numWarriorsAlive;
-			++m_currentWarrior;
+            ++m_currentWarrior;
 
             // notify listener
-            m_warListener.onWarriorBirth(w);
+            if (m_warListener != null)
+                m_warListener.onWarriorBirth(w);
         }
 
     }
@@ -343,19 +341,16 @@ public class War {
             ++numTries;
 
             loadAddress = rand.nextInt(ARENA_SIZE);
-            found = true;
 
-            if (loadAddress < MIN_GAP) {
-                found = false;
-            }
+            found = loadAddress >= MIN_GAP;
 
             if (loadAddress+warriorSize > ARENA_SIZE-MIN_GAP) {
                 found = false;
             }
 
             // check intersections with fixed (which might still be not loaded
-            if (WarriorRepository.m_loadAddrChecker != null) {
-                if (!WarriorRepository.m_loadAddrChecker.checkOverlap(loadAddress, warriorSize)) {
+            if (WarriorRepository.m_loadAddressChecker != null) {
+                if (!WarriorRepository.m_loadAddressChecker.checkOverlap(loadAddress, warriorSize)) {
                     found = false;
                     Console.log("overlap with fixed!");
                     continue;
@@ -423,7 +418,7 @@ public class War {
     	for (int i = 0; i < m_numWarriors; ++i) {
             Warrior warrior = m_warriors[i];
             if (warrior.isAlive()) {
-                if (names == "") {
+                if (names.equals("")) {
                     names = warrior.getName();
                 } else {
                     names = names + ", " + warrior.getName();
@@ -438,14 +433,11 @@ public class War {
      */
     public void updateScores(WarriorRepository repository) {
         float score = (float)1.0 / m_numWarriorsAlive;
-        //Console.log("updateScore " + Float.toString(score));
     	for (int i = 0; i < m_numWarriors; ++i) {
             Warrior warrior = m_warriors[i];
             if (warrior.isAlive()) {
                 repository.addScore(warrior.getName(), score);
-            } /*else {    			
-                scoreBoard.addScore(warrior.getName(), 0);
-            }*/
+            }
     	}
     }
     

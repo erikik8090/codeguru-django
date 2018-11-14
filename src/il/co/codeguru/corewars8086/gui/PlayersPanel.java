@@ -336,7 +336,6 @@ public class PlayersPanel
     {
         if (m_inEditor == null)
             return;
-        //Console.log("LINES " + m_inEditor.label + " " + ((lines == null)?"NULL":Integer.toString(lines.size())));
         m_inEditor.bin = binbuffer;
         m_inEditor.lastCompileOk = compileOk;
         m_inEditor.lines = lines;
@@ -350,8 +349,7 @@ public class PlayersPanel
         }
 
         int countEnabled = 0;
-        for(int i = 0; i < m_players.size(); ++i) {
-            PlayerInfo p = m_players.get(i);
+        for (PlayerInfo p : m_players) {
             if (!p.isEnabled)
                 continue;
             ++countEnabled;
@@ -362,7 +360,7 @@ public class PlayersPanel
                 p.code[1].lastCompileOk = p.code[0].lastCompileOk;
             }
 
-            for(int ci = 0; ci < p.activeCodes(); ++ci) {
+            for (int ci = 0; ci < p.activeCodes(); ++ci) {
                 Code c = p.code[ci];
                 if (!c.lastCompileOk) {
                     Console.error("Errors in code " + c.getName() + " of player " + p.getName());
@@ -383,7 +381,6 @@ public class PlayersPanel
     }
 
     public void setDebugMode(boolean v) {
-
         m_isDebugMode = v;
     }
 
@@ -393,7 +390,6 @@ public class PlayersPanel
             Console.error("loaded file is empty, ignoring");
             return;
         }
-        //Console.log("~~~" + buf.byteLength());
 
         Int8ArrayNative arr = Int8ArrayNative.create(buf);
         byte[] ba = new byte[len];

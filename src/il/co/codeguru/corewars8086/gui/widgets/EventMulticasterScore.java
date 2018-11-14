@@ -13,10 +13,14 @@ public class EventMulticasterScore extends EventMulticasterBase<ScoreEventListen
         proxy = new MulticasterHandler();
     }
 
-
+    public boolean isEnabled()
+    {
+        return isDoneAdding;
+    }
     private class MulticasterHandler implements ScoreEventListener  {
 		@Override
 		public void scoreChanged(String name, float addedValue, int groupIndex, int subIndex) {
+		    assert isDoneAdding: "Calling observable method without finishing to add";
         	for (Object mListener : mListenersArr) {
                 ((ScoreEventListener)mListener).scoreChanged(name, addedValue, groupIndex, subIndex);
 			}

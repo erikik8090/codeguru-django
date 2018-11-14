@@ -6,12 +6,12 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class InstructionRunnerTest {
-    private CpuState state;
+    private CpuStateRiscV state;
 
     @Before
     public void setUp()
     {
-        state = new CpuState();
+        state = new CpuStateRiscV();
     }
 
     @Test

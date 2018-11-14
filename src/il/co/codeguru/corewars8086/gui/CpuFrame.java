@@ -365,7 +365,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 			if (size == 1)
 				return memory.readByte(linaddr) & 0xff;
 			else
-				return memory.readWord(new RealModeAddress(linaddr)) & 0xffff;
+				return memory.read16Bit(new RealModeAddress(linaddr)) & 0xffff;
 		}
 
 	}

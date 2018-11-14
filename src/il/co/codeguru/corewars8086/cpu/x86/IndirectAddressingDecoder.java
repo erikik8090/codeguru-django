@@ -138,7 +138,7 @@ public class IndirectAddressingDecoder {
      */
     public short getMem16() throws MemoryException {
         if (m_memAddress != null) {
-            return m_memory.readWord(m_memAddress);
+            return m_memory.read16Bit(m_memAddress);
         }
         return m_regs.getReg16(m_memIndex);
     }
@@ -190,7 +190,7 @@ public class IndirectAddressingDecoder {
      */
     public void setMem16(short value) throws MemoryException {
         if (m_memAddress != null) {
-            m_memory.writeWord(m_memAddress, value);
+            m_memory.write16Bit(m_memAddress, value);
         } else {
             m_regs.setReg16(m_memIndex, value);
         }

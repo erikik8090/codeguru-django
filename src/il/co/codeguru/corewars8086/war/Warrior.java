@@ -1,5 +1,7 @@
 package il.co.codeguru.corewars8086.war;
 
+import il.co.codeguru.corewars8086.cpu.riscv.CpuRiscV;
+import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars8086.cpu.x86.Cpu;
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.x86.CpuState;
@@ -49,7 +51,7 @@ public class Warrior
         m_loadAddress = loadAddress;
         m_myIndex = myIndex;
 
-        m_state = new CpuState();
+        m_state = new CpuStateRiscV();
         initializeCpuState(loadAddress, initialStack, groupSharedMemory);
 
         // initialize read-access regions
@@ -67,31 +69,7 @@ public class Warrior
         m_sharedWritableRegion = new RealModeMemoryRegion(groupSharedMemory, highestGroupSharedMemoryAddress);
         m_codeRegion = new RealModeMemoryRegion(lowestCoreAddress, highestCoreAddress);
 
-
-        RealModeMemoryRegion[] readAccessRegions =
-            new RealModeMemoryRegion[] {
-                m_stackWritableRegion,
-                m_codeRegion,
-                m_sharedWritableRegion
-            };
-
-        // initialize write-access regions
-        RealModeMemoryRegion[] writeAccessRegions =
-            new RealModeMemoryRegion[] {
-                m_stackWritableRegion,
-                m_codeRegion,
-                m_sharedWritableRegion
-            };
-
-        // initialize execute-access regions
-        RealModeMemoryRegion[] executeAccessRegions =
-            new RealModeMemoryRegion[] {
-                m_codeRegion
-            };
-
-        RestrictedAccessRealModeMemory m_memory = new RestrictedAccessRealModeMemory(core, readAccessRegions, writeAccessRegions, executeAccessRegions);
-
-        m_cpu = new Cpu(m_state, m_memory);
+        m_cpu = new CpuRiscV(m_state, core);
 
         m_isAlive = true;		
     }
@@ -158,7 +136,7 @@ public class Warrior
     }
 
     /**
-     * Initializes the Cpu registers & flags:
+     * Initializes the CpuRiscV registers & flags:
      *  CS,DS                    - set to the core's segment.
      *  ES                       - set to the group's shared memory segment.
      *  AX,IP                    - set to the load address.
@@ -202,7 +180,7 @@ public class Warrior
         m_state.setBomb2Count((byte)1);
     }
     
-    public CpuState getCpuState(){
+    public CpuStateRiscV getCpuState(){
     	return m_state;
     }
 
@@ -214,9 +192,9 @@ public class Warrior
     /** Warrior's initial load address */	
     private final RealModeAddress m_loadAddress;
     /** Current state of registers & flags */	
-    private CpuState m_state;
+    private CpuStateRiscV m_state;
     /** CPU instance */
-    private Cpu m_cpu;
+    private CpuRiscV m_cpu;
     /** Whether or not the warrior is still alive */
     private boolean m_isAlive;
 

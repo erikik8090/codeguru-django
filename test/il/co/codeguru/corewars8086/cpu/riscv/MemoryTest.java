@@ -3,7 +3,7 @@ package il.co.codeguru.corewars8086.cpu.riscv;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.*;
 
 public class MemoryTest {
 

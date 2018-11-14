@@ -1,10 +1,12 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
-public class CpuState {
+import il.co.codeguru.corewars8086.cpu.x86.CpuState;
+
+public class CpuStateRiscV extends CpuState {
     private int[] registers;
     private int pc;
 
-    public CpuState()
+    public CpuStateRiscV()
     {
         registers = new int[32];
         pc = 0;

@@ -1,7 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.exceptions;
 
 /**
- * Base class for all Exceptions thrown by the Cpu class.
+ * Base class for all Exceptions thrown by the CpuRiscV class.
  * 
  * @author DL
  */

@@ -5,7 +5,7 @@ import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionBase
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionI;
 
 class InstructionDecoder {
-    public static void decode_and_run(CpuState state, InstructionBase i) throws InvalidOpcodeException
+    public void decode_and_run(CpuStateRiscV state, InstructionBase i) throws InvalidOpcodeException
     {
         switch(i.getOpcode())
         {
@@ -13,7 +13,8 @@ class InstructionDecoder {
                 InstructionRunner.addi(state, new InstructionI(i));
                 break;
             default:
-                throw new InvalidOpcodeException();
+                //TODO: Return this when all instructions are done
+                // throw new InvalidOpcodeException();
         }
     }
 }

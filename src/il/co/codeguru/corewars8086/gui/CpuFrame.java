@@ -2,6 +2,7 @@ package il.co.codeguru.corewars8086.gui;
 
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
+import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.jsadd.Format;
@@ -71,16 +72,13 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		}
 	}
 
-
-
-
 	public int regChanged_callback(String name, String value)
 	{
 		War currentWar = competition.getCurrentWar();
 		if (currentWar == null)
 			return 1;
 
-		CpuState state = currentWar.getWarriorByLabel(m_currentWarriorLabel).getCpuState();
+		CpuStateRiscV state = currentWar.getWarriorByLabel(m_currentWarriorLabel).getCpuState();
 
 		int v;
 
@@ -107,7 +105,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		short sv = (short)v;
 
 		switch(name) {
-			case "AX": state.setAX(sv); break;
+			case "AX": state.setReg(1, sv); break;
 			case "BX": state.setBX(sv); break;
 			case "CX": state.setCX(sv); break;
 			case "DX": state.setDX(sv); break;
@@ -117,7 +115,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 			case "BP": state.setBP(sv); break;
 			case "SP": state.setSP(sv); stackView.moveToLine(RealModeAddress.linearAddress(state.getSS(), sv)); break;
 
-			case "IP": state.setIP(sv); changedCSIP(); break;
+			case "IP": state.setPc(sv); changedCSIP(); break;
 			case "CS": state.setCS(sv); changedCSIP(); break;
 			case "DS": state.setDS(sv); break;
 			case "SS": state.setSS(sv); stackView.moveToLine(RealModeAddress.linearAddress(sv, state.getSP())); break;
@@ -277,9 +275,9 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		}
 
 		//CpuState state = currentWar.getWarrior(dropMenu.getSelectedIndex()).getCpuState();
-		CpuState state = currentWar.getWarrior(m_currentWarriorIndex).getCpuState();
+		CpuStateRiscV state = currentWar.getWarrior(m_currentWarriorIndex).getCpuState();
 
-		regAX.setValue( state.getAX());
+		regAX.setValue( (short)state.getReg(1));
 		regBX.setValue( state.getBX());
 		regCX.setValue( state.getCX());
 		regDX.setValue( state.getDX());
@@ -287,7 +285,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		regDI.setValue( state.getDI());
 		regBP.setValue( state.getBP());
 		regSP.setValue( state.getSP());
-		regIP.setValue( state.getIP());
+		regIP.setValue( (short)state.getPc());
 		regCS.setValue( state.getCS());
 		regDS.setValue( state.getDS());
 		regSS.setValue( state.getSS());
@@ -310,7 +308,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 
 	private static class StateAccess implements ExpressionParser.IStateAccess {
-		public CpuState state;
+		public CpuStateRiscV state;
 		public RealModeMemoryImpl memory;
 
 		@Override
@@ -319,7 +317,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		        throw new Exception("invalid state");
             }
 			switch (name) {
-				case "AX": return state.getAX();
+				case "AX": return (short)state.getReg(1);
 				case "AL": return state.getAL();
 				case "AH": return state.getAH();
 
@@ -339,7 +337,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 				case "DI": return state.getDI();
 				case "BP": return state.getBP();
 				case "SP": return state.getSP();
-				case "IP": return state.getIP();
+				case "IP": return (short)state.getPc();
 				case "CS": return state.getCS();
 				case "DS": return state.getDS();
 				case "SS": return state.getSS();
@@ -403,9 +401,9 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
         }
 	}
 
-	HashMap<Integer, WatchEntry> m_watches = new HashMap<>();
-	StateAccess m_stateAccess = new StateAccess();
-	ExpressionParser m_parser = new ExpressionParser();
+	private HashMap<Integer, WatchEntry> m_watches = new HashMap<>();
+	private StateAccess m_stateAccess = new StateAccess();
+	private ExpressionParser m_parser = new ExpressionParser();
 
 	void j_addWatch(int watchId) {
         WatchEntry entry = new WatchEntry();
@@ -419,7 +417,8 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
         m_watches.remove(watchId);
     }
 
-    boolean onlySpaces(String s) {
+    private boolean onlySpaces(String s) {
+		//return s.chars().anyMatch(c -> c != ' ');
 	    for(int i = 0; i < s.length(); ++i) {
 	        char c = s.charAt(i);
 	        if (c != ' ')

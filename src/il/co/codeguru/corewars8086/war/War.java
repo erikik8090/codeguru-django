@@ -120,7 +120,7 @@ public class War {
             Warrior warrior = m_warriors[i];
             m_currentWarrior = i;
             if (warrior.isAlive()) {
-                short savedIp = warrior.getCpuState().getIP();
+                short savedIp = (short) warrior.getCpuState().getPc();
                 try {
 
                     // run first opcode
@@ -138,13 +138,14 @@ public class War {
                     if(m_warListener != null)
                         m_warListener.onWarriorDeath(warrior, "CPU exception");
                     warrior.kill();
-                    warrior.getCpuState().setIP(savedIp); // don't advance IP, show where the exception occured
+                    warrior.getCpuState().setPc(savedIp); // don't advance IP, show where the exception occured
                     --m_numWarriorsAlive;
                 }
                 catch (MemoryException e) {
-                    m_warListener.onWarriorDeath(warrior, "memory exception: " + e.getMessage());
+                    if(m_warListener != null)
+                        m_warListener.onWarriorDeath(warrior, "memory exception: " + e.getMessage());
                     warrior.kill();
-                    warrior.getCpuState().setIP(savedIp);
+                    warrior.getCpuState().setPc(savedIp);
                     --m_numWarriorsAlive;
                 }
             }

@@ -5,6 +5,7 @@ import com.google.gwt.typedarrays.client.Int8ArrayNative;
 import com.google.gwt.typedarrays.client.Uint8ArrayNative;
 import elemental2.dom.*;
 import elemental2.dom.EventListener;
+import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
@@ -1340,9 +1341,9 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         page.isDirty = false;
     }
 
-    public boolean shouldBreak(CpuState state)
+    public boolean shouldBreak(CpuStateRiscV state)
     {
-        int absAddr = RealModeAddress.linearAddress(state.getCS(), state.getIP());
+        int absAddr = RealModeAddress.linearAddress(state.getCS(), (short)state.getPc());
         int arenaAddr = absAddr - CODE_ARENA_OFFSET;
         if (m_dbgBreakpoints[arenaAddr] == null)
             return false;
@@ -1425,9 +1426,9 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     private static int getWarrirorIp(Warrior w) {
         if (w == null)
             return -1;
-        CpuState state = w.getCpuState();
+        CpuStateRiscV state = w.getCpuState();
 
-        short ip = state.getIP();
+        short ip = (short) state.getPc();
         short cs = state.getCS();
 
         int ipInsideArena = RealModeAddress.linearAddress(cs, ip) - CODE_ARENA_OFFSET;

@@ -29,7 +29,7 @@ public class CpuRiscV {
 
     public void nextOpcode() throws InvalidOpcodeException, MemoryException
     {
-        int rawCode = memory.read16Bit(new RealModeAddress((short)0, (short)state.getPc()));
+        int rawCode = memory.read32Bit(new RealModeAddress((short)0, (short)state.getPc()));
         InstructionBase instruction = new InstructionBase(rawCode);
 
         decoder.decode_and_run(state, instruction);

@@ -15,8 +15,8 @@ public interface RealModeMemory {
      * 
      * @throws MemoryException  on any error. 
      */
-    public abstract byte readByte(RealModeAddress address) throws MemoryException;
-    public abstract byte readByte(int linearAddress) throws MemoryException;
+    byte readByte(RealModeAddress address) throws MemoryException;
+    byte readByte(int linearAddress) throws MemoryException;
 
     /**
      * Reads a single word from the specified address.
@@ -26,7 +26,8 @@ public interface RealModeMemory {
      * 
      * @throws MemoryException  on any error. 
      */
-    public abstract short readWord(RealModeAddress address) throws MemoryException;
+    short read16Bit(RealModeAddress address) throws MemoryException;
+    int read32Bit(RealModeAddress address) throws MemoryException;
 
     /**
      * Writes a single byte to the specified address.
@@ -36,7 +37,7 @@ public interface RealModeMemory {
      * 
      * @throws MemoryException  on any error. 
      */
-    public abstract void writeByte(RealModeAddress address, byte value)
+    void writeByte(RealModeAddress address, byte value)
         throws MemoryException;
 
     /**
@@ -46,9 +47,11 @@ public interface RealModeMemory {
      * @param value      Data to write.
      * 
      * @throws MemoryException  on any error. 
-     */	
-    public abstract void writeWord(RealModeAddress address, short value)
+     */
+    void write16Bit(RealModeAddress address, short value)
         throws MemoryException;
+
+    void write32Bit(RealModeAddress address, int value) throws MemoryException;
 
     /**
      * Reads a single byte from the specified address, in order to execute it.
@@ -58,9 +61,9 @@ public interface RealModeMemory {
      * 
      * @throws MemoryException  on any error. 
      */
-    public abstract byte readExecuteByte(RealModeAddress address)
+    byte readExecuteByte(RealModeAddress address)
         throws MemoryException;
-    public abstract byte readExecuteByte(int address)
+    byte readExecuteByte(int address)
             throws MemoryException;
 
     /**
@@ -71,6 +74,6 @@ public interface RealModeMemory {
      * 
      * @throws MemoryException  on any error. 
      */
-    public abstract short readExecuteWord(RealModeAddress address)
+    short readExecuteWord(RealModeAddress address)
         throws MemoryException;	
 }

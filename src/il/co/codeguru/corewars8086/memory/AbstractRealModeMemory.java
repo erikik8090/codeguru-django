@@ -29,15 +29,21 @@ public abstract class AbstractRealModeMemory implements RealModeMemory {
      * 
      * @throws MemoryException  on any error. 
      */
-    public short readWord(RealModeAddress address) throws MemoryException {
-        // read low word
+    public short read16Bit(RealModeAddress address) throws MemoryException {
         byte low = readByte(address);
-
-        // read high word
         RealModeAddress nextAddress = new RealModeAddress(address.getSegment(), (short)(address.getOffset() + 1));
         byte high = readByte(nextAddress);
 
         return (short)((Unsigned.unsignedByte(high) << 8) | Unsigned.unsignedByte(low));
+    }
+
+    public int read32Bit(RealModeAddress address) throws MemoryException
+    {
+        short low = read16Bit(address);
+        RealModeAddress nextAddress = new RealModeAddress(address.getSegment(), (short)(address.getOffset() + 2));
+        short high = read16Bit(nextAddress);
+
+        return (Unsigned.unsignedShort(high) << 16) | Unsigned.unsignedShort(low);
     }
 
     /**
@@ -58,7 +64,7 @@ public abstract class AbstractRealModeMemory implements RealModeMemory {
      * 
      * @throws MemoryException  on any error. 
      */	
-    public void writeWord(RealModeAddress address, short value) throws MemoryException
+    public void write16Bit(RealModeAddress address, short value) throws MemoryException
     {
         byte low = (byte)value;
         byte high = (byte)(value >> 8);
@@ -68,7 +74,20 @@ public abstract class AbstractRealModeMemory implements RealModeMemory {
 
         // write high byte
         RealModeAddress nextAddress = new RealModeAddress(address.getSegment(), (short)(address.getOffset() + 1));
-        writeByte(nextAddress, high);		
+        writeByte(nextAddress, high);
+    }
+
+    public void write32Bit(RealModeAddress address, int value) throws MemoryException
+    {
+        short low = (short)value;
+        short high = (short)(value >> 16);
+
+        // write low byte
+        write16Bit(address, low);
+
+        // write high byte
+        RealModeAddress nextAddress = new RealModeAddress(address.getSegment(), (short)(address.getOffset() + 2));
+        write16Bit(nextAddress, high);
     }
 
     /**

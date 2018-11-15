@@ -20,19 +20,15 @@ public class codewars_js implements EntryPoint {
    * This is the entry point method.
    */
   public void onModuleLoad() {
-    console("onModuleLoad");
+    Console.stream().println("onModuleLoad");
 
-    GWT.setUncaughtExceptionHandler(new GWT.UncaughtExceptionHandler() {
-        public void onUncaughtException(Throwable e) {
-          Console.log("Uncaught EXCEPTION " + e.toString());
-        }
-    });
+    GWT.setUncaughtExceptionHandler(e -> e.printStackTrace(Console.stream()));
 
     try {
         CoreWarsEngine.main(null);
     }
     catch(Throwable e) {
-        Console.log("onModuleLoad EXCEPTION " + e.toString());
+        e.printStackTrace(Console.stream());
     }
 
 

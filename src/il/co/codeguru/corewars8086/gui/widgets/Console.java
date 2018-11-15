@@ -1,57 +1,30 @@
 package il.co.codeguru.corewars8086.gui.widgets;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.function.Consumer;
 
 class ConsolePrintStream extends PrintStream {
-	
-    StringBuilder buf = new StringBuilder();
-    
-    public ConsolePrintStream()  {
-        super((OutputStream) null);
-    }
-    
-    public void print(String s) {
-        
-        while(true) {
-            int cut = s.indexOf('\n');
-            if(cut == -1) {
-                break;
-            }
-            println(s.substring(0, cut));
-            s = s.substring(cut + 1);
-        }
-        
-        buf.append(s);
-    }
-    
-     public native void consoleLog(String msg) /*-{
-         if (window.console) {
-             window.console.log(msg);
-         } else {
-             document.title = "LOG:" + msg;
-         }
-      }-*/;
 
-    public void print(char c) {
-        if (c == '\n') {
-            println("");
-        } else {
-            buf.append(c);
-        }
+    private Consumer<String> printFunction;
+
+    public ConsolePrintStream(Consumer<String> printFunction) {
+        super((OutputStream)null);
+        this.printFunction = printFunction;
     }
-     
-    public void println() {
-        println("");
-    }
-    
+
     @Override
-    public void println(String s) {
-        buf.append(s);
-        consoleLog(buf.toString());
-        buf.setLength(0);
+    public void println(String message)
+    {
+        printFunction.accept(message + "\n");
     }
+
+    @Override
+    public void print(String message)
+    {
+        printFunction.accept(message);
+    }
+
 
 }
 
@@ -72,7 +45,11 @@ public class Console  {
     }-*/;
 
     public static PrintStream stream() {
-        return new ConsolePrintStream();
+        return new ConsolePrintStream(Console::log);
+    }
+
+    public static PrintStream errorStream() {
+        return new ConsolePrintStream(Console::error);
     }
     
 }

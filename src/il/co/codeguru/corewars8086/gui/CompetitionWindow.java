@@ -23,23 +23,18 @@ public class CompetitionWindow extends JFrame
     private ColumnGraph columnGraph;
 
     // widgets
-    //private JButton runWarButton;
     private JLabel warCounterDisplay;
-    //private JCheckBox showBattleCheckBox;
     private boolean m_isBattleShown = false;
     private JTextField battlesPerGroupField;
-    //private JTextField warriorsPerGroupField;
     public WarFrame battleFrame;
 
     private int warCounter;
     private int totalWars;
-    //private Thread warThread;
 	private boolean competitionRunning;
 
     private static final String SEED_PREFIX = "SEED!@#=";
 	private JTextField seed;
 
-    //private JCheckBox startPausedCheckBox;
     private boolean m_isStartPaused = false;
 
     public CodeEditor m_codeEditor;
@@ -56,10 +51,12 @@ public class CompetitionWindow extends JFrame
         super("CodeGuru Extreme - Competition Viewer");
         getContentPane().setLayout(new BorderLayout());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         competition = new Competition();
         competition.addCompetitionEventListener(this);
         WarriorRepository warriorRepository = competition.getWarriorRepository();
         warriorRepository.addScoreEventListener(this);
+
         columnGraph = new ColumnGraph(warriorRepository.getGroupNames());
         getContentPane().add(columnGraph, BorderLayout.CENTER);
         // -------------
@@ -67,32 +64,9 @@ public class CompetitionWindow extends JFrame
         controlArea.setLayout(new BoxLayout(controlArea, BoxLayout.Y_AXIS));
         // -------------- Button Panel
         JPanel buttonPanel = new JPanel();
-        //runWarButton = new JButton("runWarButton", "<html><font color=red>Start!</font></html>");
-        //runWarButton.addActionListener(this); // triggers actionPerformed
-        //buttonPanel.add(runWarButton);
         warCounterDisplay = new JLabel("");
         buttonPanel.add(warCounterDisplay);
         buttonPanel.add(Box.createHorizontalStrut(30));
-        /*showBattleCheckBox = new JCheckBox("showBattleCheckBox", "Show session on start");
-		showBattleCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-                m_isBattleShown = showBattleCheckBox.isSelected();
-                Console.log("isBattleShown= " + (m_isBattleShown?"true":"false") );
-            }
-		});*/
-        //buttonPanel.add(showBattleCheckBox);
-        
-        /*startPausedCheckBox = new JCheckBox("startPausedCheckBox", "Start Paused");
-		startPausedCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-                m_isStartPaused = startPausedCheckBox.isSelected();
-				//if(startPausedCheckBox.isSelected())
-				//	showBattleCheckBox.setSelected(true);
-			}
-		});
-		buttonPanel.add(startPausedCheckBox);*/
         
         controlArea.add(buttonPanel);
         // -------------
@@ -101,17 +75,13 @@ public class CompetitionWindow extends JFrame
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new FlowLayout());
         controlPanel.add(new JLabel("Survivor groups per session:"));
-        
+
         // If total number of teams is less then four, make it the defauld number
 		int numberOfGropus = Math.min(4,
             competition.getWarriorRepository().getNumberOfGroups());
-		
-        //warriorsPerGroupField = new JTextField(String.format("%d", numberOfGropus), 3); SHY-CHANGED
-        //warriorsPerGroupField = new JTextField("warriorsPerGroupField", Integer.toString(numberOfGropus), 3);
-		//controlPanel.add(warriorsPerGroupField);
+
 		controlPanel.add(new JLabel("Sessions per groups combination:"));
 		battlesPerGroupField = new JTextField("battlesPerGroupField", "100", 4);
-		//controlPanel.add(battlesPerGroupField);
 		seed = new JTextField("seed", null, 4);
 		seed.setText("guru");
 		controlPanel.add(new JLabel("seed:"));
@@ -135,21 +105,6 @@ public class CompetitionWindow extends JFrame
         competition.memoryEventCaster.doneAdding();
 
         call_gwtStart();
-
-        /*addWindowListener(new WindowListener() {
-            public void windowOpened(WindowEvent e) {}
-            public void windowClosing(WindowEvent e) {
-                if (warThread!= null) {
-                    competition.setAbort();
-                }
-            }
-
-            public void windowClosed(WindowEvent e) {}
-            public void windowIconified(WindowEvent e) {}
-            public void windowDeiconified(WindowEvent e) {}
-            public void windowActivated(WindowEvent e) {}
-            public void windowDeactivated(WindowEvent e) {}
-        });*/
     }
 
     public static native void call_gwtStart() /*-{

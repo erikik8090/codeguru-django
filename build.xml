@@ -104,7 +104,7 @@
   <target name="test" depends="javac.tests" description="Run unit tests and record code coverage">
     <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="build.path"/>
     <mkdir dir="${junit.reports.dir}" />
-    <jacoco:coverage destfile="${jacoco.exec.file}">
+    <jacoco:coverage destfile="${jacoco.exec.file}" excludes="*Test*:org.apache.*:com.client.*">
       <junit fork="yes" forkmode="perTest" printsummary="yes" haltonfailure="yes" maxmemory="256m">
         <sysproperty key="gwt.args" value="-devMode -logLevel WARN -war www-test" />
         <sysproperty key="java.awt.headless" value="true" />
@@ -130,7 +130,11 @@
       </executiondata>
       <structure name="JaCoCo Development">
         <classfiles>
-          <fileset dir="${class.dir}"/>
+          <fileset dir="${class.dir}">
+            <exclude name="**/*Test*.class"/>
+            <exclude name="org/apache/**/*"/>
+            <exclude name="com/client/**/*"/>
+          </fileset>
         </classfiles>
         <sourcefiles encoding="UTF-8">
           <fileset dir="${src.dir}"/>

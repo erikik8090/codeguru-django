@@ -1,10 +1,10 @@
 package il.co.codeguru.corewars8086.gui;
 
-import il.co.codeguru.corewars8086.gui.widgets.Console;
+import il.co.codeguru.corewars8086.utils.Logger;
 
 import java.util.ArrayList;
 
-public class LoadAddressChecker {
+public class FixedLoadAddressChecker {
     static class AddressRange {
         String name;
         int start, end;
@@ -15,7 +15,7 @@ public class LoadAddressChecker {
         }
     }
     private ArrayList<AddressRange> fixedRanges;
-    public LoadAddressChecker(int capacity) {
+    public FixedLoadAddressChecker(int capacity) {
         fixedRanges = new ArrayList<>(capacity);
     }
     public int addCheck(String startAddressStr, int len, String name) {
@@ -24,21 +24,21 @@ public class LoadAddressChecker {
         try {
             startAddress = Integer.parseInt(startAddressStr, 16);
         } catch (NumberFormatException e2) {
-            Console.error("Player " + name + " fixed start address is not a valid hex number");
+            Logger.error("Player " + name + " fixed start address is not a valid hex number");
             return -2;
         }
         if (startAddress < 0 || startAddress > 0xffff) {
-            Console.error("Player " + name + " fixed start address is out of 16 bit number range");
+            Logger.error("Player " + name + " fixed start address is out of 16 bit number range");
             return -2;
         }
         if (startAddress > 0xffff - len + 1) {
-            Console.error("Player " + name + " fixed start address does not leave enough space for code (" + Integer.toString(len) + " bytes)");
+            Logger.error("Player " + name + " fixed start address does not leave enough space for code (" + Integer.toString(len) + " bytes)");
             return -2;
         }
         AddressRange r = new AddressRange(name, startAddress, startAddress + len - 1); // both ends of the range are inclusive
         for(AddressRange a: fixedRanges) {
             if (a.overlaps(r)) {
-                Console.error("Player " + name + " fixed start address overlaps with that of player " + a.name);
+                Logger.error("Player " + name + " fixed start address overlaps with that of player " + a.name);
                 return -2;
             }
         }

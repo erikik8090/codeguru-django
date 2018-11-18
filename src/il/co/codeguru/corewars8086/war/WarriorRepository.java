@@ -1,8 +1,9 @@
 package il.co.codeguru.corewars8086.war;
 
+import java.text.MessageFormat;
 import java.util.*;
 
-import il.co.codeguru.corewars8086.gui.LoadAddressChecker;
+import il.co.codeguru.corewars8086.gui.FixedLoadAddressChecker;
 import il.co.codeguru.corewars8086.gui.PlayersPanel;
 import il.co.codeguru.corewars8086.gui.widgets.*;
 import il.co.codeguru.corewars8086.utils.Logger;
@@ -67,7 +68,8 @@ public class WarriorRepository {
     }
 
     // it's an ugly singleton but that's the only reasonable way War and WarriorRepository can communicate about fixed addresses
-    static LoadAddressChecker m_loadAddressChecker;
+    //TODO: Make this class not singleton
+    static FixedLoadAddressChecker m_Fixed_loadAddressChecker;
 
 
     public boolean loadWarriors(PlayersPanel.Code[] files, PlayersPanel.Code[] zombies, boolean isInDebug)
@@ -76,61 +78,21 @@ public class WarriorRepository {
         warriorGroups.clear();
 
         Logger.log("Found " + Integer.toString(files.length) + " survivors, " + Integer.toString(zombies.length) + " zombies");
-        m_loadAddressChecker = null; // reset it before potentially being used again
+        m_Fixed_loadAddressChecker = null; // reset it before potentially being used again
 
         Arrays.sort(files, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
 
-        WarriorGroup currentGroup = null;
+        WarriorLoader loader = new WarriorLoader();
+
         for(PlayersPanel.Code c: files)
         {
-            String name = c.getName();
-            if (name.isEmpty()) {
-                Logger.error("All players must have a name for starting a competition");
-                return false;
-            }
-            byte[] bin = c.getBin();
-            if (bin == null || bin.length == 0) {
-                Logger.error("Player " + name + " does not have any code, can't start competition");
-                return false;
-            }
+            if (!validateWarrior(c, "player")) return false;
 
-            int startAddr = -1;
-            if (!c.startAddrRandom && isInDebug) {
-                if (m_loadAddressChecker == null) {
-                    // having it in the competition window is an ugly hack but is the only way for it to get to the random
-                    // loading where it will be needed later
-                    m_loadAddressChecker = new LoadAddressChecker(files.length + zombies.length);
-                }
-                startAddr = m_loadAddressChecker.addCheck(c.startAddress, c.getBin().length, name);
-                if (startAddr == -2)
-                    return false;
-            }
+            int startAddress = getStartAddress(files, zombies, isInDebug, c);
+            if (startAddress == -2)
+                return false;
 
-            WarriorData data = new WarriorData(name, truncToSize(bin), c.getLabel(), startAddr);
-            if (c.player.wtype != PlayersPanel.EWarriorType.SINGLE)
-            {
-                if (c.getLabel().endsWith("0")) {
-                    // start a new group!
-                    currentGroup = new WarriorGroup(name.substring(0, name.length()-1));
-                    currentGroup.addWarrior(data);
-                    warriorNameToGroup.put(name, warriorGroups.size());
-                }
-                else if (c.getLabel().endsWith("1")) {
-                    currentGroup.addWarrior(data);
-                    warriorNameToGroup.put(name, warriorGroups.size());
-                    warriorGroups.add(currentGroup);
-                    currentGroup = null;
-                }
-                else {
-                    Logger.error("Unexpected suffix for warrior name. expected 1 or 2: " + name);
-                }
-            } else {
-                currentGroup = new WarriorGroup(name);
-                currentGroup.addWarrior(data);
-                warriorNameToGroup.put(name, warriorGroups.size());
-                warriorGroups.add(currentGroup);
-                currentGroup = null;
-            }
+            loader.loadWarrior(c, startAddress);
         }
 
         if (warriorGroups.isEmpty()) {
@@ -138,39 +100,56 @@ public class WarriorRepository {
             return false;
         }
 
-        if (!readZombiesFromUI(zombies, m_loadAddressChecker))
+        if (!readZombiesFromUI(zombies, m_Fixed_loadAddressChecker))
             return false;
 
         return true;
     }
 
+    private int getStartAddress(PlayersPanel.Code[] files, PlayersPanel.Code[] zombies, boolean isInDebug, PlayersPanel.Code c) {
+        int startAddr = -1;
+        if (!c.startAddrRandom && isInDebug) {
+            if (m_Fixed_loadAddressChecker == null) {
+                // having it in the competition window is an ugly hack but is the only way for it to get to the random
+                // loading where it will be needed later
+                m_Fixed_loadAddressChecker = new FixedLoadAddressChecker(files.length + zombies.length);
+            }
+            startAddr = m_Fixed_loadAddressChecker.addCheck(c.startAddress, c.getBin().length, c.getName());
 
-	private boolean readZombiesFromUI(PlayersPanel.Code[] zombieFiles, LoadAddressChecker loadAddressChecker) {
+        }
+        return startAddr;
+    }
+
+    private boolean validateWarrior(PlayersPanel.Code c, String type) {
+        if (c.getName().isEmpty()) {
+            Logger.error("All " + type + "s must have a name for starting a competition");
+            return false;
+        }
+        if (c.getBin() == null || c.getBin().length == 0) {
+            Logger.error("" + type + " " + c.getName() + "does not have any code, can't start competition");
+            return false;
+        }
+        return true;
+    }
+
+
+    private boolean readZombiesFromUI(PlayersPanel.Code[] zombieFiles, FixedLoadAddressChecker fixedLoadAddressChecker) {
         zombieGroup = null;
         if (zombieFiles == null || zombieFiles.length == 0)
             return true;
 
         zombieGroup = new WarriorGroup("ZoMbIeS");
         for (PlayersPanel.Code c : zombieFiles) {
-            String name = c.getName();
-            if (name == null) {
-                Logger.error("All zombies must have a name for starting a competition");
-                return false;
-            }
-            byte[] bin = c.getBin();
-            if (bin == null) {
-                Logger.error("Zombie " + name + " does not have any code, can't start competition");
-                return false;
-            }
+            if (!validateWarrior(c, "zombie")) return false;
 
             int startAddress = -1;
             if (!c.startAddrRandom) {
-                startAddress = loadAddressChecker.addCheck(c.startAddress, c.bin.length, name);
+                startAddress = fixedLoadAddressChecker.addCheck(c.startAddress, c.bin.length, c.getName());
                 if (startAddress == -2)
                     return false;
             }
 
-            WarriorData data = new WarriorData(name, truncToSize(bin), c.getLabel(), startAddress);
+            WarriorData data = new WarriorData(c.getName(), truncToSize(c.getBin()), c.getLabel(), startAddress);
             zombieGroup.addWarrior(data);
         }
         return true;
@@ -198,5 +177,41 @@ public class WarriorRepository {
         WarriorGroup[] groups = new WarriorGroup[groupsList.size()];
         groupsList.toArray(groups);
         return groups;
+    }
+
+    private class WarriorLoader {
+        private WarriorGroup currentGroup;
+
+        WarriorLoader() {
+            this.currentGroup = null;
+        }
+
+        void loadWarrior(PlayersPanel.Code c, int startAddr) {
+            WarriorData data = new WarriorData(c.getName(), truncToSize(c.getBin()), c.getLabel(), startAddr);
+            if (c.player.wtype != PlayersPanel.EWarriorType.SINGLE)
+            {
+                if (data.getLabel().endsWith("0")) {
+                    // start a new group!
+                    currentGroup = new WarriorGroup(data.getName().substring(0, data.getName().length()-1));
+                    currentGroup.addWarrior(data);
+                    warriorNameToGroup.put(data.getName(), warriorGroups.size());
+                }
+                else if (data.getLabel().endsWith("1")) {
+                    currentGroup.addWarrior(data);
+                    warriorNameToGroup.put(data.getName(), warriorGroups.size());
+                    warriorGroups.add(currentGroup);
+                    currentGroup = null;
+                }
+                else {
+                    Logger.error("Unexpected suffix for warrior name. expected 1 or 2: " + data.getName());
+                }
+            } else {
+                currentGroup = new WarriorGroup(data.getName());
+                currentGroup.addWarrior(data);
+                warriorNameToGroup.put(data.getName(), warriorGroups.size());
+                warriorGroups.add(currentGroup);
+                currentGroup = null;
+            }
+        }
     }
 }

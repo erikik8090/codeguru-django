@@ -350,8 +350,8 @@ public class War {
             }
 
             // check intersections with fixed (which might still be not loaded
-            if (WarriorRepository.m_loadAddressChecker != null) {
-                if (!WarriorRepository.m_loadAddressChecker.checkOverlap(loadAddress, warriorSize)) {
+            if (WarriorRepository.m_Fixed_loadAddressChecker != null) {
+                if (!WarriorRepository.m_Fixed_loadAddressChecker.checkOverlap(loadAddress, warriorSize)) {
                     found = false;
                     Logger.log("overlap with fixed!");
                     continue;

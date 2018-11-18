@@ -1,5 +1,6 @@
 package il.co.codeguru.corewars8086.war;
 
+import il.co.codeguru.corewars8086.utils.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -13,6 +14,7 @@ public class WarTest {
     @Before
     public void setUp()
     {
+        Logger.setTestingMode();
         war = new War(null, null, true);
         //TODO: Add tests that test that the listeners are called correctly
         warriorGroups = new WarriorGroup[1];

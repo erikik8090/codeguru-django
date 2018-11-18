@@ -28,7 +28,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 	private int m_base = 16;
 	
 
-	private RegisterField regAX,regBX,regCX,regDX,
+	private RegisterField reg1,reg2,reg3,reg4,
 						regSI,regDI,regBP,regSP,
 						 regIP,regCS,regDS,regSS,
 						 regES,regE, regF;
@@ -93,10 +93,10 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		short sv = (short)v;
 
 		switch(name) {
-			case "AX": state.setReg(1, sv); break;
-			case "BX": state.setBX(sv); break;
-			case "CX": state.setCX(sv); break;
-			case "DX": state.setDX(sv); break;
+			case "1": state.setReg(1, sv); break;
+			case "2": state.setBX(sv); break;
+			case "3": state.setCX(sv); break;
+			case "4": state.setDX(sv); break;
 
 			case "SI": state.setSI(sv); break;
 			case "DI": state.setDI(sv); break;
@@ -182,10 +182,10 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
         cpuPanel = (HTMLElement) DomGlobal.document.getElementById("cpuPanel");
 
 		
-		regAX = new RegisterField("AX", this);
-		regBX = new RegisterField("BX", this);
-		regCX = new RegisterField("CX", this);
-		regDX = new RegisterField("DX", this);
+		reg1 = new RegisterField("1", this);
+		reg2 = new RegisterField("2", this);
+		reg3 = new RegisterField("3", this);
+		reg4 = new RegisterField("4", this);
 
 		regSI = new RegisterField("SI", this);
 		regDI = new RegisterField("DI", this);
@@ -229,10 +229,10 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 	public void j_setRegistersBase(int base) {
 		m_base = base;
-		regAX.setBase(base);
-		regBX.setBase(base);
-		regCX.setBase(base);
-		regDX.setBase(base);
+		reg1.setBase(base);
+		reg2.setBase(base);
+		reg3.setBase(base);
+		reg4.setBase(base);
 		regSI.setBase(base);
 		regDI.setBase(base);
 		regBP.setBase(base);
@@ -265,15 +265,15 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		//CpuState state = currentWar.getWarrior(dropMenu.getSelectedIndex()).getCpuState();
 		CpuStateRiscV state = currentWar.getWarrior(m_currentWarriorIndex).getCpuState();
 
-		regAX.setValue( (short)state.getReg(1));
-		regBX.setValue( state.getBX());
-		regCX.setValue( state.getCX());
-		regDX.setValue( state.getDX());
+		reg1.setValue( (short)state.getReg(1));
+		reg2.setValue( (short)state.getReg(2));
+		reg3.setValue( (short)state.getReg(3));
+		reg4.setValue( (short)state.getReg(4));
 		regSI.setValue( state.getSI());
 		regDI.setValue( state.getDI());
 		regBP.setValue( state.getBP());
 		regSP.setValue( state.getSP());
-		regIP.setValue( (short)state.getPc());
+		regIP.setValue( (short) state.getPc());
 		regCS.setValue( state.getCS());
 		regDS.setValue( state.getDS());
 		regSS.setValue( state.getSS());
@@ -292,9 +292,6 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 	}
 
-
-
-
 	private static class StateAccess implements ExpressionParser.IStateAccess {
 		public CpuStateRiscV state;
 		public RealModeMemoryImpl memory;
@@ -305,19 +302,19 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		        throw new Exception("invalid state");
             }
 			switch (name) {
-				case "AX": return (short)state.getReg(1);
+				case "1": return (short)state.getReg(1);
 				case "AL": return state.getAL();
 				case "AH": return state.getAH();
 
-				case "BX": return state.getBX();
+				case "2": return(short)state.getReg(2);
 				case "BL": return state.getBL();
 				case "BH": return state.getBH();
 
-				case "CX": return state.getCX();
+				case "3": return (short)state.getReg(3);
 				case "CL": return state.getCL();
 				case "CH": return state.getCH();
 
-				case "DX": return state.getDX();
+				case "4": return (short)state.getReg(4);
 				case "DL": return state.getDL();
 				case "DH": return state.getDH();
 

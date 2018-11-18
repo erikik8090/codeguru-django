@@ -10,6 +10,7 @@ import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryRegion;
 import il.co.codeguru.corewars8086.memory.RestrictedAccessRealModeMemory;
+import il.co.codeguru.corewars8086.utils.Logger;
 
 
 /**
@@ -155,9 +156,9 @@ public class Warrior
 
         // initialize registers
         m_state.setReg(1, loadAddress.getOffset());
-        m_state.setBX((short)0);
-        m_state.setCX((short)0);
-        m_state.setDX((short)0);
+        m_state.setReg(2,0);
+        m_state.setReg(3,(short)0);
+        m_state.setReg(4,(short)0);
 
         m_state.setDS(loadAddress.getSegment());
         m_state.setES(groupSharedMemory.getSegment());
@@ -169,7 +170,7 @@ public class Warrior
         m_state.setSP(initialStack.getOffset());
 
         m_state.setCS(loadAddress.getSegment());
-        m_state.setPc(loadAddress.getOffset());
+        m_state.setPc(loadAddress.getOffset() & 0xFFFF);
         m_state.setFlags((short)0);
 
         // initialize Energy

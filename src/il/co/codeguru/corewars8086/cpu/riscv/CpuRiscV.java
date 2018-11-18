@@ -5,6 +5,9 @@ import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionBase
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
+import il.co.codeguru.corewars8086.utils.Logger;
+
+import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 public class CpuRiscV {
 
@@ -29,7 +32,7 @@ public class CpuRiscV {
 
     public void nextOpcode() throws InvalidOpcodeException, MemoryException
     {
-        int rawCode = memory.read32Bit(new RealModeAddress((short)0, (short)state.getPc()));
+        int rawCode = memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)state.getPc()));
         InstructionBase instruction = new InstructionBase(rawCode);
 
         decoder.decode_and_run(state, instruction);

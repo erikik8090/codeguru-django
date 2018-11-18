@@ -2,11 +2,11 @@ package il.co.codeguru.corewars8086.war;
 
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.gui.IBreakpointCheck;
-import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
+import il.co.codeguru.corewars8086.utils.Logger;
 import il.co.codeguru.corewars8086.utils.Unsigned;
 
 import java.util.ArrayList;
@@ -353,7 +353,7 @@ public class War {
             if (WarriorRepository.m_loadAddressChecker != null) {
                 if (!WarriorRepository.m_loadAddressChecker.checkOverlap(loadAddress, warriorSize)) {
                     found = false;
-                    Console.log("overlap with fixed!");
+                    Logger.log("overlap with fixed!");
                     continue;
                 }
             }
@@ -369,7 +369,7 @@ public class War {
 
                 if ((loadAddress+warriorSize >= otherStart) && (loadAddress < otherEnd)) {
                     found = false;
-                    Console.log("overlap with loaded!");
+                    Logger.log("overlap with loaded!");
                     break;
                 }
             }

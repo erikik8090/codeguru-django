@@ -4,6 +4,7 @@ import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
+import il.co.codeguru.corewars8086.utils.Logger;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -15,6 +16,7 @@ public class CpuRiscVTest {
     @Before
     public void setUp()
     {
+        Logger.setTestingMode();
         state = new CpuStateRiscV();
         memory = new RealModeMemoryImpl();
         cpuRiscV = new CpuRiscV(state, memory);

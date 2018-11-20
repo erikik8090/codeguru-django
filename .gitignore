@@ -7,3 +7,4 @@ target/
 jacoco.dev.exec
 jacoco.prod.exec
 .sonar/
+war/codewars_js

@@ -10,9 +10,13 @@ import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.utils.Disassembler;
+import il.co.codeguru.corewars8086.utils.Logger;
 import il.co.codeguru.corewars8086.war.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import static elemental2.dom.DomGlobal.document;
 
 public class CodeEditor implements CompetitionEventListener, MemoryEventListener, IBreakpointCheck
 {
@@ -122,7 +126,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     final int PAGE_SIZE = _PAGE_SIZE();
 
     private static native int _PAGE_SIZE() /*-{
-        return $wnd.PAGE_SIZE
+        return (typeof $wnd.PAGE_SIZE === "undefined" ? 512 : $wnd.PAGE_SIZE)
     }-*/;
 
     public CodeEditor(Competition competition)
@@ -131,13 +135,13 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         m_competition.addCompetitionEventListener(this);
         m_competition.addMemoryEventLister(this);
 
-        asm_edit = (HTMLTextAreaElement)DomGlobal.document.getElementById("asm_edit");
-        asm_show = (HTMLElement)DomGlobal.document.getElementById("asm_show");
-        asm_output = (HTMLElement)DomGlobal.document.getElementById("asm_output");
-        editor_bottom = (HTMLElement)DomGlobal.document.getElementById("editor_bottom");
-        opcodes_edit = (HTMLElement)DomGlobal.document.getElementById("opcodes_edit");
-        asm_linenums = (HTMLElement)DomGlobal.document.getElementById("asm_linenums");
-        editor_title = (HTMLInputElement)DomGlobal.document.getElementById("editor_title");
+        asm_edit = (HTMLTextAreaElement) document.getElementById("asm_edit");
+        asm_show = (HTMLElement) document.getElementById("asm_show");
+        asm_output = (HTMLElement) document.getElementById("asm_output");
+        editor_bottom = (HTMLElement) document.getElementById("editor_bottom");
+        opcodes_edit = (HTMLElement) document.getElementById("opcodes_edit");
+        asm_linenums = (HTMLElement) document.getElementById("asm_linenums");
+        editor_title = (HTMLInputElement) document.getElementById("editor_title");
 
         asm_edit.addEventListener("input", (event) -> assemblyEditorChanged());
         editor_title.addEventListener("input", (event) -> m_playersPanel.updateTitle(editor_title.value));
@@ -304,7 +308,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     private DocumentFragment makeLineNumberFragment(String intext)
     {
-        DocumentFragment lndf = DomGlobal.document.createDocumentFragment();
+        DocumentFragment lndf = document.createDocumentFragment();
         // make a new one each time since the old one is kept around for breakpoints line reference
         m_lineOffsets = new ArrayList<>();
 
@@ -314,10 +318,10 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             // need line number after with each new line and at the end
             if (i == intext.length() || intext.charAt(i) == '\n')
             {
-                Element e = DomGlobal.document.createElement("div");
+                Element e = document.createElement("div");
                 e.addEventListener("click", m_editBrClickHandler);
                 e.setAttribute("id", "ln" + Integer.toString(lineCount));
-                e.appendChild(DomGlobal.document.createTextNode(Integer.toString(lineCount)));
+                e.appendChild(document.createTextNode(Integer.toString(lineCount)));
                 lndf.appendChild(e);
 
                 ++lineCount;
@@ -444,39 +448,29 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     }
 
 
+    /**
+     * Converts the code editor text into html tags
+     * @param intext The code editor text
+     * @return A DocumentFragment containing all of the html tags
+     */
     private DocumentFragment htmlizeText(String intext)
     {
-        DocumentFragment df = DomGlobal.document.createDocumentFragment();
-        int lastFound = -1;
-        int found = intext.indexOf('\n');
+        DocumentFragment df = document.createDocumentFragment();
         int lineNum = 1;
-        while (found != -1) {
-            if (found != lastFound + 1) { // not an empty line
-                Element e = DomGlobal.document.createElement("span");
+        String[] lines = intext.split("\\n");
+        Arrays.stream(lines).forEach(Logger::log);
+
+        for(String line : lines)
+        {
+            if(!line.equals(""))
+            {
+                Element e = document.createElement("span");
                 e.setAttribute("id", "mline_" + Integer.toString(lineNum));
-                String ss = intext.substring(lastFound + 1, found + 1);  // +1 to include the NL that is there
-                Text t = DomGlobal.document.createTextNode(ss);
+                Text t = document.createTextNode(line + "\n");
                 e.appendChild(t);
                 df.appendChild(e);
             }
-            else {
-                Text t = DomGlobal.document.createTextNode("\n");
-                df.appendChild(t);
-            }
-            lastFound = found;
-            found = intext.indexOf('\n', found+1);
-            ++lineNum;
-        }
-
-        // take care of the last line that might not end with NL
-        if (lastFound != intext.length() - 1)  // if it does end with NL, don't bother with the last empty line
-        {
-            Element e = DomGlobal.document.createElement("span");
-            e.setAttribute("id", "mline_" + Integer.toString(lineNum));
-            String ss = intext.substring(lastFound + 1);
-            Text t = DomGlobal.document.createTextNode(ss);
-            e.appendChild(t);
-            df.appendChild(e);
+            lineNum++;
         }
         return df;
     }
@@ -669,20 +663,20 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                         asm_show.innerHTML = "";
                         asm_show.appendChild(asmElem); // this is somewhat replicated code from above that there's no easy way to avoid it
                     }
-                    Element e = DomGlobal.document.getElementById("mline_" + Integer.toString(lineNum+1));
+                    Element e = document.getElementById("mline_" + Integer.toString(lineNum+1));
                     if (e == null) {
                         Console.error("did not find line?");
                         return;
                     }
                     e.classList.add("edit_warning");
 
-                    Element omsgdiv = DomGlobal.document.createElement("div");
+                    Element omsgdiv = document.createElement("div");
                     omsgdiv.classList.add("stdout_line_w");
 
                     if (lineNum < m_lineOffsets.size()) {
                         omsgdiv.setAttribute("ondblclick","asm_cursorToLine(" + Integer.toString(m_lineOffsets.get(lineNum)) + ")");
                     }
-                    Text omsgtxt = DomGlobal.document.createTextNode(msg);
+                    Text omsgtxt = document.createTextNode(msg);
                     omsgdiv.appendChild(omsgtxt);
 
                     asm_output.appendChild(omsgdiv);
@@ -759,7 +753,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     }
 
     public void setLineNumBreakpoint(int lineNum, boolean v) {
-        Element e = DomGlobal.document.getElementById("ln" + Integer.toString(lineNum));
+        Element e = document.getElementById("ln" + Integer.toString(lineNum));
         if (v)
             e.classList.add("edit_breakpoint");
         else

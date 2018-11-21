@@ -14,15 +14,12 @@
         <dependency org="javax.validation" name="validation-api" rev="1.0.0.GA" conf="compile->default"/>
         <dependency org="com.google.gwt" name="gwt-codeserver" rev="2.8.2" conf="compile->default"/>
 
-
         <dependency org="com.google.elemental2" name="elemental2-dom" rev="1.0.0-RC1" conf="compile->default"/>
         <dependency org="com.google.elemental2" name="elemental2-core" rev="1.0.0-RC1" conf="compile->default"/>
         <dependency org="com.google.elemental2" name="elemental2-promise" rev="1.0.0-RC1" conf="compile->default"/>
         <dependency org="com.google.jsinterop" name="base" rev="1.0.0-RC1" conf="compile->default"/>
         <dependency org="com.google.jsinterop" name="jsinterop-annotations" rev="1.0.0 " conf="compile->default"/>
         <dependency org="org.realityforge.com.google.jsinterop" name="jsinterop-annotations" rev="1.0.2-p1" conf="compile->default"/>
-
-
 
         <dependency org="junit" name="junit" rev="4.12" conf="test->default"/>
         <dependency org="org.hamcrest" name="hamcrest-core" rev="1.3" conf="test->default"/>

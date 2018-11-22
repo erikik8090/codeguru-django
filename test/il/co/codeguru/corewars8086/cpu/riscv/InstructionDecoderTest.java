@@ -13,9 +13,10 @@ public class InstructionDecoderTest {
     private InstructionDecoder decoder;
 
     @Before
+    //TODO: Replace this with a proper interface
     public void setUp()
     {
-        decoder = new InstructionDecoder();
+        decoder = new InstructionDecoder(new InstructionRunner());
     }
 
     @Test

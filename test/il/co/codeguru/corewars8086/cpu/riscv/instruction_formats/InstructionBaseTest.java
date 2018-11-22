@@ -46,4 +46,31 @@ public class InstructionBaseTest {
         a = new InstructionI(-1,-1,-1,-1,-1);
         assertEquals(0xFFFFFFFF, a.getRaw());
     }
+
+    @Test
+    public void testInstructionUJ()
+    {
+        InstructionUJ a = new InstructionUJ(0);
+        assertEquals(0,a.getRd());
+        assertEquals(0,a.getImmediate());
+
+        a = new InstructionUJ(0x123456);
+        assertEquals(86, a.getOpcode());
+        assertEquals(8,a.getRd());
+        assertEquals(291,a.getImmediate());
+    }
+
+    @Test
+    public void testInstructionUJConstructor()
+    {
+        InstructionUJ a = new InstructionUJ((byte)0, (byte)0, 0);
+        assertEquals(0, a.getRaw());
+
+        a = new InstructionUJ(86, 8, 291);
+        assertEquals(0x123456, a.getRaw());
+
+        a = new InstructionUJ(-1,-1,-1);
+        assertEquals(0xFFFFFFFF, a.getRaw());
+    }
+
 }

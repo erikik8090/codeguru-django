@@ -27,7 +27,7 @@ public class CpuRiscV {
     {
         this.state = state;
         this.memory = memory;
-        this.decoder = new InstructionDecoder();
+        this.decoder = new InstructionDecoder(new InstructionRunner());
     }
 
     public void nextOpcode() throws InvalidOpcodeException, MemoryException

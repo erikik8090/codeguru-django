@@ -44,9 +44,10 @@ public class InstructionRunnerTest {
             " 5,  5, 10",
             " 5, -1,  4",
             " 0, -1, -1",
-            "-1, -1, -2"
+            "-1, -1, -2",
+            "2147483647, 1, -2147483648"
     })
-    public void testAddi2(int reg, int imm, int expected)
+    public void testAddi(int reg, int imm, int expected)
     {
         state.setReg(5, reg);
         InstructionI i = new InstructionI(0, 2, 0, 5, imm);
@@ -55,7 +56,7 @@ public class InstructionRunnerTest {
     }
 
     @Test
-    public void testSw(int rs1, int rs2, int imm, int address, int expected) throws MemoryException
+    public void testSw() throws MemoryException
     {
         state.setReg(1,5);
         InstructionS i = new InstructionS(0,2,0,1,0);
@@ -107,7 +108,203 @@ public class InstructionRunnerTest {
 
     }
 
-    
+    @Test
+    @Parameters({
+            "5, 6, 4",
+            "5, 5, 5",
+            "5, 0, 0",
+            "5, -1, 5"
+    })
+    public void testAndi(int reg, int imm, int expected)
+    {
+        state.setReg(1,reg);
+        InstructionI i = new InstructionI(0,2,0,1, imm);
+        runner.andi(i, state);
+        assertEquals(expected, state.getReg(2));
+    }
+
+    @Test
+    @Parameters({
+            "5, 6, 4",
+            "5, 5, 5",
+            "5, 0, 0",
+            "5, -1, 5"
+    })
+    public void testAnd(int reg1, int reg2, int expected)
+    {
+        state.setReg(1,reg1);
+        state.setReg(2,reg2);
+        InstructionR i = new InstructionR(0,3,0,1,2,0);
+        runner.and(i, state);
+        assertEquals(expected, state.getReg(3));
+    }
+
+    @Test
+    @Parameters({
+            "1, 2, 3",
+            "5, 4, 5",
+            "5, 0, 5",
+            "5, -1, -1"
+
+    })
+    public void testOri(int reg, int imm, int expected)
+    {
+        state.setReg(1,reg);
+        InstructionI i = new InstructionI(0,2,0,1,imm);
+        runner.ori(i, state);
+        assertEquals(expected, state.getReg(2));
+    }
+
+    @Test
+    @Parameters({
+            "1, 2, 3",
+            "5, 4, 5",
+            "5, 0, 5",
+            "5, -1, -1"
+    })
+    public void testOr(int reg1, int reg2, int expected)
+    {
+        state.setReg(1,reg1);
+        state.setReg(2,reg2);
+        InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
+        runner.or(i, state);
+        assertEquals(expected, state.getReg(3));
+    }
+
+
+    @Test
+    @Parameters({
+            " 1,  2,  3",
+            " 3, 10,  9",
+            " 3, -1, -4",
+            "-4, -1,  3",
+            " 5,  0,  5"
+
+    })
+    public void testXori(int reg, int imm, int expected)
+    {
+        state.setReg(1,reg);
+        InstructionI i = new InstructionI(0, 2, 0, 1, imm);
+        runner.xori(i, state);
+        assertEquals(expected, state.getReg(2));
+    }
+
+    @Test
+    @Parameters({
+            " 1,  2,  3",
+            " 3, 10,  9",
+            " 3, -1, -4",
+            "-4, -1,  3",
+            " 5,  0,  5"
+    })
+    public void testXor(int reg1, int reg2, int expected)
+    {
+        state.setReg(1,reg1);
+        state.setReg(2,reg2);
+        InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
+        runner.xor(i, state);
+        assertEquals(expected, state.getReg(3));
+    }
+
+    @Test
+    @Parameters({
+            " 1, 2,  4",
+            " 3, 2, 12",
+            "-1, 2, -4",
+            "-2147483648, 1, 0"
+    })
+    public void testSlli(int reg, int imm, int expected)
+    {
+        state.setReg(1,reg);
+        InstructionI i = new InstructionI(0, 2,0,1,imm);
+        runner.slli(i, state);
+        assertEquals(expected, state.getReg(2));
+    }
+
+    @Test
+    @Parameters({
+            " 1, 2,  4",
+            " 3, 2, 12",
+            "-1, 2, -4",
+            "-2147483648, 1, 0"
+    })
+    public void testSll(int reg1, int reg2, int expected)
+    {
+        state.setReg(1,reg1);
+        state.setReg(2,reg2);
+        InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
+        runner.sll(i, state);
+        assertEquals(expected, state.getReg(3));
+    }
+
+    @Test
+    @Parameters({
+            " 4, 2, 1",
+            "12, 2, 3",
+            " 1, 1, 0",
+            " 0, 1, 0",
+            "-1, 1, 2147483647"
+    })
+    public void testSrli(int reg, int imm, int expected)
+    {
+        state.setReg(1,reg);
+        InstructionI i = new InstructionI(0, 2,0,1,imm);
+        runner.srli(i, state);
+        assertEquals(expected, state.getReg(2));
+    }
+
+    @Test
+    @Parameters({
+            " 4, 2, 1",
+            "12, 2, 3",
+            " 1, 1, 0",
+            " 0, 1, 0",
+            "-1, 1, 2147483647",
+            "-2, 1, 2147483647",
+    })
+    public void testSrl(int reg1, int reg2, int expected)
+    {
+        state.setReg(1,reg1);
+        state.setReg(2,reg2);
+        InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
+        runner.srl(i, state);
+        assertEquals(expected, state.getReg(3));
+    }
+
+    @Test
+    @Parameters({
+            " 4, 2, 1",
+            "12, 2, 3",
+            " 1, 1, 0",
+            " 0, 1, 0",
+            "-1, 1, -1"
+    })
+    public void testSrai(int reg, int imm, int expected)
+    {
+        state.setReg(1,reg);
+        InstructionI i = new InstructionI(0, 2,0,1,imm);
+        runner.srai(i, state);
+        assertEquals(expected, state.getReg(2));
+    }
+
+    @Test
+    @Parameters({
+            " 4, 2, 1",
+            "12, 2, 3",
+            " 1, 1, 0",
+            " 0, 1, 0",
+            "-1, 1, -1",
+            "-2, 1, -1"
+    })
+    public void testSra(int reg1, int reg2, int expected)
+    {
+        state.setReg(1,reg1);
+        state.setReg(2,reg2);
+        InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
+        runner.sra(i, state);
+        assertEquals(expected, state.getReg(3));
+    }
+
 
 
 }

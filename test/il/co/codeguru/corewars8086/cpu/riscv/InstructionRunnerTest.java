@@ -1,10 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
 import il.co.codeguru.corewars8086.cpu.exceptions.MisalignedMemoryLoadException;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionI;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionR;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionS;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionUJ;
+import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
 import junitparams.JUnitParamsRunner;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
@@ -53,6 +50,76 @@ public class InstructionRunnerTest {
         InstructionI i = new InstructionI(0, 2, 0, 5, imm);
         runner.addi(i, state);
         assertEquals(expected, state.getReg(2));
+    }
+
+    @Test
+    @Parameters({
+            " 0, 10, 40960",
+            " 5,  5,  20485",
+            " 5, -1, -4091",
+            " 0, -1, -4096",
+            "-1, -1, -1",
+            "-1,  0, 4095"
+    })
+    public void testLui(int reg, int imm, int expected)
+    {
+        state.setReg(1,reg);
+        InstructionU i = new InstructionU(0, 1, imm);
+        runner.lui(i, state);
+        assertEquals(expected, state.getReg(1));
+    }
+
+    @Test
+    @Parameters({
+            " 0, 10, 40960",
+            " 5,  5,  20485",
+            " 5, -1, -4091",
+            " 0, -1, -4096",
+            "-1, -1, -4097",
+            "-1,  0, -1"
+    })
+    public void testAuipc(int pc, int imm, int expected)
+    {
+        state.setPc(pc);
+        InstructionU i = new InstructionU(0, 1, imm);
+        runner.auipc(i, state);
+        assertEquals(expected, state.getReg(1));
+    }
+
+    @Test
+    @Parameters({
+            " 0, 10, 10",
+            " 5,  5, 10",
+            " 5, -1,  4",
+            " 0, -1, -1",
+            "-1, -1, -2",
+            "2147483647, 1, -2147483648"
+    })
+    public void testAdd(int reg1, int reg2, int expected)
+    {
+        state.setReg(1,reg1);
+        state.setReg(2,reg2);
+        InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
+        runner.add(i, state);
+        assertEquals(expected, state.getReg(3));
+    }
+
+    @Test
+    @Parameters({
+            " 10, 0, 10",
+            " 10,  5, 5",
+            " 4, -1,  5",
+            " 1, 2, -1",
+            "-1, -1, 0",
+            "-2147483648, 1, 2147483647"
+    })
+    public void testSub(int reg1, int reg2, int expected)
+    {
+        state.setReg(1,reg1);
+        state.setReg(2,reg2);
+        InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
+        runner.sub(i, state);
+        assertEquals(expected, state.getReg(3));
     }
 
     @Test
@@ -304,6 +371,72 @@ public class InstructionRunnerTest {
         runner.sra(i, state);
         assertEquals(expected, state.getReg(3));
     }
+
+    @Test
+    @Parameters({
+            "2, 1, 0",
+            "1, 2, 1",
+            "-1,1, 1",
+            "1,-1, 0",
+    })
+    public void testSlti(int reg, int imm, int expected)
+    {
+        state.setReg(1,reg);
+        InstructionI i = new InstructionI(0, 2,0,1,imm);
+        runner.slti(i, state);
+        assertEquals(expected, state.getReg(2));
+    }
+
+    @Test
+    @Parameters({
+            "2, 1, 0",
+            "1, 2, 1",
+            "-1,1, 1",
+            "1,-1, 0",
+
+    })
+    public void testSlt(int reg1, int reg2, int expected)
+    {
+        state.setReg(1,reg1);
+        state.setReg(2,reg2);
+        InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
+        runner.slt(i, state);
+        assertEquals(expected, state.getReg(3));
+    }
+
+    @Test
+    @Parameters({
+            "2, 1, 0",
+            "1, 2, 1",
+            "-1,1, 0",
+            "1,-1, 1",
+
+    })
+    public void testSltiu(int reg, int imm, int expected)
+    {
+        state.setReg(1,reg);
+        InstructionI i = new InstructionI(0, 2,0,1,imm);
+        runner.sltiu(i, state);
+        assertEquals(expected, state.getReg(2));
+    }
+
+    @Test
+    @Parameters({
+            "2, 1, 0",
+            "1, 2, 1",
+            "-1,1, 0",
+            "1,-1, 1",
+
+    })
+    public void testSltu(int reg1, int reg2, int expected)
+    {
+        state.setReg(1,reg1);
+        state.setReg(2,reg2);
+        InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
+        runner.sltu(i, state);
+        assertEquals(expected, state.getReg(3));
+    }
+
 
 
 

@@ -2,19 +2,28 @@ package il.co.codeguru.corewars8086.cpu.riscv;
 
 import il.co.codeguru.corewars8086.cpu.exceptions.MisalignedMemoryLoadException;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionI;
+import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionR;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionS;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionUJ;
+import junitparams.JUnitParamsRunner;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Logger;
+import junitparams.Parameters;
+import org.apache.bcel.generic.Instruction;
+import org.apache.tools.ant.taskdefs.Pack;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 import static org.junit.Assert.*;
 
+@RunWith(JUnitParamsRunner.class)
 public class InstructionRunnerTest {
     private CpuStateRiscV state;
     private InstructionRunner runner;
@@ -30,34 +39,23 @@ public class InstructionRunnerTest {
     }
 
     @Test
-    public void testAddi() {
-        InstructionI i = new InstructionI(0, 2, 0, 5, 10);
+    @Parameters({
+            " 0, 10, 10",
+            " 5,  5, 10",
+            " 5, -1,  4",
+            " 0, -1, -1",
+            "-1, -1, -2"
+    })
+    public void testAddi2(int reg, int imm, int expected)
+    {
+        state.setReg(5, reg);
+        InstructionI i = new InstructionI(0, 2, 0, 5, imm);
         runner.addi(i, state);
-        assertEquals(10, state.getReg(2));
-
-        state.setReg(5, 5);
-        i = new InstructionI(0, 2, 0, 5, 10);
-        runner.addi(i, state);
-        assertEquals(15, state.getReg(2));
-
-        state.setReg(5, 5);
-        i = new InstructionI(0, 2, 0, 5, -1);
-        runner.addi(i, state);
-        assertEquals(4, state.getReg(2));
-
-        state.setReg(5, 0);
-        i = new InstructionI(0, 2, 0, 5, -1);
-        runner.addi(i, state);
-        assertEquals(-1, state.getReg(2));
-
-        state.setReg(5, -1);
-        i = new InstructionI(0, 2, 0, 5, -1);
-        runner.addi(i, state);
-        assertEquals(-2, state.getReg(2));
+        assertEquals(expected, state.getReg(2));
     }
 
     @Test
-    public void testSw() throws MemoryException
+    public void testSw(int rs1, int rs2, int imm, int address, int expected) throws MemoryException
     {
         state.setReg(1,5);
         InstructionS i = new InstructionS(0,2,0,1,0);
@@ -108,6 +106,8 @@ public class InstructionRunnerTest {
         fail("JAL should throw exception when loading mis-aligned address");
 
     }
+
+    
 
 
 }

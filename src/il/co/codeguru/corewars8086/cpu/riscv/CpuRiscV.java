@@ -1,5 +1,6 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
+import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.exceptions.InvalidOpcodeException;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionBase;
 import il.co.codeguru.corewars8086.memory.MemoryException;
@@ -30,13 +31,14 @@ public class CpuRiscV {
         this.decoder = new InstructionDecoder(new InstructionRunner());
     }
 
-    public void nextOpcode() throws InvalidOpcodeException, MemoryException
+    public void nextOpcode() throws CpuException, MemoryException
     {
         int rawCode = memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)state.getPc()));
+        Logger.log("PC: " + state.getPc());
         InstructionBase instruction = new InstructionBase(rawCode);
 
-        decoder.decode_and_run(state, instruction);
+        decoder.decode_and_run(state, instruction, memory);
 
-        state.setPc(state.getPc() + 1);
+        state.setPc(state.getPc() + 4);
     }
 }

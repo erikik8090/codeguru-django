@@ -74,7 +74,7 @@ public class WarTest {
         assertNotNull(warrior);
         assertTrue(warrior.isAlive());
         assertEquals(1, war.getNumRemainingWarriors());
-        assertEquals(1, warrior.getCpuState().getPc());
+        assertEquals(4, warrior.getCpuState().getPc());
     }
 
 
@@ -98,7 +98,7 @@ public class WarTest {
         Warrior warrior =  war.getWarrior(0);
         assertFalse(warrior.isAlive());
         assertEquals(0, war.getNumRemainingWarriors());
-        assertEquals(0, warrior.getCpuState().getIP());
+        assertEquals(0, warrior.getCpuState().getPc());
 
     }
 }

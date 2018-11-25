@@ -1,6 +1,7 @@
 package il.co.codeguru.corewars8086.memory;
 
 import com.google.gwt.typedarrays.client.Int8ArrayNative;
+import il.co.codeguru.corewars8086.utils.Logger;
 
 /**
  * Implements the RealModeMemory interface using a buffer.

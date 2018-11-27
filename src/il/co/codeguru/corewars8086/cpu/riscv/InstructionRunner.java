@@ -37,6 +37,14 @@ public class InstructionRunner {
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short)(state.getReg(i.getRs1()) + i.getImm())),state.getReg(i.getRs2()));
     }
 
+    public void sh(InstructionS i, CpuStateRiscV state, RealModeMemory memory) throws MemoryException{
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)(state.getReg(i.getRs1()) + i.getImm())),(short)state.getReg(i.getRs2()));
+    }
+
+    public void sb(InstructionS i, CpuStateRiscV state, RealModeMemory memory) throws MemoryException{
+        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)(state.getReg(i.getRs1()) + i.getImm())),(byte)state.getReg(i.getRs2()));
+    }
+
     public void jal(InstructionUJ i, CpuStateRiscV state) throws MisalignedMemoryLoadException
     {
         if(i.getImmediate() % 4 != 0) throw new MisalignedMemoryLoadException();
@@ -110,5 +118,25 @@ public class InstructionRunner {
     }
 
 
+    public void lw(InstructionI i, CpuStateRiscV state, RealModeMemory memory) throws MemoryException {
+        state.setReg(i.getRd(), memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)(state.getReg(i.getRs1()) + i.getImmediate()))));
+    }
 
+    public void lh(InstructionI i, CpuStateRiscV state, RealModeMemory memory) throws MemoryException {
+        state.setReg(i.getRd(), memory.read16Bit(new RealModeAddress(ARENA_SEGMENT, (short)(state.getReg(i.getRs1()) + i.getImmediate()))));
+    }
+
+    public void lhu(InstructionI i, CpuStateRiscV state, RealModeMemory memory) throws MemoryException {
+        int val = memory.read16Bit(new RealModeAddress(ARENA_SEGMENT, (short)(state.getReg(i.getRs1()) + i.getImmediate())));
+        state.setReg(i.getRd(), val & 0xFFFF);
+    }
+
+    public void lb(InstructionI i, CpuStateRiscV state, RealModeMemory memory) throws MemoryException{
+        state.setReg(i.getRd(), memory.readByte(new RealModeAddress(ARENA_SEGMENT, (short)(state.getReg(i.getRs1()) + i.getImmediate()))));
+    }
+
+    public void lbu(InstructionI i, CpuStateRiscV state, RealModeMemory memory) throws MemoryException{
+        int val = memory.readByte(new RealModeAddress(ARENA_SEGMENT, (short)(state.getReg(i.getRs1()) + i.getImmediate())));
+        state.setReg(i.getRd(), val & 0xFF);
+    }
 }

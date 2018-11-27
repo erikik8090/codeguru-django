@@ -148,6 +148,216 @@ public class InstructionRunnerTest {
     }
 
     @Test
+    public void testSh() throws MemoryException
+    {
+        state.setReg(1,5);
+        InstructionS i = new InstructionS(0,2,0,1,0);
+        runner.sh(i,state,memory);
+        assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0)));
+
+        state.setReg(1,5);
+        state.setReg(2, 12);
+        i = new InstructionS(0,2,2,1,0);
+        runner.sh(i,state,memory);
+        assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)12)));
+
+        state.setReg(1,5);
+        state.setReg(2, 12);
+        i = new InstructionS(0,2,2,1,15);
+        runner.sh(i,state,memory);
+        assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)27)));
+
+        i = new InstructionS(0,2,0,0,0);
+        runner.sh(i,state,memory);
+        assertEquals(0, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0)));
+    }
+
+    @Test
+    public void testSb() throws MemoryException
+    {
+        state.setReg(1,5);
+        InstructionS i = new InstructionS(0,2,0,1,0);
+        runner.sb(i,state,memory);
+        assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0)));
+
+        state.setReg(1,5);
+        state.setReg(2, 12);
+        i = new InstructionS(0,2,2,1,0);
+        runner.sb(i,state,memory);
+        assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)12)));
+
+        state.setReg(1,5);
+        state.setReg(2, 12);
+        i = new InstructionS(0,2,2,1,15);
+        runner.sb(i,state,memory);
+        assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)27)));
+
+        i = new InstructionS(0,2,0,0,0);
+        runner.sb(i,state,memory);
+        assertEquals(0, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0)));
+    }
+
+    @Test
+    public void testLw() throws MemoryException
+    {
+        state.setReg(1, 0);
+        state.setReg(2,0);
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), 17);
+        InstructionI i = new InstructionI(0,2,0,1,0);
+        runner.lw(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 15);
+        state.setReg(2,0);
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short)15), 17);
+        i = new InstructionI(0,2,0,1,0);
+        runner.lw(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 15);
+        state.setReg(2,0);
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short)35), 17);
+        i = new InstructionI(0,2,0,1,20);
+        runner.lw(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 0);
+        state.setReg(2,0);
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), -1);
+        i = new InstructionI(0,2,0,1,0);
+        runner.lw(i, state, memory);
+        assertEquals(-1, state.getReg(2));
+    }
+
+    @Test
+    public void testLh() throws MemoryException
+    {
+        state.setReg(1, 0);
+        state.setReg(2,0);
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), (short)17);
+        InstructionI i = new InstructionI(0,2,0,1,0);
+        runner.lh(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 15);
+        state.setReg(2,0);
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)15), (short)17);
+        i = new InstructionI(0,2,0,1,0);
+        runner.lh(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 15);
+        state.setReg(2,0);
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)35), (short)17);
+        i = new InstructionI(0,2,0,1,20);
+        runner.lh(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 0);
+        state.setReg(2,0);
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), (short)(-1));
+        i = new InstructionI(0,2,0,1,0);
+        runner.lh(i, state, memory);
+        assertEquals(-1, state.getReg(2));
+    }
+
+    @Test
+    public void testLhu() throws MemoryException
+    {
+        state.setReg(1, 0);
+        state.setReg(2,0);
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), (short)17);
+        InstructionI i = new InstructionI(0,2,0,1,0);
+        runner.lhu(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 15);
+        state.setReg(2,0);
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)15), (short)17);
+        i = new InstructionI(0,2,0,1,0);
+        runner.lhu(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 15);
+        state.setReg(2,0);
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)35), (short)17);
+        i = new InstructionI(0,2,0,1,20);
+        runner.lhu(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 0);
+        state.setReg(2,0);
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), (short)(-1));
+        i = new InstructionI(0,2,0,1,0);
+        runner.lhu(i, state, memory);
+        assertNotEquals(-1, state.getReg(2));
+    }
+
+    @Test
+    public void testlb() throws MemoryException
+    {
+        state.setReg(1, 0);
+        state.setReg(2,0);
+        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)0), (byte)17);
+        InstructionI i = new InstructionI(0,2,0,1,0);
+        runner.lb(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 15);
+        state.setReg(2,0);
+        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)15), (byte)17);
+        i = new InstructionI(0,2,0,1,0);
+        runner.lb(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 15);
+        state.setReg(2,0);
+        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)35), (byte)17);
+        i = new InstructionI(0,2,0,1,20);
+        runner.lb(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 0);
+        state.setReg(2,0);
+        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)0), (byte)(-1));
+        i = new InstructionI(0,2,0,1,0);
+        runner.lb(i, state, memory);
+        assertEquals(-1, state.getReg(2));
+    }
+
+    @Test
+    public void testlbu() throws MemoryException
+    {
+        state.setReg(1, 0);
+        state.setReg(2,0);
+        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)0), (byte)17);
+        InstructionI i = new InstructionI(0,2,0,1,0);
+        runner.lbu(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 15);
+        state.setReg(2,0);
+        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)15), (byte)17);
+        i = new InstructionI(0,2,0,1,0);
+        runner.lbu(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 15);
+        state.setReg(2,0);
+        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)35), (byte)17);
+        i = new InstructionI(0,2,0,1,20);
+        runner.lbu(i, state, memory);
+        assertEquals(17, state.getReg(2));
+
+        state.setReg(1, 0);
+        state.setReg(2,0);
+        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)0), (byte)(-1));
+        i = new InstructionI(0,2,0,1,0);
+        runner.lbu(i, state, memory);
+        assertNotEquals(-1, state.getReg(2));
+    }
+
+    @Test
     public void testJal() throws MisalignedMemoryLoadException
     {
         //J

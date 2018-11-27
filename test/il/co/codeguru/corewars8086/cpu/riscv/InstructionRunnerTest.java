@@ -2,20 +2,16 @@ package il.co.codeguru.corewars8086.cpu.riscv;
 
 import il.co.codeguru.corewars8086.cpu.exceptions.MisalignedMemoryLoadException;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
-import junitparams.JUnitParamsRunner;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Logger;
+import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.bcel.generic.Instruction;
-import org.apache.tools.ant.taskdefs.Pack;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 import static org.junit.Assert.*;
@@ -358,34 +354,6 @@ public class InstructionRunnerTest {
     }
 
     @Test
-    public void testJal() throws MisalignedMemoryLoadException
-    {
-        //J
-        state.setPc(0);
-        InstructionUJ i = new InstructionUJ(0,0, 4);
-        runner.jal(i, state);
-        assertEquals(4-4, state.getPc()); //-4 for the pc+=4
-
-        state.setPc(12);
-        i = new InstructionUJ(0, 1, -8);
-        runner.jal(i, state);
-        assertEquals(4-4, state.getPc()); // -4 for the pc+=4
-        assertEquals(16, state.getReg(1));
-
-        state.setPc(24);
-        i = new InstructionUJ(0, 1, 14);
-        try{
-            runner.jal(i, state);
-        }
-        catch(MisalignedMemoryLoadException e)
-        {
-            return;
-        }
-        fail("JAL should throw exception when loading mis-aligned address");
-
-    }
-
-    @Test
     @Parameters({
             "5, 6, 4",
             "5, 5, 5",
@@ -648,6 +616,353 @@ public class InstructionRunnerTest {
     }
 
 
+    @Test
+    public void testJal() throws MisalignedMemoryLoadException
+    {
+        //J
+        state.setPc(0);
+        InstructionUJ i = new InstructionUJ(0,0, 4);
+        runner.jal(i, state);
+        assertEquals(4-4, state.getPc()); //-4 for the pc+=4
 
+        state.setPc(12);
+        i = new InstructionUJ(0, 1, -8);
+        runner.jal(i, state);
+        assertEquals(4-4, state.getPc()); // -4 for the pc+=4
+        assertEquals(16, state.getReg(1));
+
+        state.setPc(24);
+        i = new InstructionUJ(0, 1, 14);
+        try{
+            runner.jal(i, state);
+        }
+        catch(MisalignedMemoryLoadException e)
+        {
+            return;
+        }
+        fail("JAL should throw exception when loading mis-aligned address");
+
+    }
+
+    @Test
+    public void testJalr() throws MisalignedMemoryLoadException
+    {
+        //J
+        state.setReg(1, 4);
+        state.setPc(0);
+        InstructionI i = new InstructionI(0,0, 0, 1, 0);
+        runner.jalr(i, state);
+        assertEquals(4-4, state.getPc()); //-4 for the pc+=4
+
+        state.setPc(12);
+        state.setReg(1, -8);
+        i = new InstructionI(0, 2, 0, 1, 0);
+        runner.jalr(i, state);
+        assertEquals(4-4, state.getPc()); // -4 for the pc+=4
+        assertEquals(16, state.getReg(2));
+
+        state.setPc(12);
+        state.setReg(1, -8);
+        i = new InstructionI(0, 2, 0, 1, 16);
+        runner.jalr(i, state);
+        assertEquals(20-4, state.getPc()); // -4 for the pc+=4
+        assertEquals(16, state.getReg(2));
+
+        state.setReg(1, 14);
+        state.setPc(24);
+        i = new InstructionI(0, 0,0,1,0);
+        try{
+            runner.jalr(i, state);
+        }
+        catch(MisalignedMemoryLoadException e)
+        {
+            return;
+        }
+        fail("JAL should throw exception when loading mis-aligned address");
+
+    }
+
+    @Test
+    public void testBeq() throws MisalignedMemoryLoadException
+    {
+        state.setPc(0);
+        InstructionSB i = new InstructionSB(0,0,0,0,8);
+        runner.beq(i, state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2,5);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.beq(i, state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2, 6);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.beq(i,state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 6);
+        state.setReg(2, 5);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.beq(i,state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(24);
+        i = new InstructionSB(0,0,0,0,14);
+        //TODO: Check the behavior of SPIKE - does it crash if the instruction has invalid immidiate even though you dont take it?
+        try{
+            runner.beq(i, state);
+        }
+        catch(MisalignedMemoryLoadException e)
+        {
+            return;
+        }
+        fail("BEQ should throw exception when loading mis-aligned address");
+    }
+
+    @Test
+    public void testBne() throws MisalignedMemoryLoadException
+    {
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2,5);
+        InstructionSB i = new InstructionSB(0,0,1,2,-8);
+        runner.bne(i, state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2, 6);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bne(i,state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 6);
+        state.setReg(2, 5);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bne(i,state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(24);
+        state.setReg(2, 5);
+        i = new InstructionSB(0,0,0,2,14);
+        try{
+            runner.bne(i, state);
+        }
+        catch(MisalignedMemoryLoadException e)
+        {
+            return;
+        }
+        fail("BNE should throw exception when loading mis-aligned address");
+    }
+
+    @Test
+    public void testBlt() throws MisalignedMemoryLoadException
+    {
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2,5);
+        InstructionSB i = new InstructionSB(0,0,1,2,-8);
+        assertEquals(-8, i.getImm());
+        runner.blt(i, state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2, 6);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.blt(i,state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 6);
+        state.setReg(2, 5);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.blt(i,state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, -1);
+        state.setReg(2, 1);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.blt(i,state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 1);
+        state.setReg(2, -1);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.blt(i,state);
+        assertEquals(16, state.getPc());
+
+        state.setReg(1, 5);
+        state.setPc(24);
+        i = new InstructionSB(0,0,0,1,14);
+        try{
+            runner.blt(i, state);
+        }
+        catch(MisalignedMemoryLoadException e)
+        {
+            return;
+        }
+        fail("BLT should throw exception when loading mis-aligned address");
+    }
+
+    @Test
+    public void testBltu() throws MisalignedMemoryLoadException
+    {
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2,5);
+        InstructionSB i  = new InstructionSB(0,0,1,2,-8);
+        runner.bltu(i, state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2, 6);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bltu(i,state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 6);
+        state.setReg(2, 5);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bltu(i,state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, -1);
+        state.setReg(2, 1);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bltu(i,state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 1);
+        state.setReg(2, -1);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bltu(i,state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(24);
+        i = new InstructionSB(0,0,1,2,14);
+        try{
+            runner.bltu(i, state);
+        }
+        catch(MisalignedMemoryLoadException e)
+        {
+            return;
+        }
+        fail("bltu should throw exception when loading mis-aligned address");
+    }
+
+    public void testBge() throws MisalignedMemoryLoadException
+    {
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2,5);
+        InstructionSB i = new InstructionSB(0,0,1,2,-8);
+        assertEquals(-8, i.getImm());
+        runner.bge(i, state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2, 6);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bge(i,state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 6);
+        state.setReg(2, 5);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bge(i,state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, -1);
+        state.setReg(2, 1);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bge(i,state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 1);
+        state.setReg(2, -1);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bge(i,state);
+        assertEquals(4, state.getPc());
+
+        state.setReg(1, 5);
+        state.setPc(24);
+        i = new InstructionSB(0,0,0,1,14);
+        try{
+            runner.bge(i, state);
+        }
+        catch(MisalignedMemoryLoadException e)
+        {
+            return;
+        }
+        fail("bge should throw exception when loading mis-aligned address");
+    }
+
+    public void testBgeu() throws MisalignedMemoryLoadException
+    {
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2,5);
+        InstructionSB i = new InstructionSB(0,0,1,2,-8);
+        assertEquals(-8, i.getImm());
+        runner.bgeu(i, state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 5);
+        state.setReg(2, 6);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bgeu(i,state);
+        assertEquals(16, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 6);
+        state.setReg(2, 5);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bgeu(i,state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, -1);
+        state.setReg(2, 1);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bgeu(i,state);
+        assertEquals(4, state.getPc());
+
+        state.setPc(16);
+        state.setReg(1, 1);
+        state.setReg(2, -1);
+        i = new InstructionSB(0,0,1,2,-8);
+        runner.bgeu(i,state);
+        assertEquals(16, state.getPc());
+
+        state.setReg(1, 5);
+        state.setPc(24);
+        i = new InstructionSB(0,0,0,1,14);
+        try{
+            runner.bgeu(i, state);
+        }
+        catch(MisalignedMemoryLoadException e)
+        {
+            return;
+        }
+        fail("bgeu should throw exception when loading mis-aligned address");
+    }
 
 }

@@ -45,12 +45,7 @@ public class InstructionRunner {
         memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)(state.getReg(i.getRs1()) + i.getImm())),(byte)state.getReg(i.getRs2()));
     }
 
-    public void jal(InstructionUJ i, CpuStateRiscV state) throws MisalignedMemoryLoadException
-    {
-        if(i.getImmediate() % 4 != 0) throw new MisalignedMemoryLoadException();
-        state.setReg(i.getRd(), state.getPc() + 4);
-        state.setPc(state.getPc() + i.getImmediate() - 4 );
-    }
+
 
     public void andi(InstructionI i, CpuStateRiscV state)
     {
@@ -139,4 +134,47 @@ public class InstructionRunner {
         int val = memory.readByte(new RealModeAddress(ARENA_SEGMENT, (short)(state.getReg(i.getRs1()) + i.getImmediate())));
         state.setReg(i.getRd(), val & 0xFF);
     }
+
+    private void jump(CpuStateRiscV state, int immediate) throws MisalignedMemoryLoadException {
+        if (immediate % 4 != 0) throw new MisalignedMemoryLoadException();
+        state.setPc(state.getPc() + immediate - 4);
+    }
+
+    public void jal(InstructionUJ i, CpuStateRiscV state) throws MisalignedMemoryLoadException {
+        state.setReg(i.getRd(), state.getPc() + 4);
+        jump(state, i.getImmediate());
+    }
+
+    public void jalr(InstructionI i, CpuStateRiscV state) throws MisalignedMemoryLoadException{
+        state.setReg(i.getRd(), state.getPc() + 4);
+        jump(state, state.getReg(i.getRs1()) + i.getImmediate());
+    }
+
+    public void beq(InstructionSB i, CpuStateRiscV state) throws MisalignedMemoryLoadException {
+        Logger.log("Immediate for beq:" + i.getImm());
+        if(state.getReg(i.getRs1()) == state.getReg(i.getRs2())) jump(state, i.getImm());
+    }
+
+
+    public void bne(InstructionSB i, CpuStateRiscV state) throws MisalignedMemoryLoadException {
+        if(state.getReg(i.getRs1()) != state.getReg(i.getRs2())) jump(state, i.getImm());
+    }
+
+    public void blt(InstructionSB i, CpuStateRiscV state) throws MisalignedMemoryLoadException{
+        if(state.getReg(i.getRs1()) < state.getReg(i.getRs2())) jump(state, i.getImm());
+    }
+
+    public void bltu(InstructionSB i, CpuStateRiscV state) throws MisalignedMemoryLoadException{
+        if(state.getReg(i.getRs1()) + 0x80000000  < state.getReg(i.getRs2()) + 0x80000000) jump(state, i.getImm());
+    }
+
+    public void bge(InstructionSB i, CpuStateRiscV state) throws MisalignedMemoryLoadException {
+        if(state.getReg(i.getRs1()) >= state.getReg(i.getRs2())) jump(state, i.getImm());
+    }
+
+    public void bgeu(InstructionSB i, CpuStateRiscV state) throws MisalignedMemoryLoadException{
+        if(state.getReg(i.getRs1()) + 0x80000000  >= state.getReg(i.getRs2()) + 0x80000000) jump(state, i.getImm());
+    }
+
+
 }

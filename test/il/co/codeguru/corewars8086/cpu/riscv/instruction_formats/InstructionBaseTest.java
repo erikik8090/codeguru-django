@@ -156,4 +156,32 @@ public class InstructionBaseTest {
         assertEquals(0x004004ef, a.getRaw());
     }
 
+    @Test
+    public void testInstructionSB() {
+        InstructionS a = new InstructionS(0);
+        assertEquals(0, a.getFunct3());
+        assertEquals(0, a.getRs1());
+        assertEquals(0, a.getRs2());
+        assertEquals(0, a.getImm());
+
+        a = new InstructionS( 0x00308063);
+        assertEquals(99, a.getOpcode());
+        assertEquals(0, a.getFunct3());
+        assertEquals(1, a.getRs1());
+        assertEquals(3, a.getRs2());
+        assertEquals(0, a.getImm());
+    }
+
+    @Test
+    public void testInstructionSBConstructor() {
+        InstructionS a = new InstructionS((byte) 0, (byte) 0, 0, 0, 0);
+        assertEquals(0, a.getRaw());
+
+        a = new InstructionS(99, 0, 1, 3, 0);
+        assertEquals( 0x00308063, a.getRaw());
+
+        a = new InstructionS(-1, -1, -1, -1, -1);
+        assertEquals(0xFFFFFFFF, a.getRaw());
+    }
+
 }

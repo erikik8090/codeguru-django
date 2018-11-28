@@ -25,8 +25,8 @@ public class InstructionRunnerTest {
     @Before
     public void setUp() {
         state = new CpuStateRiscV();
-        runner = new InstructionRunner();
         memory = new RealModeMemoryImpl();
+        runner = new InstructionRunner(new CpuRiscV(state, memory));
         Logger.setTestingMode();
 
     }
@@ -44,7 +44,7 @@ public class InstructionRunnerTest {
     {
         state.setReg(5, reg);
         InstructionI i = new InstructionI(0, 2, 0, 5, imm);
-        runner.addi(i, state);
+        runner.addi(i);
         assertEquals(expected, state.getReg(2));
     }
 
@@ -61,7 +61,7 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,reg);
         InstructionU i = new InstructionU(0, 1, imm);
-        runner.lui(i, state);
+        runner.lui(i);
         assertEquals(expected, state.getReg(1));
     }
 
@@ -78,7 +78,7 @@ public class InstructionRunnerTest {
     {
         state.setPc(pc);
         InstructionU i = new InstructionU(0, 1, imm);
-        runner.auipc(i, state);
+        runner.auipc(i);
         assertEquals(expected, state.getReg(1));
     }
 
@@ -96,7 +96,7 @@ public class InstructionRunnerTest {
         state.setReg(1,reg1);
         state.setReg(2,reg2);
         InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
-        runner.add(i, state);
+        runner.add(i);
         assertEquals(expected, state.getReg(3));
     }
 
@@ -114,7 +114,7 @@ public class InstructionRunnerTest {
         state.setReg(1,reg1);
         state.setReg(2,reg2);
         InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
-        runner.sub(i, state);
+        runner.sub(i);
         assertEquals(expected, state.getReg(3));
     }
 
@@ -123,23 +123,23 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,5);
         InstructionS i = new InstructionS(0,2,0,1,0);
-        runner.sw(i,state,memory);
+        runner.sw(i);
         assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0)));
 
         state.setReg(1,5);
         state.setReg(2, 12);
          i = new InstructionS(0,2,2,1,0);
-        runner.sw(i,state,memory);
+        runner.sw(i);
         assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)12)));
 
         state.setReg(1,5);
         state.setReg(2, 12);
         i = new InstructionS(0,2,2,1,15);
-        runner.sw(i,state,memory);
+        runner.sw(i);
         assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)27)));
 
          i = new InstructionS(0,2,0,0,0);
-        runner.sw(i,state,memory);
+        runner.sw(i);
         assertEquals(0, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0)));
     }
 
@@ -148,23 +148,23 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,5);
         InstructionS i = new InstructionS(0,2,0,1,0);
-        runner.sh(i,state,memory);
+        runner.sh(i);
         assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0)));
 
         state.setReg(1,5);
         state.setReg(2, 12);
         i = new InstructionS(0,2,2,1,0);
-        runner.sh(i,state,memory);
+        runner.sh(i);
         assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)12)));
 
         state.setReg(1,5);
         state.setReg(2, 12);
         i = new InstructionS(0,2,2,1,15);
-        runner.sh(i,state,memory);
+        runner.sh(i);
         assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)27)));
 
         i = new InstructionS(0,2,0,0,0);
-        runner.sh(i,state,memory);
+        runner.sh(i);
         assertEquals(0, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0)));
     }
 
@@ -173,23 +173,23 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,5);
         InstructionS i = new InstructionS(0,2,0,1,0);
-        runner.sb(i,state,memory);
+        runner.sb(i);
         assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0)));
 
         state.setReg(1,5);
         state.setReg(2, 12);
         i = new InstructionS(0,2,2,1,0);
-        runner.sb(i,state,memory);
+        runner.sb(i);
         assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)12)));
 
         state.setReg(1,5);
         state.setReg(2, 12);
         i = new InstructionS(0,2,2,1,15);
-        runner.sb(i,state,memory);
+        runner.sb(i);
         assertEquals(5, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)27)));
 
         i = new InstructionS(0,2,0,0,0);
-        runner.sb(i,state,memory);
+        runner.sb(i);
         assertEquals(0, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0)));
     }
 
@@ -200,28 +200,28 @@ public class InstructionRunnerTest {
         state.setReg(2,0);
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), 17);
         InstructionI i = new InstructionI(0,2,0,1,0);
-        runner.lw(i, state, memory);
+        runner.lw(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 15);
         state.setReg(2,0);
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short)15), 17);
         i = new InstructionI(0,2,0,1,0);
-        runner.lw(i, state, memory);
+        runner.lw(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 15);
         state.setReg(2,0);
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short)35), 17);
         i = new InstructionI(0,2,0,1,20);
-        runner.lw(i, state, memory);
+        runner.lw(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 0);
         state.setReg(2,0);
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), -1);
         i = new InstructionI(0,2,0,1,0);
-        runner.lw(i, state, memory);
+        runner.lw(i);
         assertEquals(-1, state.getReg(2));
     }
 
@@ -232,28 +232,28 @@ public class InstructionRunnerTest {
         state.setReg(2,0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), (short)17);
         InstructionI i = new InstructionI(0,2,0,1,0);
-        runner.lh(i, state, memory);
+        runner.lh(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 15);
         state.setReg(2,0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)15), (short)17);
         i = new InstructionI(0,2,0,1,0);
-        runner.lh(i, state, memory);
+        runner.lh(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 15);
         state.setReg(2,0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)35), (short)17);
         i = new InstructionI(0,2,0,1,20);
-        runner.lh(i, state, memory);
+        runner.lh(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 0);
         state.setReg(2,0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), (short)(-1));
         i = new InstructionI(0,2,0,1,0);
-        runner.lh(i, state, memory);
+        runner.lh(i);
         assertEquals(-1, state.getReg(2));
     }
 
@@ -264,28 +264,28 @@ public class InstructionRunnerTest {
         state.setReg(2,0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), (short)17);
         InstructionI i = new InstructionI(0,2,0,1,0);
-        runner.lhu(i, state, memory);
+        runner.lhu(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 15);
         state.setReg(2,0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)15), (short)17);
         i = new InstructionI(0,2,0,1,0);
-        runner.lhu(i, state, memory);
+        runner.lhu(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 15);
         state.setReg(2,0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)35), (short)17);
         i = new InstructionI(0,2,0,1,20);
-        runner.lhu(i, state, memory);
+        runner.lhu(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 0);
         state.setReg(2,0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short)0), (short)(-1));
         i = new InstructionI(0,2,0,1,0);
-        runner.lhu(i, state, memory);
+        runner.lhu(i);
         assertNotEquals(-1, state.getReg(2));
     }
 
@@ -296,28 +296,28 @@ public class InstructionRunnerTest {
         state.setReg(2,0);
         memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)0), (byte)17);
         InstructionI i = new InstructionI(0,2,0,1,0);
-        runner.lb(i, state, memory);
+        runner.lb(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 15);
         state.setReg(2,0);
         memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)15), (byte)17);
         i = new InstructionI(0,2,0,1,0);
-        runner.lb(i, state, memory);
+        runner.lb(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 15);
         state.setReg(2,0);
         memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)35), (byte)17);
         i = new InstructionI(0,2,0,1,20);
-        runner.lb(i, state, memory);
+        runner.lb(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 0);
         state.setReg(2,0);
         memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)0), (byte)(-1));
         i = new InstructionI(0,2,0,1,0);
-        runner.lb(i, state, memory);
+        runner.lb(i);
         assertEquals(-1, state.getReg(2));
     }
 
@@ -328,28 +328,28 @@ public class InstructionRunnerTest {
         state.setReg(2,0);
         memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)0), (byte)17);
         InstructionI i = new InstructionI(0,2,0,1,0);
-        runner.lbu(i, state, memory);
+        runner.lbu(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 15);
         state.setReg(2,0);
         memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)15), (byte)17);
         i = new InstructionI(0,2,0,1,0);
-        runner.lbu(i, state, memory);
+        runner.lbu(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 15);
         state.setReg(2,0);
         memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)35), (byte)17);
         i = new InstructionI(0,2,0,1,20);
-        runner.lbu(i, state, memory);
+        runner.lbu(i);
         assertEquals(17, state.getReg(2));
 
         state.setReg(1, 0);
         state.setReg(2,0);
         memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)0), (byte)(-1));
         i = new InstructionI(0,2,0,1,0);
-        runner.lbu(i, state, memory);
+        runner.lbu(i);
         assertNotEquals(-1, state.getReg(2));
     }
 
@@ -364,7 +364,7 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,reg);
         InstructionI i = new InstructionI(0,2,0,1, imm);
-        runner.andi(i, state);
+        runner.andi(i);
         assertEquals(expected, state.getReg(2));
     }
 
@@ -380,7 +380,7 @@ public class InstructionRunnerTest {
         state.setReg(1,reg1);
         state.setReg(2,reg2);
         InstructionR i = new InstructionR(0,3,0,1,2,0);
-        runner.and(i, state);
+        runner.and(i);
         assertEquals(expected, state.getReg(3));
     }
 
@@ -396,7 +396,7 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,reg);
         InstructionI i = new InstructionI(0,2,0,1,imm);
-        runner.ori(i, state);
+        runner.ori(i);
         assertEquals(expected, state.getReg(2));
     }
 
@@ -412,7 +412,7 @@ public class InstructionRunnerTest {
         state.setReg(1,reg1);
         state.setReg(2,reg2);
         InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
-        runner.or(i, state);
+        runner.or(i);
         assertEquals(expected, state.getReg(3));
     }
 
@@ -430,7 +430,7 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,reg);
         InstructionI i = new InstructionI(0, 2, 0, 1, imm);
-        runner.xori(i, state);
+        runner.xori(i);
         assertEquals(expected, state.getReg(2));
     }
 
@@ -447,7 +447,7 @@ public class InstructionRunnerTest {
         state.setReg(1,reg1);
         state.setReg(2,reg2);
         InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
-        runner.xor(i, state);
+        runner.xor(i);
         assertEquals(expected, state.getReg(3));
     }
 
@@ -462,7 +462,7 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,reg);
         InstructionI i = new InstructionI(0, 2,0,1,imm);
-        runner.slli(i, state);
+        runner.slli(i);
         assertEquals(expected, state.getReg(2));
     }
 
@@ -478,7 +478,7 @@ public class InstructionRunnerTest {
         state.setReg(1,reg1);
         state.setReg(2,reg2);
         InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
-        runner.sll(i, state);
+        runner.sll(i);
         assertEquals(expected, state.getReg(3));
     }
 
@@ -494,7 +494,7 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,reg);
         InstructionI i = new InstructionI(0, 2,0,1,imm);
-        runner.srli(i, state);
+        runner.srli(i);
         assertEquals(expected, state.getReg(2));
     }
 
@@ -512,7 +512,7 @@ public class InstructionRunnerTest {
         state.setReg(1,reg1);
         state.setReg(2,reg2);
         InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
-        runner.srl(i, state);
+        runner.srl(i);
         assertEquals(expected, state.getReg(3));
     }
 
@@ -528,7 +528,7 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,reg);
         InstructionI i = new InstructionI(0, 2,0,1,imm);
-        runner.srai(i, state);
+        runner.srai(i);
         assertEquals(expected, state.getReg(2));
     }
 
@@ -546,7 +546,7 @@ public class InstructionRunnerTest {
         state.setReg(1,reg1);
         state.setReg(2,reg2);
         InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
-        runner.sra(i, state);
+        runner.sra(i);
         assertEquals(expected, state.getReg(3));
     }
 
@@ -561,7 +561,7 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,reg);
         InstructionI i = new InstructionI(0, 2,0,1,imm);
-        runner.slti(i, state);
+        runner.slti(i);
         assertEquals(expected, state.getReg(2));
     }
 
@@ -578,7 +578,7 @@ public class InstructionRunnerTest {
         state.setReg(1,reg1);
         state.setReg(2,reg2);
         InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
-        runner.slt(i, state);
+        runner.slt(i);
         assertEquals(expected, state.getReg(3));
     }
 
@@ -594,7 +594,7 @@ public class InstructionRunnerTest {
     {
         state.setReg(1,reg);
         InstructionI i = new InstructionI(0, 2,0,1,imm);
-        runner.sltiu(i, state);
+        runner.sltiu(i);
         assertEquals(expected, state.getReg(2));
     }
 
@@ -611,7 +611,7 @@ public class InstructionRunnerTest {
         state.setReg(1,reg1);
         state.setReg(2,reg2);
         InstructionR i = new InstructionR(0, 3, 0, 1, 2, 0);
-        runner.sltu(i, state);
+        runner.sltu(i);
         assertEquals(expected, state.getReg(3));
     }
 
@@ -622,19 +622,19 @@ public class InstructionRunnerTest {
         //J
         state.setPc(0);
         InstructionUJ i = new InstructionUJ(0,0, 4);
-        runner.jal(i, state);
+        runner.jal(i);
         assertEquals(4-4, state.getPc()); //-4 for the pc+=4
 
         state.setPc(12);
         i = new InstructionUJ(0, 1, -8);
-        runner.jal(i, state);
+        runner.jal(i);
         assertEquals(4-4, state.getPc()); // -4 for the pc+=4
         assertEquals(16, state.getReg(1));
 
         state.setPc(24);
         i = new InstructionUJ(0, 1, 14);
         try{
-            runner.jal(i, state);
+            runner.jal(i);
         }
         catch(MisalignedMemoryLoadException e)
         {
@@ -651,20 +651,20 @@ public class InstructionRunnerTest {
         state.setReg(1, 4);
         state.setPc(0);
         InstructionI i = new InstructionI(0,0, 0, 1, 0);
-        runner.jalr(i, state);
+        runner.jalr(i);
         assertEquals(4-4, state.getPc()); //-4 for the pc+=4
 
         state.setPc(12);
         state.setReg(1, -8);
         i = new InstructionI(0, 2, 0, 1, 0);
-        runner.jalr(i, state);
+        runner.jalr(i);
         assertEquals(4-4, state.getPc()); // -4 for the pc+=4
         assertEquals(16, state.getReg(2));
 
         state.setPc(12);
         state.setReg(1, -8);
         i = new InstructionI(0, 2, 0, 1, 16);
-        runner.jalr(i, state);
+        runner.jalr(i);
         assertEquals(20-4, state.getPc()); // -4 for the pc+=4
         assertEquals(16, state.getReg(2));
 
@@ -672,7 +672,7 @@ public class InstructionRunnerTest {
         state.setPc(24);
         i = new InstructionI(0, 0,0,1,0);
         try{
-            runner.jalr(i, state);
+            runner.jalr(i);
         }
         catch(MisalignedMemoryLoadException e)
         {
@@ -687,35 +687,35 @@ public class InstructionRunnerTest {
     {
         state.setPc(0);
         InstructionSB i = new InstructionSB(0,0,0,0,8);
-        runner.beq(i, state);
+        runner.beq(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 5);
         state.setReg(2,5);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.beq(i, state);
+        runner.beq(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 5);
         state.setReg(2, 6);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.beq(i,state);
+        runner.beq(i);
         assertEquals(16, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 6);
         state.setReg(2, 5);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.beq(i,state);
+        runner.beq(i);
         assertEquals(16, state.getPc());
 
         state.setPc(24);
         i = new InstructionSB(0,0,0,0,14);
         //TODO: Check the behavior of SPIKE - does it crash if the instruction has invalid immidiate even though you dont take it?
         try{
-            runner.beq(i, state);
+            runner.beq(i);
         }
         catch(MisalignedMemoryLoadException e)
         {
@@ -731,28 +731,28 @@ public class InstructionRunnerTest {
         state.setReg(1, 5);
         state.setReg(2,5);
         InstructionSB i = new InstructionSB(0,0,1,2,-8);
-        runner.bne(i, state);
+        runner.bne(i);
         assertEquals(16, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 5);
         state.setReg(2, 6);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bne(i,state);
+        runner.bne(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 6);
         state.setReg(2, 5);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bne(i,state);
+        runner.bne(i);
         assertEquals(4, state.getPc());
 
         state.setPc(24);
         state.setReg(2, 5);
         i = new InstructionSB(0,0,0,2,14);
         try{
-            runner.bne(i, state);
+            runner.bne(i);
         }
         catch(MisalignedMemoryLoadException e)
         {
@@ -769,42 +769,42 @@ public class InstructionRunnerTest {
         state.setReg(2,5);
         InstructionSB i = new InstructionSB(0,0,1,2,-8);
         assertEquals(-8, i.getImm());
-        runner.blt(i, state);
+        runner.blt(i);
         assertEquals(16, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 5);
         state.setReg(2, 6);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.blt(i,state);
+        runner.blt(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 6);
         state.setReg(2, 5);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.blt(i,state);
+        runner.blt(i);
         assertEquals(16, state.getPc());
 
         state.setPc(16);
         state.setReg(1, -1);
         state.setReg(2, 1);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.blt(i,state);
+        runner.blt(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 1);
         state.setReg(2, -1);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.blt(i,state);
+        runner.blt(i);
         assertEquals(16, state.getPc());
 
         state.setReg(1, 5);
         state.setPc(24);
         i = new InstructionSB(0,0,0,1,14);
         try{
-            runner.blt(i, state);
+            runner.blt(i);
         }
         catch(MisalignedMemoryLoadException e)
         {
@@ -820,41 +820,41 @@ public class InstructionRunnerTest {
         state.setReg(1, 5);
         state.setReg(2,5);
         InstructionSB i  = new InstructionSB(0,0,1,2,-8);
-        runner.bltu(i, state);
+        runner.bltu(i);
         assertEquals(16, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 5);
         state.setReg(2, 6);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bltu(i,state);
+        runner.bltu(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 6);
         state.setReg(2, 5);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bltu(i,state);
+        runner.bltu(i);
         assertEquals(16, state.getPc());
 
         state.setPc(16);
         state.setReg(1, -1);
         state.setReg(2, 1);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bltu(i,state);
+        runner.bltu(i);
         assertEquals(16, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 1);
         state.setReg(2, -1);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bltu(i,state);
+        runner.bltu(i);
         assertEquals(4, state.getPc());
 
         state.setPc(24);
         i = new InstructionSB(0,0,1,2,14);
         try{
-            runner.bltu(i, state);
+            runner.bltu(i);
         }
         catch(MisalignedMemoryLoadException e)
         {
@@ -870,42 +870,42 @@ public class InstructionRunnerTest {
         state.setReg(2,5);
         InstructionSB i = new InstructionSB(0,0,1,2,-8);
         assertEquals(-8, i.getImm());
-        runner.bge(i, state);
+        runner.bge(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 5);
         state.setReg(2, 6);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bge(i,state);
+        runner.bge(i);
         assertEquals(16, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 6);
         state.setReg(2, 5);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bge(i,state);
+        runner.bge(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, -1);
         state.setReg(2, 1);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bge(i,state);
+        runner.bge(i);
         assertEquals(16, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 1);
         state.setReg(2, -1);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bge(i,state);
+        runner.bge(i);
         assertEquals(4, state.getPc());
 
         state.setReg(1, 5);
         state.setPc(24);
         i = new InstructionSB(0,0,0,1,14);
         try{
-            runner.bge(i, state);
+            runner.bge(i);
         }
         catch(MisalignedMemoryLoadException e)
         {
@@ -921,42 +921,42 @@ public class InstructionRunnerTest {
         state.setReg(2,5);
         InstructionSB i = new InstructionSB(0,0,1,2,-8);
         assertEquals(-8, i.getImm());
-        runner.bgeu(i, state);
+        runner.bgeu(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 5);
         state.setReg(2, 6);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bgeu(i,state);
+        runner.bgeu(i);
         assertEquals(16, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 6);
         state.setReg(2, 5);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bgeu(i,state);
+        runner.bgeu(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, -1);
         state.setReg(2, 1);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bgeu(i,state);
+        runner.bgeu(i);
         assertEquals(4, state.getPc());
 
         state.setPc(16);
         state.setReg(1, 1);
         state.setReg(2, -1);
         i = new InstructionSB(0,0,1,2,-8);
-        runner.bgeu(i,state);
+        runner.bgeu(i);
         assertEquals(16, state.getPc());
 
         state.setReg(1, 5);
         state.setPc(24);
         i = new InstructionSB(0,0,0,1,14);
         try{
-            runner.bgeu(i, state);
+            runner.bgeu(i);
         }
         catch(MisalignedMemoryLoadException e)
         {

@@ -28,59 +28,59 @@ class InstructionDecoder {
                 switch (ii.getFunct3())
                 {
                     case 0x0:
-                        runner.addi(ii, state);
+                        runner.addi(ii);
                         break;
                     case 0x1:
-                        runner.slli(ii, state);
+                        runner.slli(ii);
                         break;
                     case 0x2:
-                        runner.slti(ii, state);
+                        runner.slti(ii);
                         break;
                     case 0x3:
-                        runner.sltiu(ii,state);
+                        runner.sltiu(ii);
                         break;
                     case 0x4:
-                        runner.xori(ii, state);
+                        runner.xori(ii);
                         break;
                     case 0x5:
                         int imm = ii.getImmediate() >> 5;
                         switch(imm)
                         {
                             case 0:
-                                runner.srli(ii, state);
+                                runner.srli(ii);
                                 break;
                             case 32:
-                                runner.srai(ii, state);
+                                runner.srai(ii);
                                 break;
                             default:
                                 throw new InvalidOpcodeException();
                         }
                         break;
                     case 0x6:
-                        runner.ori(ii, state);
+                        runner.ori(ii);
                         break;
                     case 0x7:
-                        runner.andi(ii, state);
+                        runner.andi(ii);
                         break;
                     default:
                         throw new InvalidOpcodeException();
                 }
                 break;
             case 0x17:
-                runner.auipc(new InstructionU(i), state);
+                runner.auipc(new InstructionU(i));
                 break;
             case 0x23:
                 InstructionS is = new InstructionS(i);
                 switch(is.getFunct3())
                 {
                     case 0:
-                        runner.sb(is, state, memory);
+                        runner.sb(is);
                         break;
                     case 1:
-                        runner.sh(is, state, memory);
+                        runner.sh(is);
                         break;
                     case 2:
-                        runner.sw(is, state, memory);
+                        runner.sw(is);
                         break;
                     default:
                         throw new InvalidOpcodeException();
@@ -94,84 +94,84 @@ class InstructionDecoder {
                         switch (ir.getFunct7())
                         {
                             case 0:
-                                runner.add(ir,state);
+                                runner.add(ir);
                                 break;
                             case 32:
-                                runner.sub(ir,state);
+                                runner.sub(ir);
                                 break;
                             default:
                                 throw new InvalidOpcodeException();
                         }
                         break;
                     case 1:
-                        runner.sll(ir, state);
+                        runner.sll(ir);
                         break;
                     case 2:
-                        runner.slt(ir, state);
+                        runner.slt(ir);
                         break;
                     case 3:
-                        runner.sltu(ir,state);
+                        runner.sltu(ir);
                         break;
                     case 4:
-                        runner.xor(ir, state);
+                        runner.xor(ir);
                         break;
                     case 5:
                         switch(ir.getFunct7())
                         {
                             case 0:
-                                runner.srl(ir, state);
+                                runner.srl(ir);
                                 break;
                             case 32:
-                                runner.sra(ir, state);
+                                runner.sra(ir);
                                 break;
                             default:
                                 throw new InvalidOpcodeException();
                         }
                         break;
                     case 6:
-                        runner.or(ir, state);
+                        runner.or(ir);
                         break;
                     case 7:
-                        runner.and(ir, state);
+                        runner.and(ir);
                         break;
                     default:
                         throw new InvalidOpcodeException();
                 }
                 break;
             case 0x37:
-                runner.lui(new InstructionU(i), state);
+                runner.lui(new InstructionU(i));
                 break;
             case 0x63:
                 InstructionSB sb = new InstructionSB(i);
                 switch(sb.getFunct3())
                 {
                     case 0:
-                        runner.beq(sb, state);
+                        runner.beq(sb);
                         break;
                     case 1:
-                        runner.bne(sb, state);
+                        runner.bne(sb);
                         break;
                     case 4:
-                        runner.blt(sb, state);
+                        runner.blt(sb);
                         break;
                     case 5:
-                        runner.bge(sb, state);
+                        runner.bge(sb);
                         break;
                     case 6:
-                        runner.bltu(sb, state);
+                        runner.bltu(sb);
                         break;
                     case 7:
-                        runner.bgeu(sb, state);
+                        runner.bgeu(sb);
                         break;
                     default:
                         throw new InvalidOpcodeException();
                 }
                 break;
             case 0x67:
-                runner.jalr(new InstructionI(i), state);
+                runner.jalr(new InstructionI(i));
                 break;
             case 0x6f:
-                runner.jal(new InstructionUJ(i), state);
+                runner.jal(new InstructionUJ(i));
                 break;
             default:
                 throw new InvalidOpcodeException();
@@ -183,19 +183,19 @@ class InstructionDecoder {
         switch(ii.getFunct3())
         {
             case 0x0:
-                runner.lb(ii, state, memory);
+                runner.lb(ii);
                 break;
             case 0x1:
-                runner.lh(ii, state, memory);
+                runner.lh(ii);
                 break;
             case 0x2:
-                runner.lw(ii, state, memory);
+                runner.lw(ii);
                 break;
             case 0x4:
-                runner.lbu(ii, state, memory);
+                runner.lbu(ii);
                 break;
             case 0x5:
-                runner.lhu(ii, state, memory);
+                runner.lhu(ii);
                 break;
             default:
                 throw new InvalidOpcodeException();

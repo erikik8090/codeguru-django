@@ -20,7 +20,7 @@ public class InstructionDecoderTest {
     //TODO: Replace this with a proper interface
     public void setUp()
     {
-        decoder = new InstructionDecoder(new InstructionRunner());
+        decoder = new InstructionDecoder(new InstructionRunner(new CpuRiscV(new CpuStateRiscV(), new RealModeMemoryImpl())));
         Logger.setTestingMode();
     }
 

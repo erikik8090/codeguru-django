@@ -6,6 +6,8 @@ import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Logger;
 import org.junit.*;
+
+import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 import static org.junit.Assert.*;
 
 public class CpuRiscVTest {
@@ -33,7 +35,7 @@ public class CpuRiscVTest {
     public void nextOpcodeTest() throws MemoryException
     {
         state.setPc(0);
-        memory.write16Bit(new RealModeAddress((short)0,(short)0), (short)0x00000013);
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT,(short)0), (short)0x00000013);
 
         try {
             cpuRiscV.nextOpcode();

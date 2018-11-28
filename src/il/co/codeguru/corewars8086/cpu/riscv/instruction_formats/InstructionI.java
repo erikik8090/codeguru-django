@@ -37,8 +37,8 @@ public class InstructionI extends InstructionBase {
         return (byte)((this.raw >> 15) & mask(5));
     }
 
-    public byte getImmediate()
+    public short getImmediate()
     {
-        return (byte)(this.raw >> 20);
+        return (short)(this.raw >> 20);
     }
 }

@@ -56,9 +56,7 @@ public class WarTest {
     @Test
     public void testNextRoundNormal()
     {
-        byte[] arr = new byte[]{0x1E,0x07,(byte)0x97,(byte)0x83,(byte)0xC7,0x0C, (byte)0x89,
-                (byte)0xFE, (byte)0x83,(byte)0xC6,0x0A,(byte)0xFD,0x4F,0x4F,(byte)0xA5,(byte)0xA5,
-                (byte)0xA5, (byte)0xA5,(byte)0xA5,(byte)0xA5,0x47,0x47,(byte)0xFF,(byte)0xE7};
+        byte[] arr = new byte[]{0x13, 0x00, 0x00, 0x00};
         warriorGroups[0].addWarrior(new WarriorData("player1", arr, "label", 0));
         try {
             war.loadWarriorGroups(warriorGroups);
@@ -80,7 +78,6 @@ public class WarTest {
 
     //TODO: Add this with a new instruction to fail the test
     @Test
-    @Ignore
     public void testNextRoundExceptionThrown()
     {
         byte[] arr = new byte[]{(byte)0xCC};

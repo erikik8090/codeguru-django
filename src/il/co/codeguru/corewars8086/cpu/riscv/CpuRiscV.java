@@ -34,10 +34,9 @@ public class CpuRiscV {
     public void nextOpcode() throws CpuException, MemoryException
     {
         int rawCode = memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)state.getPc()));
-        Logger.log("PC: " + state.getPc());
         InstructionBase instruction = new InstructionBase(rawCode);
 
-        decoder.decode_and_run(state, instruction, memory);
+        decoder.decode_and_run(instruction);
 
         state.setPc(state.getPc() + 4);
     }

@@ -158,7 +158,6 @@ public class InstructionRunner {
     }
 
     public void beq(InstructionSB i) throws MisalignedMemoryLoadException {
-        Logger.log("Immediate for beq:" + i.getImm());
         if (state.getReg(i.getRs1()) == state.getReg(i.getRs2())) jump(state, i.getImm());
     }
 

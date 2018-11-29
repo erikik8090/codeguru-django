@@ -1,7 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.exceptions;
 
 /**
- * Thrown when attempting to execute an unsupported opcode.
+ * Thrown when attempting to execute an unsupported Opcode.
  * 
  * @author DL
  */

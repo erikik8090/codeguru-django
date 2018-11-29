@@ -128,7 +128,7 @@ public class Warrior
     }
 
     /**
-     * Performs the warrior's next turn (= next opcode).
+     * Performs the warrior's next turn (= next Opcode).
      * @throws CpuException     on any CPU error.
      * @throws MemoryException  on any Memory error.
      */

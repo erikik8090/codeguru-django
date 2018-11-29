@@ -29,7 +29,7 @@ public class Cpu {
     }
 
     /**
-     * Performs the next single opcode.
+     * Performs the next single Opcode.
      * 
      * @throws CpuException    on any CPU error.
      * @throws MemoryException on any Memory error. 
@@ -144,7 +144,7 @@ public class Cpu {
                 push(m_state.getCS());
                 break;
             case (byte)0x0F:
-                // 0x0F - invalid opcode
+                // 0x0F - invalid Opcode
                 throw new InvalidOpcodeException();
             default:
                 throw new RuntimeException();
@@ -452,7 +452,7 @@ public class Cpu {
     private void opcode8X(byte opcode) throws CpuException, MemoryException {
         switch (opcode) {
             case (byte)0x80: // <?> byte ptr [X], imm8
-            case (byte)0x82: // TODO: opcode 0x82 is identical to opcode 0x80 ?
+            case (byte)0x82: // TODO: Opcode 0x82 is identical to Opcode 0x80 ?
                 m_indirect.reset();
                 switch (m_indirect.getRegIndex()) {
                     case 0: // ADD
@@ -610,7 +610,7 @@ public class Cpu {
                 m_indirect.reset();
                 RealModeAddress address = m_indirect.getMemAddress();
                 if (address == null) {
-                    // "LEA reg16, reg16" is an invalid opcode
+                    // "LEA reg16, reg16" is an invalid Opcode
                     throw new InvalidOpcodeException();
                 }
                 m_indirect.setReg16(address.getOffset());
@@ -621,7 +621,7 @@ public class Cpu {
                 break;
             case (byte)0x8F: // POP [X]
                 // Note: since Reg index bits are ignored, there are 8 different
-                // machine-code representations for this opcode :-)
+                // machine-code representations for this Opcode :-)
                 m_indirect.reset();
                 m_indirect.setMem16(pop());
                 break;
@@ -664,8 +664,8 @@ public class Cpu {
                 short newCS = m_fetcher.nextWord();
                 callFar(newCS, newIP);
                 break;
-            case (byte)0x9B: // original: WAIT, modified: virtual opcode NRG
-                // The virtual NRG opcode is made up of 2 consecutive WAIT opcodes
+            case (byte)0x9B: // original: WAIT, modified: virtual Opcode NRG
+                // The virtual NRG Opcode is made up of 2 consecutive WAIT opcodes
                 if (m_fetcher.nextByte() != (byte)0x9B) {
                     throw new UnsupportedOpcodeException();
                 }
@@ -804,7 +804,7 @@ public class Cpu {
                 m_indirect.reset();
                 address1 = m_indirect.getMemAddress();
                 if (address1 == null) {
-                    // "LES reg16, reg16" is an invalid opcode
+                    // "LES reg16, reg16" is an invalid Opcode
                     throw new InvalidOpcodeException();					
                 }
                 address2 = new RealModeAddress(
@@ -817,7 +817,7 @@ public class Cpu {
                 m_indirect.reset();
                 address1 = m_indirect.getMemAddress();
                 if (address1 == null) {
-                    // "LDS reg16, reg16" is an invalid opcode
+                    // "LDS reg16, reg16" is an invalid Opcode
                     throw new InvalidOpcodeException();					
                 }
                 address2 = new RealModeAddress(
@@ -828,13 +828,13 @@ public class Cpu {
                 break;			
             case (byte)0xC6: // MOV [X], imm8
                 // Note: since Reg index bits are ignored, there are 8 different
-                // machine-code representations for this opcode :-)
+                // machine-code representations for this Opcode :-)
                 m_indirect.reset();
                 m_indirect.setMem8(m_fetcher.nextByte());
                 break;
             case (byte)0xC7: // MOV [X], imm16
                 // Note: since Reg index bits are ignored, there are 8 different
-                // machine-code representations for this opcode :-)
+                // machine-code representations for this Opcode :-)
                 m_indirect.reset();
                 m_indirect.setMem16(m_fetcher.nextWord());
                 break;
@@ -901,7 +901,7 @@ public class Cpu {
                     case (byte)0x05: // SHR
                         shr8(1);
                         break;
-                    case (byte)0x06: // invalid opcode
+                    case (byte)0x06: // invalid Opcode
                         throw new InvalidOpcodeException();
                     case (byte)0x07: // SAR
                         sar8(1);
@@ -931,7 +931,7 @@ public class Cpu {
                     case (byte)0x05: // SHR
                         shr16(1);
                         break;
-                    case (byte)0x06: // invalid opcode
+                    case (byte)0x06: // invalid Opcode
                         throw new InvalidOpcodeException();
                     case (byte)0x07: // SAR
                         sar16(1);
@@ -961,7 +961,7 @@ public class Cpu {
                     case (byte)0x05: // SHR
                         shr8(m_state.getCL());
                         break;
-                    case (byte)0x06: // invalid opcode
+                    case (byte)0x06: // invalid Opcode
                         throw new InvalidOpcodeException();
                     case (byte)0x07: // SAR
                         sar8(m_state.getCL());
@@ -991,7 +991,7 @@ public class Cpu {
                     case (byte)0x05: // SHR
                         shr16(m_state.getCL());
                         break;
-                    case (byte)0x06: // invalid opcode
+                    case (byte)0x06: // invalid Opcode
                         throw new InvalidOpcodeException();
                     case (byte)0x07: // SAR
                         sar16(m_state.getCL());
@@ -1004,7 +1004,7 @@ public class Cpu {
             case (byte)0xD5: // TODO: AAD
                 throw new UnimplementedOpcodeException();
             case (byte)0xD6:
-                // 0xD6 - invalid opcode
+                // 0xD6 - invalid Opcode
                 throw new InvalidOpcodeException();
             case (byte)0xD7: // XLAT, XLATB
                 RealModeAddress address = new RealModeAddress(m_state.getDS(),
@@ -1102,7 +1102,7 @@ public class Cpu {
             case (byte)0xF0: // LOCK
                 throw new UnsupportedOpcodeException();
             case (byte)0xF1:
-                // 0xF1 - invalid opcode
+                // 0xF1 - invalid Opcode
                 throw new InvalidOpcodeException();
             case (byte)0xF2: // REPNZ
                 nextOpcode = m_fetcher.nextByte();
@@ -1412,7 +1412,7 @@ public class Cpu {
                     case 6: // PUSH
                         push(m_indirect.getMem16());
                         break;
-                    case 7: // invalid opcode
+                    case 7: // invalid Opcode
                         throw new InvalidOpcodeException();
                     default:
                         throw new RuntimeException();
@@ -1698,7 +1698,7 @@ public class Cpu {
     }
 
     /**
-     * Implements a near call opcode.
+     * Implements a near call Opcode.
      * @param offset    New value for IP (CS stays the same).
      * @throws MemoryException
      */
@@ -1708,7 +1708,7 @@ public class Cpu {
     }
 
     /**
-     * Implements a far call opcode.
+     * Implements a far call Opcode.
      * @param segment   New value for CS.
      * @param offset    New value for IP.
      * @throws MemoryException
@@ -1720,7 +1720,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the 'movsb' opcode.
+     * Implements the 'movsb' Opcode.
      * @throws MemoryException
      */
     private void movsb() throws MemoryException {
@@ -1736,7 +1736,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the 'movsw' opcode.
+     * Implements the 'movsw' Opcode.
      * @throws MemoryException
      */
     private void movsw() throws MemoryException {
@@ -1752,7 +1752,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the 'cmpsb' opcode.
+     * Implements the 'cmpsb' Opcode.
      * @throws MemoryException
      */
     private void cmpsb() throws MemoryException {
@@ -1768,7 +1768,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the 'cmpsw' opcode.
+     * Implements the 'cmpsw' Opcode.
      * @throws MemoryException
      */
     private void cmpsw() throws MemoryException {
@@ -1784,7 +1784,7 @@ public class Cpu {
     }	
 
     /**
-     * Implements the 'stosb' opcode.
+     * Implements the 'stosb' Opcode.
      * @throws MemoryException
      */
     private void stosb() throws MemoryException {
@@ -1796,7 +1796,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the 'stosw' opcode.
+     * Implements the 'stosw' Opcode.
      * @throws MemoryException
      */
     private void stosw() throws MemoryException {
@@ -1808,7 +1808,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the virtual 'stosdw' opcode.
+     * Implements the virtual 'stosdw' Opcode.
      * @throws MemoryException
      */
     private void stosdw() throws MemoryException {
@@ -1825,7 +1825,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the 'lodsb' opcode.
+     * Implements the 'lodsb' Opcode.
      * @throws MemoryException
      */
     private void lodsb() throws MemoryException {
@@ -1837,7 +1837,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the 'lodsw' opcode.
+     * Implements the 'lodsw' Opcode.
      * @throws MemoryException
      */
     private void lodsw() throws MemoryException {
@@ -1849,7 +1849,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the 'scasb' opcode.
+     * Implements the 'scasb' Opcode.
      * @throws MemoryException
      */
     private void scasb() throws MemoryException {
@@ -1861,7 +1861,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the 'scasw' opcode.
+     * Implements the 'scasw' Opcode.
      * @throws MemoryException
      */
     private void scasw() throws MemoryException {
@@ -2127,9 +2127,9 @@ public class Cpu {
 
 
     /**
-     * Implements the virtual INT 0x86 opcode.
+     * Implements the virtual INT 0x86 Opcode.
      * If enough bombs are left, calls the stosdw virtual
-     * opcode 64 times.  
+     * Opcode 64 times.
      * 
      * @throws MemoryException
      */
@@ -2145,7 +2145,7 @@ public class Cpu {
     }
 
     /**
-     * Implements the virtual INT 0x87 opcode.
+     * Implements the virtual INT 0x87 Opcode.
      * If enough bombs are left, searches for a given 4 bytes and replaces
      * their first occurence with another given 4 bytes.
      *  

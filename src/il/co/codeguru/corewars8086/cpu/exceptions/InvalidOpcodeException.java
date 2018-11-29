@@ -1,7 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.exceptions;
 
 /**
- * Thrown when attempting to execute an invalid opcode.
+ * Thrown when attempting to execute an invalid Opcode.
  * 
  * @author DL
  */

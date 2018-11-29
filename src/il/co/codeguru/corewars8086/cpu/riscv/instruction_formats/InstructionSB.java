@@ -46,15 +46,9 @@ public class InstructionSB extends InstructionBase{
 
     public byte getImm() {
         int bit11 = (this.raw >> 7) & 1;
-        Logger.log("bit11: " + bit11);
         int first_part = (byte)((this.raw >> 8) & mask(4));
-        Logger.log("first_part: " + first_part );
         int bit12 = (this.raw >> 31) & 1;
-        Logger.log("bit12: " + bit12 );
         int second_part = (byte)(this.raw >> 25) & mask(6);
-        Logger.log("second_part: " + second_part);
-        Logger.log("" + (byte)((first_part << 1)| (second_part << 5) | (bit11 << 11) | (bit12 << 12)));
-        Logger.log("\n");
         return (byte)((first_part << 1) | (second_part << 5) | (bit11 << 11) | (bit12 << 12));
 
     }

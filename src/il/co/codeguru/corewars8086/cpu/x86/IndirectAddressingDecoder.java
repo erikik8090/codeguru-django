@@ -14,7 +14,7 @@ import il.co.codeguru.corewars8086.memory.RealModeMemory;
  *  (2) [BX+SI+1234h]   indirect + imm16
  *  (3) AX              direct register mode
  * 
- * Each indirect-addressing opcode has two operands: a register, and one of the
+ * Each indirect-addressing Opcode has two operands: a register, and one of the
  * above. e.g:
  *               ADD [BX+SI], AX
  * 
@@ -26,7 +26,7 @@ public class IndirectAddressingDecoder {
      * Constructor.
      * @param state    CPU registers.
      * @param memory   Memory. 
-     * @param fetcher  Used to fetch additional opcode bytes.
+     * @param fetcher  Used to fetch additional Opcode bytes.
      */
     public IndirectAddressingDecoder(
             CpuState state, RealModeMemory memory, OpcodeFetcher fetcher) {
@@ -57,7 +57,7 @@ public class IndirectAddressingDecoder {
         m_regIndex = (byte)((modeByte >> 3) & 0x07);		
         m_memIndex = (byte)(modeByte & 0x07);
 
-        // decode the opcode according to the indirect-addressing mode, and
+        // decode the Opcode according to the indirect-addressing mode, and
         // retrieve the address operand
         switch (mode) {
             case 0:
@@ -93,7 +93,7 @@ public class IndirectAddressingDecoder {
     }
 
     /**
-     * Assuming the opcode operand referred to an 8bit register, returns the
+     * Assuming the Opcode operand referred to an 8bit register, returns the
      * corresponding register's value.
      * @return 8bit register value. 
      */
@@ -114,7 +114,7 @@ public class IndirectAddressingDecoder {
     }
 
     /**
-     * Assuming the opcode operand referred to a 16bit register, returns the
+     * Assuming the Opcode operand referred to a 16bit register, returns the
      * corresponding register's value.
      * @return 16bit register value. 
      */
@@ -123,7 +123,7 @@ public class IndirectAddressingDecoder {
     }
 
     /**
-     * Assuming the opcode operand referred to a segment register, returns the
+     * Assuming the Opcode operand referred to a segment register, returns the
      * corresponding register's value.
      * @return segment register value. 
      */
@@ -144,7 +144,7 @@ public class IndirectAddressingDecoder {
     }
 
     /**
-     * Assuming the opcode operand referred to an 8bit register, sets the
+     * Assuming the Opcode operand referred to an 8bit register, sets the
      * corresponding register's value.
      * @param value    New value for the 8bit register.
      */
@@ -166,7 +166,7 @@ public class IndirectAddressingDecoder {
     }
 
     /**
-     * Assuming the opcode operand referred to a 16bit register, sets the
+     * Assuming the Opcode operand referred to a 16bit register, sets the
      * corresponding register's value.
      * @param value    New value for the segment register.
      */
@@ -175,7 +175,7 @@ public class IndirectAddressingDecoder {
     }
 
     /**
-     * Assuming the opcode operand referred to a segment register, sets the
+     * Assuming the Opcode operand referred to a segment register, sets the
      * corresponding register's value.
      * @param value    New value for the segment register.
      */
@@ -319,10 +319,10 @@ public class IndirectAddressingDecoder {
     /** Memory */
     private final RealModeMemory m_memory;
 
-    /** Used to fetch additional opcode bytes. */
+    /** Used to fetch additional Opcode bytes. */
     private final OpcodeFetcher m_fetcher;
 
-    /** Used to decode the non-memory part of the opcode */
+    /** Used to decode the non-memory part of the Opcode */
     private final RegisterIndexingDecoder m_regs;
 
     private byte m_regIndex;

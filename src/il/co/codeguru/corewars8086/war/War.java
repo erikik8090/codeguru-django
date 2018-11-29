@@ -123,11 +123,11 @@ public class War {
                 short savedIp = (short) warrior.getCpuState().getPc();
                 try {
 
-                    // run first opcode
+                    // run first Opcode
                     warrior.nextOpcode();
                     atBreakpoint |= (m_breakpointCheck != null && m_currentWarrior == m_uiWarriorIndex && m_breakpointCheck.shouldBreak(warrior.getCpuState()));
 
-                    // run one extra opcode, if warrior deserves it :)
+                    // run one extra Opcode, if warrior deserves it :)
                     updateWarriorEnergy(warrior, round);
                     if (shouldRunExtraOpcode(warrior)) {
                         warrior.nextOpcode();
@@ -182,7 +182,7 @@ public class War {
     }
 	
     /**
-     * Determines whether or not a given warrior deserves an extra opcode,
+     * Determines whether or not a given warrior deserves an extra Opcode,
      * by calculating the warrior's current speed (using its current Energy
      * value), and comparing it against a random value.
      * 
@@ -194,7 +194,7 @@ public class War {
      *     solves the issue of determining what to do if the current speed is x1.7 :)
      * 
      * @param warrior The warrior.
-     * @return true if the warrior deserves an extra opcode, otherwise
+     * @return true if the warrior deserves an extra Opcode, otherwise
      * returns false.
      */
     private boolean shouldRunExtraOpcode(Warrior warrior) {

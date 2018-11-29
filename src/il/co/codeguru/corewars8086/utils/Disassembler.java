@@ -75,7 +75,7 @@ public abstract class Disassembler
 	 */
 	protected int pointer;
 
-	protected int startOffset; // start of current opcode
+	protected int startOffset; // start of current Opcode
 	protected int progStartOffset; // offset the program is loaded to
 	protected int endOffset;
 	
@@ -130,12 +130,12 @@ public abstract class Disassembler
 			int lastPointer = pointer;
 			try
 			{
-				String opcode = nextOpcode();
+				String Opcode = nextOpcode();
 				String assembledBytes = "0x";
 				for (int i = lastPointer; i < pointer; i++)
 					assembledBytes += Integer.toHexString(bytes[i] & 0xFF).toUpperCase();
 				res.add(toString(address.getSegment(), (short)((address.getOffset() + lastPointer) & 0xFFFF)) + "\t"
-					+ assembledBytes + "\t" + opcode);
+					+ assembledBytes + "\t" + Opcode);
 			}
 			catch (DisassemblerException e)
 			{
@@ -213,7 +213,7 @@ public abstract class Disassembler
 	private String getMem8() throws DisassemblerException
 	{
 		String extraInfo = null;
-		// decode the opcode according to the indirect-addressing mode, and
+		// decode the Opcode according to the indirect-addressing mode, and
         // retrieve the address operand
         switch (mode) {
             case 0:
@@ -481,7 +481,7 @@ public abstract class Disassembler
             	return "OR AX, " + toString(nextWord());			
             case (byte)0x0E: // PUSH CS
                 return "PUSH CS";
-            case (byte)0x0F: // invalid opcode
+            case (byte)0x0F: // invalid Opcode
             	throw new DisassemblerException();
             default:
                 throw new RuntimeException();
@@ -739,7 +739,7 @@ public abstract class Disassembler
     private String opcode8X(byte opcode) throws DisassemblerException {
         switch (opcode) {
             case (byte)0x80: // <?> byte ptr [X], imm8
-            case (byte)0x82: // TODO: opcode 0x82 is identical to opcode 0x80 ?
+            case (byte)0x82: // TODO: Opcode 0x82 is identical to Opcode 0x80 ?
                 resetIndirect();
                 switch (regIndex)
                 {
@@ -837,7 +837,7 @@ public abstract class Disassembler
                 return "MOV " + getMem16() + ", " + getSeg();
             case (byte)0x8D: // LEA reg16, [X]
                 resetIndirect();
-                if (mode == 3) // "LEA reg16, reg16" is an invalid opcode
+                if (mode == 3) // "LEA reg16, reg16" is an invalid Opcode
                     return "DW " + toString(toWord(opcode, getIndirect()));
                 else
                 	return "LEA " + getReg16() + ", " + getMem16();
@@ -846,7 +846,7 @@ public abstract class Disassembler
                 return "MOV " + getSeg() + ", " + getMem16();
             case (byte)0x8F: // POP [X]
                 // Note: since Reg index bits are ignored, there are 8 different
-                // machine-code representations for this opcode :-)
+                // machine-code representations for this Opcode :-)
                 resetIndirect();
                 return "POP " + getMem16();
             default:
@@ -873,8 +873,8 @@ public abstract class Disassembler
                 return "CWD";				
             case (byte)0x9A: // CALL far imm16:imm16
                 return "CALL FAR " + toString(nextWord()) + ":" + toString(nextWord());
-            case (byte)0x9B: // original: WAIT, modified: virtual opcode NRG
-                // The virtual NRG opcode is made up of 4 consecutive WAIT opcodes
+            case (byte)0x9B: // original: WAIT, modified: virtual Opcode NRG
+                // The virtual NRG Opcode is made up of 4 consecutive WAIT opcodes
                 for (int i = 0; i < 3; ++i)
                 {
                     if (getByte() != (byte)0x9B)
@@ -975,25 +975,25 @@ public abstract class Disassembler
             case (byte)0xC4: // LES reg16, [X]
                 resetIndirect();
                 if (mode == 3)
-                    // "LES reg16, reg16" is an invalid opcode
+                    // "LES reg16, reg16" is an invalid Opcode
                     throw new DisassemblerException();					
                 else
                 	return "LES " + getReg16() + ", " + getMem8();		
             case (byte)0xC5: // LDS reg16, [X]
                 resetIndirect();
                 if (mode == 3)
-                    // "LDS reg16, reg16" is an invalid opcode
+                    // "LDS reg16, reg16" is an invalid Opcode
                     throw new DisassemblerException();					
                 else
                 	return "LDS " + getReg16() + ", " + getMem8();		
             case (byte)0xC6: // MOV [X], imm8
                 // Note: since Reg index bits are ignored, there are 8 different
-                // machine-code representations for this opcode :-)
+                // machine-code representations for this Opcode :-)
                 resetIndirect();
             	return "MOV " + getMem8() + ", " + toString(nextByte());
             case (byte)0xC7: // MOV [X], imm16
                 // Note: since Reg index bits are ignored, there are 8 different
-                // machine-code representations for this opcode :-)
+                // machine-code representations for this Opcode :-)
                 resetIndirect();
                 return "MOV " + getMem16() + ", " + toString(nextWord());
             case (byte)0xC8:
@@ -1041,7 +1041,7 @@ public abstract class Disassembler
                     	return "SHL " + getMem8() + ", 1";
                     case (byte)0x05: // SHR
                     	return "SHR " + getMem8() + ", 1";
-                    case (byte)0x06: // invalid opcode
+                    case (byte)0x06: // invalid Opcode
                         throw new DisassemblerException();
                     case (byte)0x07: // SAR
                     	return "SAR " + getMem8() + ", 1";
@@ -1064,7 +1064,7 @@ public abstract class Disassembler
 	                	return "SHL " + getMem16() + ", 1";
 	                case (byte)0x05: // SHR
 	                	return "SHR " + getMem16() + ", 1";
-	                case (byte)0x06: // invalid opcode
+	                case (byte)0x06: // invalid Opcode
 	                    throw new DisassemblerException();
 	                case (byte)0x07: // SAR
 	                	return "SAR " + getMem16() + ", 1";
@@ -1087,7 +1087,7 @@ public abstract class Disassembler
 	                	return "SHL " + getMem8() + ", CL";
 	                case (byte)0x05: // SHR
 	                	return "SHR " + getMem8() + ", CL";
-	                case (byte)0x06: // invalid opcode
+	                case (byte)0x06: // invalid Opcode
 	                    throw new DisassemblerException();
 	                case (byte)0x07: // SAR
 	                	return "SAR " + getMem8() + ", CL";
@@ -1110,7 +1110,7 @@ public abstract class Disassembler
 	                	return "SHL " + getMem16() + ", CL";
 	                case (byte)0x05: // SHR
 	                	return "SHR " + getMem16() + ", CL";
-	                case (byte)0x06: // invalid opcode
+	                case (byte)0x06: // invalid Opcode
 	                    throw new DisassemblerException();
 	                case (byte)0x07: // SAR
 	                	return "SAR " + getMem16() + ", CL";
@@ -1122,7 +1122,7 @@ public abstract class Disassembler
                 return "XLATB";
             case (byte)0xD4: // TODO: AAM
             case (byte)0xD5: // TODO: AAD
-            case (byte)0xD6: // 0xD6 - invalid opcode
+            case (byte)0xD6: // 0xD6 - invalid Opcode
             case (byte)0xD8: // FADD dword
             case (byte)0xD9: // FLD dword
             case (byte)0xDA: // FIADD dword
@@ -1323,13 +1323,13 @@ public abstract class Disassembler
                         	return "JMP FAR " + getMem16();
                     case 6: // PUSH
                         return "PUSH " + getMem16();
-                    case 7: // invalid opcode
+                    case 7: // invalid Opcode
                         throw new DisassemblerException();
                     default:
                         throw new RuntimeException();
                 }
             case (byte)0xF0: // LOCK
-            case (byte)0xF1: // 0xF1 - invalid opcode
+            case (byte)0xF1: // 0xF1 - invalid Opcode
             case (byte)0xF4: // HLT
                 throw new DisassemblerException();
             default:

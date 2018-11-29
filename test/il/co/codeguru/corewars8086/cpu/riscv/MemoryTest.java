@@ -42,14 +42,4 @@ public class MemoryTest {
         assertEquals(0x3456, memory.loadHalfWord(1));
     }
 
-    @Test
-    public void loadDoubleWordTest()
-    {
-        memory.storeDoubleWord(0, 0x1234567812345678L);
-        assertEquals(0x1234567812345678L, memory.loadDoubleWord(0));
-        assertEquals(0x12345678, memory.loadWord(0));
-        assertEquals(0x56781234, memory.loadWord(2));
-        assertEquals(0x12345678, memory.loadWord(4));
-    }
-
 }

@@ -23,11 +23,6 @@ public class Memory {
         storeHalfWord(index, (short) (value & 0xffff));
         storeHalfWord(index + 2, (short) ((value >> 16) & 0xffff));
     }
-    public void storeDoubleWord(int index, long value)
-    {
-        storeWord(index, (int)(value));
-        storeWord(index + 4, (int)(value >> 32));
-    }
 
 
     public byte loadByte(int index)
@@ -36,17 +31,12 @@ public class Memory {
     }
     public short loadHalfWord(int index)
     {
-        return (short)(loadByte(index) |
+        return (short)(loadByte(index) & 0xFF |
                       (loadByte(index + 1) << 8));
     }
     public int loadWord(int index)
     {
-        return  (loadHalfWord(index) |
+        return  (loadHalfWord(index) & 0xFFFF |
                 (loadHalfWord(index+2) << 16));
-    }
-    public long loadDoubleWord(int index)
-    {
-        return loadWord(index) |
-         (long)loadWord(index + 4) << 32;
     }
 }

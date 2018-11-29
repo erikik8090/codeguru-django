@@ -5,7 +5,7 @@ import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
 public final class RV32I {
     private RV32I(){}
 
-    public static InstructionI  instructionI (Opcode op, int rd, int rs1, int imm) { return new InstructionI(op.opcode, rd, op.funct3,rs1,imm);}
+    public static InstructionI  instructionI (Opcode op, int rd, int rs1, int imm) { return new InstructionI(op.opcode, rd, op.funct3,rs1,imm | (op.funct7 << 5));}
     public static InstructionS  instructionS (Opcode op, int rs1, int rs2, int imm) { return new InstructionS(op.opcode,op.funct3, rs1, rs2, imm);}
     public static InstructionR  instructionR (Opcode op, int rd, int rs1, int rs2) { return new InstructionR(op.opcode, rd, op.funct3, rs1, rs2, op.funct7);}
     public static InstructionU  instructionU (Opcode op, int rd, int imm) { return new InstructionU(op.opcode, rd, imm);}
@@ -25,9 +25,6 @@ public final class RV32I {
     }
 
     public static final class Opcodes{
-        public static Opcode[] opcodes;
-
-
         //BRANCH
         public static Opcode Beq = new Opcode(OpcodeTypes.BRANCH, 0);
         public static Opcode Bne = new Opcode(OpcodeTypes.BRANCH, 1);
@@ -41,11 +38,11 @@ public final class RV32I {
         public static Opcode Sub = new Opcode(OpcodeTypes.OP, 0, 32);
         public static Opcode Sll = new Opcode(OpcodeTypes.OP, 1);
         public static Opcode Slt = new Opcode(OpcodeTypes.OP, 2);
-        public static Opcode Sltu = new Opcode(OpcodeTypes.OP, 3);
+        public static Opcode Sltu= new Opcode(OpcodeTypes.OP, 3);
         public static Opcode Xor = new Opcode(OpcodeTypes.OP, 4);
         public static Opcode Srl = new Opcode(OpcodeTypes.OP, 5, 0);
         public static Opcode Sra = new Opcode(OpcodeTypes.OP, 5, 32);
-        public static Opcode Or = new Opcode(OpcodeTypes.OP, 6);
+        public static Opcode Or  = new Opcode(OpcodeTypes.OP, 6);
         public static Opcode And = new Opcode(OpcodeTypes.OP, 7);
 
         //Store
@@ -57,24 +54,24 @@ public final class RV32I {
         public static Opcode Addi = new Opcode(OpcodeTypes.OP_IMM, 0);
         public static Opcode Slli = new Opcode(OpcodeTypes.OP_IMM, 1);
         public static Opcode Slti = new Opcode(OpcodeTypes.OP_IMM, 2);
-        public static Opcode Sltiu = new Opcode(OpcodeTypes.OP_IMM, 3);
+        public static Opcode Sltiu= new Opcode(OpcodeTypes.OP_IMM, 3);
         public static Opcode Xori = new Opcode(OpcodeTypes.OP_IMM, 4);
         public static Opcode Srli = new Opcode(OpcodeTypes.OP_IMM, 5, 0);
         public static Opcode Srai = new Opcode(OpcodeTypes.OP_IMM, 5, 32);
-        public static Opcode Ori = new Opcode(OpcodeTypes.OP_IMM, 6);
+        public static Opcode Ori  = new Opcode(OpcodeTypes.OP_IMM, 6);
         public static Opcode Andi = new Opcode(OpcodeTypes.OP_IMM, 7);
 
         //Load
-        public static Opcode Lb = new Opcode(OpcodeTypes.OP_IMM, 0);
-        public static Opcode Lh = new Opcode(OpcodeTypes.OP_IMM, 1);
-        public static Opcode Lw = new Opcode(OpcodeTypes.OP_IMM, 2);
-        public static Opcode Lbu = new Opcode(OpcodeTypes.OP_IMM, 4);
-        public static Opcode Lhu = new Opcode(OpcodeTypes.OP_IMM, 5);
+        public static Opcode Lb  = new Opcode(OpcodeTypes.LOAD, 0);
+        public static Opcode Lh  = new Opcode(OpcodeTypes.LOAD, 1);
+        public static Opcode Lw  = new Opcode(OpcodeTypes.LOAD, 2);
+        public static Opcode Lbu = new Opcode(OpcodeTypes.LOAD, 4);
+        public static Opcode Lhu = new Opcode(OpcodeTypes.LOAD, 5);
 
         //Other
-        public static Opcode Lui = new Opcode(OpcodeTypes.LUI);
-        public static Opcode Auipc = new Opcode(OpcodeTypes.AUIPC);
-        public static Opcode Jal = new Opcode(OpcodeTypes.JAL);
+        public static Opcode Lui  = new Opcode(OpcodeTypes.LUI);
+        public static Opcode Auipc= new Opcode(OpcodeTypes.AUIPC);
+        public static Opcode Jal  = new Opcode(OpcodeTypes.JAL);
         public static Opcode Jalr = new Opcode(OpcodeTypes.JALR);
 
 
@@ -82,7 +79,9 @@ public final class RV32I {
 
     }
 
-    private static class Opcode {
+    public static class Opcode {
+        Opcode() {}
+
         private int opcode;
         private int funct3;
         private int funct7;

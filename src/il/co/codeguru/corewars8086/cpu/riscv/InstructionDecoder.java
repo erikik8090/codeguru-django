@@ -5,6 +5,7 @@ import il.co.codeguru.corewars8086.cpu.exceptions.InvalidOpcodeException;
 import il.co.codeguru.corewars8086.cpu.exceptions.MisalignedMemoryLoadException;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
 import il.co.codeguru.corewars8086.memory.MemoryException;
+import il.co.codeguru.corewars8086.utils.Logger;
 
 class InstructionDecoder {
 
@@ -197,21 +198,27 @@ class InstructionDecoder {
 
     private void loadOpcode(InstructionBase i) throws MemoryException, InvalidOpcodeException {
         InstructionI ii = new InstructionI(i);
+        Logger.log(ii.getRd() + ""+ ii.getRs1()+"" + ii.getImmediate());
         switch(ii.getFunct3())
         {
             case 0x0:
+                Logger.log("LB");
                 runner.lb(ii);
                 break;
             case 0x1:
+                Logger.log("LH");
                 runner.lh(ii);
                 break;
             case 0x2:
+                Logger.log("LW");
                 runner.lw(ii);
                 break;
             case 0x4:
+                Logger.log("LBU");
                 runner.lbu(ii);
                 break;
             case 0x5:
+                Logger.log("LHU");
                 runner.lhu(ii);
                 break;
             default:

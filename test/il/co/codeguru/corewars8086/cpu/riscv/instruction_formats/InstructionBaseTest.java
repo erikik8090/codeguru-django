@@ -1,10 +1,20 @@
 package il.co.codeguru.corewars8086.cpu.riscv.instruction_formats;
 
+import il.co.codeguru.corewars8086.utils.Logger;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class InstructionBaseTest {
+
+    @Before
+    public void setUp()
+    {
+        Logger.setTestingMode();
+    }
+
+
     @Test
     public void testBase() {
         InstructionBase a = new InstructionBase(0);

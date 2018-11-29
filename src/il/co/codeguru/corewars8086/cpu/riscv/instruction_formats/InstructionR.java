@@ -1,5 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.riscv.instruction_formats;
 
+import il.co.codeguru.corewars8086.utils.Logger;
+
 public class InstructionR extends InstructionBase
 {
     public InstructionR(int raw)
@@ -20,7 +22,7 @@ public class InstructionR extends InstructionBase
                         ((funct3 & mask(3)) << 12) |
                         ((rs1 & mask(5)) << 15) |
                         ((rs2 & mask(5)) << 20) |
-                        ((funct7 & mask(7) << 25))
+                        ((funct7 & mask(7)) << 25)
         );
     }
 

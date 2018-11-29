@@ -96,6 +96,7 @@ public class InstructionRunner {
     }
 
     public void srai(InstructionI i) {
+        Logger.log("here");
         state.setReg(i.getRd(), state.getReg(i.getRs1()) >> i.getImmediate());
     }
 
@@ -121,6 +122,7 @@ public class InstructionRunner {
 
 
     public void lw(InstructionI i) throws MemoryException {
+
         state.setReg(i.getRd(), memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImmediate()))));
     }
 

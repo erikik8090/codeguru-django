@@ -16,13 +16,13 @@ public class RealModeMemoryImplTest {
     }
 
     @Test
-    public void readByte() throws MemoryException {
+    public void testReadByte() throws MemoryException {
         memory.writeByte(new RealModeAddress((short)0,(short)0), (byte)0x12);
         assertEquals(0x12, memory.readByte(0));
     }
 
     @Test
-    public void read16Bit() throws MemoryException {
+    public void testRead16Bit() throws MemoryException {
         memory.write16Bit(new RealModeAddress((short)0,(short)0), (short)0x1234);
         assertEquals(0x1234, memory.read16Bit(new RealModeAddress((short)0,(short)0)));
         assertEquals(0x12, memory.readByte(1));
@@ -30,7 +30,7 @@ public class RealModeMemoryImplTest {
     }
 
     @Test
-    public void read32Bit() throws MemoryException {
+    public void testRead32Bit() throws MemoryException {
         memory.write32Bit(new RealModeAddress((short)0,(short)0), 0x12345678);
         assertEquals(0x1234, memory.read16Bit(new RealModeAddress((short)0,(short)2)));
         assertEquals(0x5678, memory.read16Bit(new RealModeAddress((short)0,(short)0)));

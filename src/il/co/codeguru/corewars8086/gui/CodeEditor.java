@@ -1,12 +1,10 @@
 package il.co.codeguru.corewars8086.gui;
 
 
-import com.google.gwt.typedarrays.client.Int8ArrayNative;
 import com.google.gwt.typedarrays.client.Uint8ArrayNative;
 import elemental2.dom.*;
 import elemental2.dom.EventListener;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
-import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
@@ -20,28 +18,27 @@ import java.util.*;
 
 public class CodeEditor implements CompetitionEventListener, MemoryEventListener, IBreakpointCheck
 {
+    private final LstParser lstParser = new LstParser(this);
+    private EditorBreakpointManager breakpointManager = new EditorBreakpointManager(this);
     private HTMLElement asm_output, opcodes_edit, asm_linenums, asm_show, debug_area, editor_bottom;
     private HTMLInputElement editor_title;
     private HTMLTextAreaElement asm_edit;
 
     private boolean m_isDebugMode = false;
     private MemoryEventListener.EWriteState m_memWriteState = MemoryEventListener.EWriteState.INIT;
-    private ArrayList<PlayersPanel.Breakpoint> m_breakpoints = null;
+
 
     public static final int CODE_ARENA_OFFSET = 0x10000;
 
     private RealModeMemoryImpl m_mem = null;
-    // competitionEventListener
     @Override
     public void onWarPreStartClear() {}
     @Override
     public void onWarStart() {
         m_mem = m_competition.getCurrentWar().getMemory();
-
     }
     @Override
     public void onWarEnd(int reason, String winners, boolean inDebug) {
-        //m_mem = null;
     }
     @Override
     public void onRound(int round) {}
@@ -62,7 +59,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     @Override
     public void onEndRound() {
         updateDebugLine();
-
     }
 
     DbgLine getSingleByteLine(byte bval) {
@@ -73,8 +69,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             String hexVal = Format.hex2(val);
             byteline.text = "<span class='dbg_opcodes'>" + hexVal + "</span>db " + hexVal + "h";
             byteline.flags = FLAG_UNPARSED;
-            //byteline.binOpcode = new byte[1];
-            //byteline.binOpcode[0] = War.ARENA_BYTE;
         }
         m_singleByte[val] = byteline;
         return byteline;
@@ -118,12 +112,12 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             setByte(ipInsideArena, value);
         }
         else  {
-            // find where this InstructionInfo starts
+            // find where this Opcode starts
             while (m_dbglines[ipInsideArena] == null)
                 --ipInsideArena;
 
             do {
-                // rewriting only a single InstructionInfo so its not possible to cross to a new InstructionInfo which will need reparsing
+                // rewriting only a single Opcode so its not possible to cross to a new Opcode which will need reparsing
                 setByte(ipInsideArena, m_mem.readByte(ipInsideArena + CODE_ARENA_OFFSET));
                 ++ipInsideArena;
             } while (ipInsideArena < 0x10000 && m_dbglines[ipInsideArena] == null);
@@ -143,8 +137,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         m_memWriteState = state;
     }
 
-
-
     public static class LstLine {
         int lineNum = -1;
         int address = -1;
@@ -152,21 +144,9 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         String opcode = "";  // for display
         String fullOpcode = ""; // for knowing the real length
         String code = "";
-        int opcodesCount = 0; // number of bytes in my InstructionInfo, without brackets and spaces
+        int opcodesCount = 0; // number of bytes in my Opcode, without brackets and spaces
         PlayersPanel.Breakpoint tmp_br = null; // used when initializing debug view (doesn't hold info when editing)
     }
-    enum Field {
-        START_SPACE,
-        INDEX,
-        SINGLE_SPACE_AFTER_INDEX,
-        SPACE_BEFORE_CODE,
-        ADDRESS,
-        SPACE_AFTER_ADDRESS,
-        OPCODE,
-        WARNING,
-        CODE,
-        PARSE_ERR
-    };
 
     public static final int FLAG_UNPARSED = 1;  // means this is a DbgLine of a value written by a warrior and not yet parsed by the disassembler
     public static final int FLAG_DEFINE_CODE = 2; // line that came from the user typed text that defines a number (db 123)
@@ -181,7 +161,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     // one such object can appear in multiple addresses for instance the comment int3 line
     public static class DbgLine {
         String text; // includes the command and any comment lines after it
-        //byte[] binOpcode;
         int flags = 0;
     }
     private DbgLine[] m_dbglines;  // for every address, the line of display in the debugger panel or null if line is not displayed
@@ -196,6 +175,14 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     private PageInfo[] m_pages; // marks when a page of 500 addresses should be redrawn in the next required time
     private int m_atScrollP1 = -1, m_atScrollP2 = -1;
     private DbgLine[] m_singleByte = new DbgLine[256]; // hold lines with db XXh for memory write events
+
+    public ArrayList<LstLine> getCurrentListing() {
+        return m_currentListing;
+    }
+
+    public void setCurrentListing(ArrayList<LstLine> m_currentListing) {
+        this.m_currentListing = m_currentListing;
+    }
 
     private ArrayList<LstLine> m_currentListing;
     public PlayersPanel m_playersPanel = null;
@@ -220,9 +207,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         asm_linenums = (HTMLElement)DomGlobal.document.getElementById("asm_linenums");
         editor_title = (HTMLInputElement)DomGlobal.document.getElementById("editor_title");
 
-        asm_edit.addEventListener("input", (event) -> {
-            asm_edit_changed();
-        });
+        asm_edit.addEventListener("input", (event) -> assemblyEditorChanged());
 
         editor_title.addEventListener("input", (event) -> {
             m_playersPanel.updateTitle(editor_title.value);
@@ -247,7 +232,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         var that = this
         $wnd.j_renderIfDirty = $entry(function(i) { that.@il.co.codeguru.corewars8086.gui.CodeEditor::j_renderIfDirty(I)(i) });
         $wnd.j_setScrollAt = $entry(function(i,j) { that.@il.co.codeguru.corewars8086.gui.CodeEditor::j_setScrollAt(II)(i,j) });
-        $wnd.j_asm_edit_changed = $entry(function() { that.@il.co.codeguru.corewars8086.gui.CodeEditor::asm_edit_changed()() });
+        $wnd.j_asm_edit_changed = $entry(function() { that.@il.co.codeguru.corewars8086.gui.CodeEditor::assemblyEditorChanged()() });
     }-*/;
 
     private static native int run_nasm(String asmname, String text, String lstname)     /*-{
@@ -280,223 +265,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     public static final char SPACE_FOR_HEX_CHAR = '\u202f';
     public static final String SPACE_FOR_HEX = "&#x202f;";
 
-    // hex field in the InstructionInfo can have all sorts of brackets and -. need to know how many just digits
-    public int countDigits(String s) {
-        boolean doingDigits = s.length() > 0 && isHexDigit(s.charAt(0)); // see below 'nesb 4'
-        if (!doingDigits)
-            return 0; // not supported yet
-        int count = 0;
-        for(int i = 0; i < s.length(); ++i) {
-            char c = s.charAt(i);
-            if (isHexDigit(c)) {
-                ++count;
-            }
-        }
-        return count;
-    }
-
-    public String spacedHex(String s)
-    {
-        // find how many spaces from the end should be trimmed
-        // spaces appear at the end since we take everything in the code area of the lst
-        int upto = s.length() - 1;
-        for(; upto >= 0; --upto) {
-            if (s.charAt(upto) != ' ')
-                break;
-        }
-        StringBuilder bs = new StringBuilder();
-        int digitCount = 0;
-        boolean doingDigits = s.length() > 0 && isHexDigit(s.charAt(0)); // if it's not a hex number thing, don't do any spacing (resb 4)
-
-        for(int i = 0; i <= upto; ++i) {
-            char c = s.charAt(i);
-            if (digitCount == 7*2) {
-                // don't add more than 7 bytes of InstructionInfo to not overflow the field size
-                bs.append(SPACE_FOR_HEX); // ellipsis
-                break;
-            }
-            if (doingDigits && isHexDigit(c)) {
-                bs.append(c);
-                ++digitCount;
-                if ((digitCount % 2) == 0 && digitCount > 0)
-                    bs.append("&#x202f;"); // thin space
-                continue;
-            }
-            else if (c == '<') {
-                bs.append("&lt;");
-                continue;
-            }
-            else if (c == '>') {
-                bs.append("&gt;");
-                continue;
-            }
-            else if ( (c == ')' || c == ']') && bs.length() > 8 && bs.substring(bs.length()-8) == "&#x202f;") {
-                // if we see an end brace but we just added a space
-                // put the end brace before the space so it would look good
-                bs.insert(bs.length() - 8, c);
-                continue;
-            }
-            bs.append(c);
-        }
-        return bs.toString();
-    }
-
-    private static boolean isDigit(char c) {
-        return c >= '0' && c <= '9';
-    }
-    private static boolean isHexDigit(char c) {
-        return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F'); // lst output only has upcase hex digits
-    }
-
-    // runs a state machine that parses the .lst files
-    private boolean parseLst(String lsttext, StringBuilder opcodesText)
-    {
-        String[] lines = lsttext.split("\\n");
-        m_currentListing = new ArrayList<LstLine>();
-
-        int lineIndex = 1; // does not increment in warning lines that appear in the listing file
-        LstLine prevLine = null;
-        int totalOpcodeCount = 0;
-        for(int i = 0; i < lines.length; ++i)
-        {
-            String line = lines[i];
-            Field state = Field.START_SPACE;
-            LstLine l = new LstLine();
-
-            int indexStart = 0, addressStart = 0, opcodeStart = 0;
-            int charsBeforeCode = 0; // number of characters after the space after address and before the code. used fo not missing indentation
-            for(int j = 0; j < line.length(); ++j)
-            {
-                char c = line.charAt(j);
-                switch(state) {
-                    case START_SPACE:
-                        if (isDigit(c)) {
-                            indexStart = j;
-                            state = Field.INDEX;
-                        }
-                        else if (c != ' ')
-                            state = Field.PARSE_ERR;
-                        break;
-                    case INDEX:
-                        if (c == ' ') {
-                            state = Field.SINGLE_SPACE_AFTER_INDEX;
-                            l.lineNum = Integer.parseInt(line.substring(indexStart,j));
-                            // check the line number only at the end in order to sip warnings
-                        }
-                        else if (!isDigit(c))
-                            state = Field.PARSE_ERR;
-                        break;
-                    case SINGLE_SPACE_AFTER_INDEX:
-                        if (c == ' ') {
-                            state = Field.SPACE_BEFORE_CODE;
-                            charsBeforeCode = -9; // account for not having an address
-                        }
-                        else if (isHexDigit(c)) {
-                            addressStart = j;
-                            state = Field.ADDRESS;
-                        }
-                        else
-                            state = Field.PARSE_ERR;
-                        break;
-                    case ADDRESS:
-                        if (c == ' ') {
-                            state = Field.SPACE_AFTER_ADDRESS;
-                            l.addressStr = line.substring(addressStart, j);
-                            l.address = Integer.parseInt(l.addressStr, 16);
-                        }
-                        else if (!isHexDigit(c))
-                            state = Field.PARSE_ERR;
-                        break;
-                    case SPACE_AFTER_ADDRESS:
-                        //if (isHexDigit(c)) {
-                        state = Field.OPCODE;
-                        opcodeStart = j;
-                        //}
-                        //else
-                        //    state = Field.PARSE_ERR;
-                        break;
-                    case OPCODE:
-                        boolean islast = (j == line.length() - 1);
-                        if (c == '*') {
-                            state = Field.WARNING;
-                        }
-                        else if (!islast && charsBeforeCode < 22)
-                            ++charsBeforeCode; // take anything as long as its in the field size of the InstructionInfo. need this sinc resb adds spaces
-                        else if (c == ' ' || islast) { // continueation lines of a string definition end in the middle of the InstructionInfo field.
-                            //spacedHex(, l);
-                            l.fullOpcode = line.substring(opcodeStart, j);
-                            l.opcode = spacedHex(l.fullOpcode);
-                            l.opcodesCount = countDigits(l.fullOpcode) / 2;
-                            totalOpcodeCount += l.opcodesCount;
-                            if (totalOpcodeCount > WarriorRepository.MAX_WARRIOR_SIZE)
-                                return true; // is going to fail later in setText we check here just for not getting stuch in a long loop
-                            state = Field.SPACE_BEFORE_CODE;
-                            ++charsBeforeCode;
-                        }
-                        else
-                            ++charsBeforeCode;
-                        break;
-                    case SPACE_BEFORE_CODE:
-                        if (c == '*') {
-                            state = Field.WARNING;
-                        }
-                        else if (c != ' ' || charsBeforeCode == 23) {
-                            state = Field.CODE;
-                            l.code = line.substring(j);
-                        }
-                        else
-                            ++charsBeforeCode;
-                        break;
-                    case CODE:
-                        break; // don't care about the code part, we already have that from the input
-                    case PARSE_ERR:
-                        Console.log("ERROR: parsing list file!\n" + lsttext);
-                        return false;
-                } // switch
-                if (state == Field.WARNING)
-                    break; // stop parsing line
-            } // for j in line chars
-            if (state == Field.WARNING)
-                continue; // skip this line
-            if (l.lineNum > lineIndex)
-            {  // this can happen if there is a \ at the end of a line, extending it to the next line
-               // so the next line doesn't exist in the line count, we need to just skit it in the output
-                // this can happe for multiple consecutive lines
-                while (l.lineNum != lineIndex) {
-                    opcodesText.append("\n");
-                    ++lineIndex;
-                }
-            }
-            else if (prevLine != null && l.lineNum == prevLine.lineNum) {
-                // it's a continuation line of the previous line. we need to concatenate to get the full InstructionInfo in order to know its size
-                // happens with string definition db "abcdefgh"
-                prevLine.fullOpcode += l.fullOpcode;
-                prevLine.opcodesCount = countDigits(prevLine.fullOpcode) / 2;
-                // no need to update the display InstructionInfo because its already too long
-                continue;
-            }
-            else if (l.lineNum != lineIndex) {
-                Console.log("wrong line number " + Integer.toString(l.lineNum) + " at " + Integer.toString(lineIndex));
-                return false;
-            }
-
-            ++lineIndex;
-
-            m_currentListing.add(l);
-            opcodesText.append(l.opcode);
-            opcodesText.append("\n");
-
-            prevLine = l;
-        }
-
-        // if text doen't end with new line, delete the one added to opcodes
-        //if (asmtext.charAt(asmtext.length() - 1) != '\n')
-         //   opcodesText.deleteCharAt(opcodesText.length() - 1);
-
-        return true;
-    }
-
-
     private static native Element DocumentFragment_getElementById(DocumentFragment df, String id) /*-{
         return df.getElementById(id)
     }-*/;
@@ -512,17 +280,13 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     private char[] m_errLines = null;
 
     // returns the input asm text, with added formatting for error and warning lines
-    private void parseStdout(String stdoutText, DocumentFragment asmElem, StringBuilder stdoutShorten)
+    private String parseStdout(String stdoutText, DocumentFragment asmElem)
     {
+        StringBuilder errorHtml = new StringBuilder();
         String[] lines = stdoutText.split("\\n");
         // warning come before errors so we can't assume the line numbers are ascending
         // so we need to save all the line nums, sort and then go over from start to end of the text
 
-     /*   int countAllNL = 1; // +1 for the last line with no \n
-        for (int i = 0; i < asmText.length(); ++i) {
-            if (asmText.charAt(i) == '\n')
-                ++countAllNL;
-        }*/
         int countAllNL = m_lineOffsets.size();
 
         // have a potential char for every line in the asm text. this way there's no need to sort
@@ -531,14 +295,12 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         m_errLines = new char[countAllNL]; // for every line in the asmText, 0,'e' or 'w'
 
         // go over stdout, find out which lines need marking
-        for(int i = 0; i < lines.length; ++i)
-        {
-            String line = lines[i];
+        for (String line : lines) {
             int firstColon = -1;
             int lineNum = -1; // this would be zero based
             char lineType = 0;
             // find first and second columns chars
-            for(int j = 0 ; j < line.length(); ++j) {
+            for (int j = 0; j < line.length(); ++j) {
                 if (line.charAt(j) == ':') {
                     if (firstColon == -1)
                         firstColon = j;
@@ -557,15 +319,13 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             }
             if (lineNum == -1) {
                 Console.log("Failed parsing error stdout");
-                return;
+                return  "";
             }
 
-            stdoutShorten.append("<div class='stdout_line_" + lineType + "' ondblclick='asm_cursorToLine(" +
-                                   Integer.toString(m_lineOffsets.get(lineNum)) +")'>");
-            stdoutShorten.append(line.substring(firstColon + 1));
-            stdoutShorten.append("</div>");
-            //if (i < lines.length - 1)
-            //    stdoutShorten.append('\n');
+            errorHtml.append("<div class='stdout_line_" + lineType + "' ondblclick='asm_cursorToLine(" +
+                    Integer.toString(m_lineOffsets.get(lineNum)) + ")'>");
+            errorHtml.append(line.substring(firstColon + 1));
+            errorHtml.append("</div>");
         }
 
 
@@ -584,7 +344,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                 e.classList.add("edit_warning");
 
         }
-
+        return errorHtml.toString();
 
     }
 
@@ -601,16 +361,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
 
 
-
-
-    private void setLineNumBreakpoint(int lineNum, boolean v) {
-        Element e = DomGlobal.document.getElementById("ln" + Integer.toString(lineNum));
-        if (v)
-            e.classList.add("edit_breakpoint");
-        else
-            e.classList.remove("edit_breakpoint");
-    }
-
     private void toggleBreakpointEdit(int atline)
     {
         int atindex = atline - 1; // 0 base index
@@ -619,38 +369,20 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             return;
         }
 
-       // LstLine line = m_currentListing.get(atindex);
-        //line.hasBreakpoint = !line.hasBreakpoint;
-
-        PlayersPanel.Breakpoint found = null;
-        for(PlayersPanel.Breakpoint b: m_breakpoints)
-            if (b.lineNum == atline) {
-                found = b;
-                break;
-            }
-
-        setLineNumBreakpoint(atline, found == null);
-        if (found != null)
-            m_breakpoints.remove(found);
-        else
-            m_breakpoints.add(new PlayersPanel.Breakpoint(atline));
+        breakpointManager.toggleBreakpointEdit(atline);
     }
 
-    private final EventListener m_editBrClickHandler = new EventListener() {
-        @Override
-        public void handleEvent(Event event) {
-            Element e = (Element)event.target;
-            //Console.log(e.innerHTML);
-            toggleBreakpointEdit( Integer.parseInt(e.innerHTML));
-        }
+    private final EventListener m_editBrClickHandler = event -> {
+        Element e = (Element)event.target;
+        toggleBreakpointEdit(Integer.parseInt(e.innerHTML));
     };
 
 
-    private DocumentFragment makeLineNums(String intext)
+    private DocumentFragment makeLineNumberFragment(String intext)
     {
         DocumentFragment lndf = DomGlobal.document.createDocumentFragment();
         // make a new one each time since the old one is kept around for breakpoints line reference
-        m_lineOffsets = new ArrayList<Integer>();
+        m_lineOffsets = new ArrayList<>();
 
         int lineCount = 1;
         for (int i = 0; i <= intext.length(); ++i)
@@ -679,7 +411,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     private boolean entered = false;
     private String m_prevInText = null; // used for breakpoint move analysis
 
-    private void asm_edit_changed()
+    private void assemblyEditorChanged()
     {
         if (entered) // edit recursion should not happen because we're not making changes to asm_edit.value;
             return;  // so this probably does nothing but just to be safe...
@@ -712,9 +444,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     }
 
     public void removeCurrentBreakpoints() {
-        if (m_breakpoints != null) // will be null on the first time
-            for(PlayersPanel.Breakpoint b: m_breakpoints)
-                setLineNumBreakpoint(b.lineNum, false);
+        breakpointManager.removeCurrentBreakpoints();
     }
 
     // from PlayersPanel
@@ -729,9 +459,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
         // add breakpoints of current one
         // set them in the editor even if we're in debug mode
-        m_breakpoints = incode.breakpoints;
-        for(PlayersPanel.Breakpoint b: m_breakpoints)
-            setLineNumBreakpoint(b.lineNum, true);
+        breakpointManager.changePlayer(incode.breakpoints);
 
         if (m_isDebugMode) {
             updateDebugLine();
@@ -761,8 +489,8 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         try {
             while (offset < incode.bin.length) {
                 String text = dis.nextOpcode();
-                sb.append(text);
-                sb.append("\n");
+                sb.append(text)
+                  .append("\n");
                 int len = dis.lastOpcodeSize();
                 offset += len;
             }
@@ -774,9 +502,9 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         // if there's anything left at the end that we didn't eat above
         for(;offset < incode.bin.length; ++offset) {
             byte b = incode.bin[offset];
-            sb.append("db 0x");
-            sb.append(Format.hex2(b & 0xff));  // TBD
-            sb.append("\n");
+            sb.append("db 0x")
+              .append(Format.hex2(b & 0xff))
+              .append("\n");
         }
         String text = sb.toString();
         incode.asmText = text;
@@ -793,7 +521,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
 
         // when setting breakpoints, set to this
-        m_breakpoints = incode.breakpoints;
+        breakpointManager.setBreakpoints(incode.breakpoints);
     }
 
 
@@ -801,7 +529,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     {
         DocumentFragment df = DomGlobal.document.createDocumentFragment();
         int lastFound = -1;
-        int found = intext.indexOf('\n', 0);
+        int found = intext.indexOf('\n');
         int lineNum = 1;
         while (found != -1) {
             if (found != lastFound + 1) { // not an empty line
@@ -851,79 +579,22 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     }-*/;
 
 
-    //a
-    //b
-    //c
-    //d
+    public int getLineCount() {
+        return m_lineCount;
+    }
 
     // used for dececting if lines were added or removed
-    int m_lineCount = 0;
+    private int m_lineCount = 0;
 
     // this function analyzes the change made by knowing what was selected or where the caret was
     // and how many lines were removed or added in order to move around breakpoints
     // - it doesn't support dragging text that has NL in it (breakpoint doesn't move)
     private void updateBreakpoints(ArrayList<Integer> prevLineOffsets, int prevLineCount, String prevInText)
     {
-        if (m_breakpoints == null || m_breakpoints.size() == 0)
-            return;
         int selStart = saved_selectionStart();
         int selEnd = saved_selectionEnd();
         String keydown = saved_keydown();
-
-        //if (selStart == -1 || selEnd == -1) {
-        //    Console.error("updateBreakpoints without selection");
-        //    return; // somehow we got here without knowing what's the selection/caret was. should not happe
-        //}  resetting the selection marker was a bad idea since a drag text move does 2 changes immediately one after
-        //   the other so the second change doesn't have a selection in
-
-        // for every breakpoint decide if it should be moved or deleted
-        ListIterator<PlayersPanel.Breakpoint> it = m_breakpoints.listIterator();
-        while(it.hasNext())
-        {
-            PlayersPanel.Breakpoint br = it.next();
-            int lineStartIndex = 0; // the case for lineNum==1
-            assert br.lineNum > 0: "unexpected breakpoint line number";
-            if (br.lineNum != 1) // -1 to make it 0 based, -1 because we want where the previous line ends, +1 to move past the NL
-                lineStartIndex = prevLineOffsets.get(br.lineNum - 1 - 1) + 1;
-
-            int lineNLIndex = prevLineOffsets.get(br.lineNum - 1); // -1 make it 0 based
-
-            if (selStart != selEnd && (selStart < lineStartIndex && selEnd > lineStartIndex   // removed the before the start of the line, including the start
-                                   ||  selStart == lineStartIndex && selEnd > lineNLIndex ))  // removed from the start of the line, passed the end of it
-            { // removing the whole line
-                // no need to remove markers because we just made a new line numbers column
-                it.remove();
-                continue;
-            }
-
-            // if it's not the above case, we don't care about anything that doesn't change the line count
-            if  (prevLineCount != m_lineCount)
-            {
-                // if we backspaced on a breakpoint,  need to remove it
-                // need to happen in normal caret, no selection and the backspace on the line of the breakpoint
-                if (selStart == selEnd && selStart == lineStartIndex && (keydown == "Backspace" || keydown == "Delete")) {
-                    boolean isLineWithText = false;
-                    if (prevInText != null) {
-                        for(int i = lineStartIndex; i < lineNLIndex && !isLineWithText; ++i) {
-                            char c = prevInText.charAt(i);
-                            isLineWithText = (c != ' ' && c != '\n');
-                        }
-                    }
-                    if (!isLineWithText) {
-                        it.remove();
-                        continue;
-                    }
-                }
-                // if we removed lines before this breakpoint line, move it up
-                if (selStart <= lineStartIndex && selEnd <= lineStartIndex) {
-                    br.lineNum += m_lineCount - prevLineCount;
-                    setLineNumBreakpoint(br.lineNum, true);
-                }
-            }
-
-            setLineNumBreakpoint(br.lineNum, true);
-
-        }
+        breakpointManager.updateBreakpoints(prevLineOffsets, prevLineCount, prevInText, selStart, selEnd, keydown);
     }
 
 
@@ -937,7 +608,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             asm_linenums.innerHTML = "1";
             if (playersPanel != null)
                 playersPanel.updateAsmResult(true, null, null);
-            //Console.log("~Empty input");
             return;
         }
 
@@ -946,15 +616,14 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                        .replace("&", "&amp;")  // other stuff coming from textarea we don't want to pass to html
                        .replace("<", "&lt;")
                        .replace(">", "&gt;");
-                // we want the markes to appear in the html for debugging but not in the nasm input
+        // we want the marks to appear in the html for debugging but not in the nasm input
         String nasm_intext = intext;
         // assemble
         int retcode = run_nasm("player.asm", nasm_intext, "player.lst");
         String stdout = get_stdout();
 
-
         // this updates m_lineOffsets and m_lineCount
-        DocumentFragment lineNumDf = makeLineNums(intext);
+        DocumentFragment lineNumDf = makeLineNumberFragment(intext);
         asm_linenums.innerHTML = "";
         asm_linenums.appendChild(lineNumDf);
 
@@ -962,15 +631,13 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         DocumentFragment df = null;
         if (!stdout.isEmpty())
         {   // add coloring to the text
-            StringBuilder stdoutShorten = new StringBuilder(); // removes the file name from the start of the lines
-
             df = htmlizeText(intext);
-            parseStdout(stdout, df, stdoutShorten);
+            String errorString = parseStdout(stdout, df);
 
             asm_show.innerHTML = "";
             asm_show.appendChild(df);
 
-            asm_output.innerHTML = stdoutShorten.toString();
+            asm_output.innerHTML = errorString;
         }
         else {
             asm_show.innerHTML = intext; // clear all line marking
@@ -982,18 +649,17 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
         if (retcode != 0) { // error
             // TBD- compile just till the error line? or just the last good result?
-            opcodes_edit.innerHTML = linesAsInput(intext); // this is needed because x-scroll hiding relies on the InstructionInfo pane to be full
+            opcodes_edit.innerHTML = linesAsInput(intext); // this is needed because x-scroll hiding relies on the Opcode pane to be full
             Console.error("~Assembler error");
             if (playersPanel != null)
                 playersPanel.updateAsmResult(false, null, null);
-            //setBreakpoints(textBreakpoints); // there isn't going to be a new listing, make the breakpoints marking now
             return;
         }
 
         String output = read_file("player.lst");
         if (output.isEmpty()) {
             m_currentListing.clear();
-            opcodes_edit.innerHTML = linesAsInput(intext);;
+            opcodes_edit.innerHTML = linesAsInput(intext);
             Console.log("~Empty output");
             if (playersPanel != null)
                 playersPanel.updateAsmResult(true, null, null);
@@ -1001,7 +667,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
 
         StringBuilder opcodesText = new StringBuilder();
-        boolean ok = parseLst(output, opcodesText);
+        boolean ok = lstParser.parseLst(output, opcodesText);
         if (!ok) {
             opcodes_edit.innerHTML = "[listing parsing error]";
             Console.error("listing parsing error"); // should not happen
@@ -1009,9 +675,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             return;
         }
         opcodes_edit.innerHTML = opcodesText.toString();
-        //Console.log("~OK");
-
-
 
         byte[] buf = read_file_bin_arr("player");
         if (buf.length > WarriorRepository.MAX_WARRIOR_SIZE) {
@@ -1023,7 +686,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             return;
         }
 
-        df = checkDisasmLines(buf, m_currentListing, df, intext);
+        checkDisasmLines(buf, m_currentListing, df, intext);
 
 
         if (playersPanel != null)
@@ -1056,76 +719,49 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         if (cmd.length() == 4 && cmd.charAt(0) == 'r' && cmd.charAt(1) == 'e' && cmd.charAt(2) == 's')
             s = cmd.charAt(3);
 
-        if (s == 'b' || s == 'w' || s == 'd' || s == 'q' || s == 't' || s == 'o' || s == 'y' || s == 'z')
-            return true;
+        return s == 'b' || s == 'w' || s == 'd' || s == 'q' || s == 't' || s == 'o' || s == 'y' || s == 'z';
 
-        return false;
     }
 
     // check opcodes that are emitten are supported by codewars8086 and issue warnings if not
-    private DocumentFragment checkDisasmLines(byte[] binbuf, ArrayList<LstLine> listing, DocumentFragment asmElem, String intext)
+    private void checkDisasmLines(byte[] binbuf, ArrayList<LstLine> listing, DocumentFragment asmElem, String intext)
     {
         Disassembler dis = new Disassembler.ArrDisassembler(binbuf, 0, binbuf.length);
 
         // process each line independently
-        for(int atLstLine = 0; atLstLine < listing.size(); ++atLstLine)
+        for(int lineNum = 0; lineNum < listing.size(); ++lineNum)
         {
-            String msg = null;
-            LstLine lstline = listing.get(atLstLine);
-            if (lstline.address == -1)
+            LstLine line = listing.get(lineNum);
+            if (line.address == -1)
                 continue; // not a code line
-            if (isDefineCode(lstline.code)) {  // don't want to check disassembled opcodes on lines that just define data
+            if (isDefineCode(line.code)) {  // don't want to check disassembled opcodes on lines that just define data
                 continue;
             }
 
-            try {
-                dis.reset(lstline.address, lstline.address + lstline.opcodesCount);
-                String asm = dis.nextOpcode();
-                int len = dis.lastOpcodeSize();
-
-                if (len != lstline.opcodesCount) {
-                    // can happen with `times 5 inc ax`
-                   // String msgtxt = "disassembled wrong number of bytes " + Integer.toString(atLstLine+1);
-                   // Console.error(msgtxt);
-                }
-
-            }
-            catch(Disassembler.DisassemblerLengthException e) {
-                msg = Integer.toString(atLstLine+1) + ": not enough bytes to parse"; // can happen if we db 09h for example, or just 'rep'
-            }
-            catch(Disassembler.DisassemblerException e) {
-                msg = Integer.toString(atLstLine+1) + ": Although this is a legal x86 InstructionInfo, codewars8086 does not support it";
-                int eptr = dis.getPointer() - 1;
-                if (eptr >= 0 && eptr < binbuf.length)
-                    msg += ", InstructionInfo = 0x" + Format.hex2(binbuf[eptr] & 0xff);
-            }
-            catch(RuntimeException e) {
-                Console.error("failed parsing binbuf RuntimeException"); // this should not happen. only happens for missing cases
-            }
+            String msg = getDisassemblerErrorMessage(binbuf, dis, lineNum, line);
 
             if (msg != null)
             {
-                //Console.error(msg);
                 // if m_errLines is null it means there are no errors or warnings so we're good
-                if (m_errLines == null || atLstLine < m_errLines.length && m_errLines[atLstLine] == 0) // it exists and there isn't an something already there
+                if (m_errLines == null || (lineNum < m_errLines.length && m_errLines[lineNum] == 0)) // it exists and there isn't an something already there
                 {
                     if (asmElem == null) {
                         asmElem = htmlizeText(intext);
                         asm_show.innerHTML = "";
                         asm_show.appendChild(asmElem); // this is somewhat replicated code from above that there's no easy way to avoid it
                     }
-                    Element e = DomGlobal.document.getElementById("mline_" + Integer.toString(atLstLine+1));
+                    Element e = DomGlobal.document.getElementById("mline_" + Integer.toString(lineNum+1));
                     if (e == null) {
                         Console.error("did not find line?");
-                        return asmElem;
+                        return;
                     }
                     e.classList.add("edit_warning");
 
                     Element omsgdiv = DomGlobal.document.createElement("div");
                     omsgdiv.classList.add("stdout_line_w");
 
-                    if (atLstLine < m_lineOffsets.size()) {
-                        omsgdiv.setAttribute("ondblclick","asm_cursorToLine(" + Integer.toString(m_lineOffsets.get(atLstLine)) + ")");
+                    if (lineNum < m_lineOffsets.size()) {
+                        omsgdiv.setAttribute("ondblclick","asm_cursorToLine(" + Integer.toString(m_lineOffsets.get(lineNum)) + ")");
                     }
                     Text omsgtxt = DomGlobal.document.createTextNode(msg);
                     omsgdiv.appendChild(omsgtxt);
@@ -1134,8 +770,28 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                 }
             }
         }
+    }
 
-        return asmElem;
+    private String getDisassemblerErrorMessage(byte[] binbuf, Disassembler dis, int lineNum, LstLine line) {
+        String msg = null;
+        try {
+            dis.reset(line.address, line.address + line.opcodesCount);
+            dis.nextOpcode();
+            dis.lastOpcodeSize();
+        }
+        catch(Disassembler.DisassemblerLengthException e) {
+            msg = Integer.toString(lineNum+1) + ": not enough bytes to parse"; // can happen if we db 09h for example, or just 'rep'
+        }
+        catch(Disassembler.DisassemblerException e) {
+            msg = Integer.toString(lineNum+1) + ": Although this is a legal x86 Opcode, codewars8086 does not support it";
+            int eptr = dis.getPointer() - 1;
+            if (eptr >= 0 && eptr < binbuf.length)
+                msg += ", Opcode = 0x" + Format.hex2(binbuf[eptr] & 0xff);
+        }
+        catch(RuntimeException e) {
+            Console.error("failed parsing binbuf RuntimeException"); // this should not happen. only happens for missing cases
+        }
+        return msg;
     }
 
 
@@ -1148,16 +804,12 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
     }-*/;
 
-    private static native double getTime() /*-{
-        return Date.now()
-    }-*/;
-
     public void setTitle(String s) {
         editor_title.value = s;
     }
 
 
-    private void setDbgAddrBreakpoint(int addr, boolean v) {
+    private void setDbgAddrBreakpoint(int addr, boolean     v) {
         Element e = DomGlobal.document.getElementById("da" + Integer.toString(addr));
         if (v)
             e.classList.add("dbg_breakpoint");
@@ -1172,13 +824,9 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     {
         War war = m_competition.getCurrentWar();
 
-        //double _start = getTime();
-
         if (m_fillCmd == null) {
             m_fillCmd = new DbgLine();
-            m_fillCmd.text = "<span class='dbg_backfill'><span class='dbg_opcodes'>CC</span>int 3</span>";;
-            //m_fillCmd.binOpcode = new byte[1];
-            //m_fillCmd.binOpcode[0] = War.ARENA_BYTE;
+            m_fillCmd.text = "<span class='dbg_backfill'><span class='dbg_opcodes'>CC</span>int 3</span>";
         }
 
         for(int addr = 0; addr < War.ARENA_SIZE; ++addr) {
@@ -1187,11 +835,8 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         for(PageInfo p: m_pages)
             p.isDirty = true;
 
-        //double _setup = getTime();
-        //Console.log("cc-setup " + Double.toString(_setup - _start));
         m_dbgBreakpoints = new PlayersPanel.Breakpoint[War.ARENA_SIZE];
 
-        //int inEditorAddr = -1;
         for(int i = 0; i < war.getNumWarriors(); ++i)
         {
             Warrior w = war.getWarrior(i);
@@ -1220,7 +865,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                     if (last_dbgline == m_fillCmd) { // it's the shared DbgLine from above, make a copy of it since we don't want to change it
                         DbgLine copy = new DbgLine();
                         copy.text = last_dbgline.text;
-                        //copy.binOpcode = last_dbgline.binOpcode;
                         last_dbgline = copy;
                         m_dbglines[befFirst] = last_dbgline;
                     }
@@ -1249,13 +893,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                     if (isDefineCode(lstline.code))
                         dbgline.flags = FLAG_DEFINE_CODE;
 
-                    /*dbgline.binOpcode = new byte[lstline.opcodesCount];  -- binOpcode not needed it seems
-                    assert lstline.address + lstline.opcodesCount <= code.bin.length: "too many opcodes for the program length?";
-                    // copy the binary of this line to dbgline for later comparison when stepping
-                    for(int j = 0; j < lstline.opcodesCount; ++j) {
-                        dbgline.binOpcode[j] = code.bin[lstline.address + j];
-                    }*/
-
                     if (lsti <= FLAG_LSTLINE_MAX) {// lines above 2^16 are not tracked... should not come to this but just to be safe
                         dbgline.flags |= ((lsti+1) << FLAG_LSTLINE_SHIFT);
                         dbgline.flags |= (i << FLAG_PLAYER_NUM_SHIFT);
@@ -1282,16 +919,11 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     }
 
     public void j_setScrollAt(int p1, int p2) {
-        //Console.log("~~~~1 bf96 " + m_dbglines[0xbf96].text);
-        //Console.log("~~~~1 9f14 " + m_dbglines[0x9f14].text);
         j_renderIfDirty(p1);
         j_renderIfDirty(p2);
 
         m_atScrollP1 = p1;
         m_atScrollP2 = p2;
-
-        //Console.log("~~~~2 bf96 " + m_dbglines[0xbf96].text);
-        //Console.log("~~~~2 9f14 " + m_dbglines[0x9f14].text);
     }
 
 
@@ -1345,9 +977,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     {
         int absAddr = RealModeAddress.linearAddress(state.getCS(), (short)state.getPc());
         int arenaAddr = absAddr - CODE_ARENA_OFFSET;
-        if (m_dbgBreakpoints[arenaAddr] == null)
-            return false;
-        return true;
+        return m_dbgBreakpoints[arenaAddr] != null;
     }
 
     // called when an address is clicked to add a breakpoint for a line
@@ -1402,17 +1032,14 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         renderLine(addr, dbgline);
     }
 
-    private final EventListener m_dbgBrClickHandler = new EventListener() {
-        @Override
-        public void handleEvent(Event event) {
-            Element e = (Element)event.target;
-            //Console.log(e.innerHTML);
-            toggleBreakpointDbg( Integer.parseInt(e.innerHTML, 16));
-        }
+    private final EventListener m_dbgBrClickHandler = event -> {
+        Element e = (Element)event.target;
+        //Console.log(e.innerHTML);
+        toggleBreakpointDbg( Integer.parseInt(e.innerHTML, 16));
     };
 
     private int m_lastDbgAddr = -1; // for knowing if we need to move it
-    private int m_lastDbgAddrEnd = -1; // end (one after last) of the debugged InstructionInfo (for edit handling)
+    private int m_lastDbgAddrEnd = -1; // end (one after last) of the debugged Opcode (for edit handling)
     private HTMLElement m_lastDbgElement;
     private boolean m_lastIsAlive = false;
 
@@ -1462,25 +1089,24 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         // in this case we don't want to disassemble since the dbglines have not even been inited yet. sort of a hack.
         if (m_dbglines[ipInsideArena] == null)
         {
-            // got to a null line, means this address is hidden and is part of a preceding InstructionInfo, first find that
+            // got to a null line, means this address is hidden and is part of a preceding Opcode, first find that
             int opcodeAddr = ipInsideArena;
             while (m_dbglines[opcodeAddr] == null)
                 --opcodeAddr;
-            // fill the size of this InstructionInfo with db lines,
-            // do this before disassembly of the IP line to make sure we've erased the old InstructionInfo correctly
-            //byte[] mem = m_competition.getCurrentWar().getMemory().m_data;
+            // fill the size of this Opcode with db lines,
+            // do this before disassembly of the IP line to make sure we've erased the old Opcode correctly
             do {
                 setByteFromMem(opcodeAddr);
                 ++opcodeAddr;
             } while (m_dbglines[opcodeAddr] == null);
-            // disassemble may eat at any of the db's after it, and might also each InstructionInfo after that
-            disassembleAddr(ipInsideArena + CODE_ARENA_OFFSET, ipInsideArena);
+            // disassemble may eat at any of the db's after it, and might also each Opcode after that
+            disassembleAddress(ipInsideArena + CODE_ARENA_OFFSET, ipInsideArena);
         }
         else {
             DbgLine ipline = m_dbglines[ipInsideArena];
             int flags = m_dbglines[ipInsideArena].flags;
             if ((flags & FLAG_UNPARSED) != 0 || (flags & FLAG_DEFINE_CODE) != 0 ) {
-                disassembleAddr(ipInsideArena + CODE_ARENA_OFFSET, ipInsideArena);
+                disassembleAddress(ipInsideArena + CODE_ARENA_OFFSET, ipInsideArena);
             }
         }
 
@@ -1499,13 +1125,10 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     }
 
-    private void disassembleAddr(int absaddr, int addrInArea)
+    private void disassembleAddress(int absaddr, int addrInArea)
     {
-        //TODO: Check the performance on this - if it is not bad, don't fix it
-        //TODO: Make version like before, but make it special to gwt version
-        Int8ArrayNative memory = Int8ArrayNative.create(m_mem.length());
-        memory.set(m_mem.getMemory());
-        Disassembler dis = new Disassembler.NArrDisassembler(memory , absaddr, m_mem.length()); // TBDTBD
+        byte[] memory_bytes = m_mem.getMemory();
+        Disassembler dis = new Disassembler.ArrDisassembler(memory_bytes , absaddr, m_mem.length()); // TBDTBD
         String text;
         try {
             text = dis.nextOpcode();
@@ -1528,13 +1151,13 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         renderLineIfInView(addrInArea, opline);
         for(int i = 1; i < len; ++i) {
             // remove the lines of the bytes after it
-            // don't know what opcodes I'm writing so need to make sure it remains consistant
+            // don't know what opcodes I'm writing so need to make sure it remains consistent
             eraseOpcode(addrInArea + i);
             // this erases one line and possible adds db in the lines after it, this is simple good although it can write several times in the same place
         }
     }
 
-    // erase the InstructionInfo in addr, and take care to setByte the bytes after it that are affected
+    // erase the Opcode in addr, and take care to setByte the bytes after it that are affected
     private void eraseOpcode(int addrInArea) {
         m_dbglines[addrInArea] = null;
         renderLineIfInView(addrInArea, null);
@@ -1555,14 +1178,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     }
 
-    // scroll triggers request for update of range of addresses
-    //  for each line,
-
-    //    check if core content matches line content
-
-
-
-
     public void setDebugMode(boolean v) {
         if (v) {
             editor_bottom.style.display = "none";
@@ -1579,6 +1194,14 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
         m_isDebugMode = v;
 
+    }
+
+    public void setLineNumBreakpoint(int lineNum, boolean v) {
+        Element e = DomGlobal.document.getElementById("ln" + Integer.toString(lineNum));
+        if (v)
+            e.classList.add("edit_breakpoint");
+        else
+            e.classList.remove("edit_breakpoint");
     }
 
 }

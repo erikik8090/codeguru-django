@@ -6,7 +6,7 @@ import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
 
 /**
- * Wraps Opcode fetching from CS:IP.
+ * Wraps InstructionInfo fetching from CS:IP.
  * 
  * @author DL
  */

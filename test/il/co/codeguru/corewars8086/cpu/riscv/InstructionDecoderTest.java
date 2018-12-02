@@ -20,7 +20,7 @@ public class InstructionDecoderTest {
     //TODO: Replace this with a proper interface
     public void setUp()
     {
-        decoder = new InstructionDecoder(new InstructionRunner(new CpuRiscV(new CpuStateRiscV(), new RealModeMemoryImpl())));
+        decoder = new InstructionDecoder();
         Logger.setTestingMode();
     }
 
@@ -29,7 +29,7 @@ public class InstructionDecoderTest {
         InstructionBase base = new InstructionBase(0x13);
 
         try {
-            decoder.decode_and_run(base);
+            decoder.decode(base);
         } catch (InvalidOpcodeException e) {
             fail("Instruction Decoder threw exception on valid instruction");
         }
@@ -43,7 +43,7 @@ public class InstructionDecoderTest {
         InstructionBase base = new InstructionBase(0);
 
         try {
-            decoder.decode_and_run(base);
+            decoder.decode(base);
         } catch (InvalidOpcodeException e) {
             return;
         }

@@ -1,7 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.exceptions;
 
 /**
- * Thrown when attempting to execute an unimplemented Opcode.
+ * Thrown when attempting to execute an unimplemented InstructionInfo.
  * 
  * @author DL
  */

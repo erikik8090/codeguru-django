@@ -4,7 +4,7 @@ import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.RV32I;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionBase;
+import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatBase;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
@@ -35,7 +35,7 @@ public class ImmediateTest {
         Logger.setTestingMode();
     }
 
-    private void loadInstruction(InstructionBase i) throws MemoryException {
+    private void loadInstruction(InstructionFormatBase i) throws MemoryException {
         cpu.getMemory().write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) state.getPc()), i.getRaw());
     }
 

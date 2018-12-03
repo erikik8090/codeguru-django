@@ -1,22 +1,20 @@
 package il.co.codeguru.corewars8086.cpu.riscv.instruction_formats;
 
-import il.co.codeguru.corewars8086.utils.Logger;
+public class InstructionFormatSB extends InstructionFormatBase {
 
-public class InstructionSB extends InstructionBase{
-
-    public InstructionSB(int raw)
+    public InstructionFormatSB(int raw)
     {
         super(raw);
     }
 
-    public InstructionSB(InstructionBase i)
+    public InstructionFormatSB(InstructionFormatBase i)
     {
-        super(i.raw);
+        this(i.raw);
     }
 
-    public InstructionSB(int opcode, int funct3, int rs1, int rs2, int imm)
+    public InstructionFormatSB(int opcode, int funct3, int rs1, int rs2, int imm)
     {
-        super(
+        this(
                 (opcode & mask(7)) |
                         (((imm >> 11) & 1) << 7) |
                         (((imm >> 1) & mask(4)) << 8) |

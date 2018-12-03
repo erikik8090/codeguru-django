@@ -2,9 +2,8 @@ package il.co.codeguru.corewars8086.cpu.riscv;
 
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.exceptions.InvalidOpcodeException;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionBase;
+import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatBase;
 import il.co.codeguru.corewars8086.memory.MemoryException;
-import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Logger;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -26,7 +25,7 @@ public class InstructionDecoderTest {
 
     @Test
     public void decodeTest() throws MemoryException, CpuException {
-        InstructionBase base = new InstructionBase(0x13);
+        InstructionFormatBase base = new InstructionFormatBase(0x13);
 
         try {
             decoder.decode(base);
@@ -40,7 +39,7 @@ public class InstructionDecoderTest {
     @Ignore
     public void decodeFailTest() throws MemoryException, CpuException
     {
-        InstructionBase base = new InstructionBase(0);
+        InstructionFormatBase base = new InstructionFormatBase(0);
 
         try {
             decoder.decode(base);

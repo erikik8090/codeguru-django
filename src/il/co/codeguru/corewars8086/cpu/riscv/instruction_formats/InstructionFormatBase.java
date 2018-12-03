@@ -1,9 +1,9 @@
 package il.co.codeguru.corewars8086.cpu.riscv.instruction_formats;
 
-public class InstructionBase {
+public class InstructionFormatBase {
     final protected int raw;
 
-    public InstructionBase(int raw) {
+    public InstructionFormatBase(int raw) {
         this.raw = raw;
     }
 

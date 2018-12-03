@@ -1,19 +1,17 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionBase;
+import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatBase;
 import il.co.codeguru.corewars8086.memory.MemoryException;
-
-import java.util.function.BiFunction;
 
 public class Instruction {
 
     private InstructionInfo info;
-    private InstructionBase instructionFormat;
+    private InstructionFormatBase instructionFormat;
     private Action action;
 
     public Instruction(InstructionInfo info,
-                       InstructionBase format,
+                       InstructionFormatBase format,
                        Action action)
     {
         this.info = info;
@@ -26,7 +24,7 @@ public class Instruction {
         return info;
     }
 
-    public InstructionBase getFormat() {
+    public InstructionFormatBase getFormat() {
         return instructionFormat;
     }
 
@@ -37,7 +35,7 @@ public class Instruction {
 
     @FunctionalInterface
     public interface Action{
-        void apply(InstructionBase i, InstructionRunner runner) throws CpuException, MemoryException;
+        void apply(InstructionFormatBase i, InstructionRunner runner) throws CpuException, MemoryException;
     }
 
     public static class InstructionInfo {

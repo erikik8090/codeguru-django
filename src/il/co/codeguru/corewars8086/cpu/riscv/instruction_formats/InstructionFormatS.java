@@ -1,20 +1,20 @@
 package il.co.codeguru.corewars8086.cpu.riscv.instruction_formats;
 
-public class InstructionS extends InstructionBase
+public class InstructionFormatS extends InstructionFormatBase
 {
-    public InstructionS(int raw)
+    public InstructionFormatS(int raw)
     {
         super(raw);
     }
 
-    public InstructionS(InstructionBase i)
+    public InstructionFormatS(InstructionFormatBase i)
     {
-        super(i.raw);
+        this(i.raw);
     }
 
-    public InstructionS(int opcode, int funct3, int rs1, int rs2, int imm)
+    public InstructionFormatS(int opcode, int funct3, int rs1, int rs2, int imm)
     {
-        super(
+        this(
                 (opcode & mask(7)) |
                         ((imm & mask(5)) << 7) |
                         ((funct3 & mask(3)) << 12) |

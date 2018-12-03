@@ -5,12 +5,12 @@ import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
 public final class RV32I {
     private RV32I(){}
 
-    public static InstructionI  instructionI (Instruction.InstructionInfo op, int rd, int rs1, int imm) { return new InstructionI(op.getOpcode(), rd, op.getFunct3(),rs1,imm | (op.getFunct7() << 5));}
-    public static InstructionS  instructionS (Instruction.InstructionInfo op, int rs1, int rs2, int imm) { return new InstructionS(op.getOpcode(),op.getFunct3(), rs1, rs2, imm);}
-    public static InstructionR  instructionR (Instruction.InstructionInfo op, int rd, int rs1, int rs2) { return new InstructionR(op.getOpcode(), rd, op.getFunct3(), rs1, rs2, op.getFunct7());}
-    public static InstructionU  instructionU (Instruction.InstructionInfo op, int rd, int imm) { return new InstructionU(op.getOpcode(), rd, imm);}
-    public static InstructionSB instructionSB(Instruction.InstructionInfo op, int rs1, int rs2, int imm) { return new InstructionSB(op.getOpcode(),op.getFunct3(),rs1, rs2, imm);}
-    public static InstructionUJ instructionUJ(Instruction.InstructionInfo op, int rd, int imm) { return new InstructionUJ(op.getOpcode(), rd, imm);}
+    public static InstructionFormatI instructionI (Instruction.InstructionInfo op, int rd, int rs1, int imm) { return new InstructionFormatI(op.getOpcode(), rd, op.getFunct3(),rs1,imm | (op.getFunct7() << 5));}
+    public static InstructionFormatS instructionS (Instruction.InstructionInfo op, int rs1, int rs2, int imm) { return new InstructionFormatS(op.getOpcode(),op.getFunct3(), rs1, rs2, imm);}
+    public static InstructionFormatR instructionR (Instruction.InstructionInfo op, int rd, int rs1, int rs2) { return new InstructionFormatR(op.getOpcode(), rd, op.getFunct3(), rs1, rs2, op.getFunct7());}
+    public static InstructionFormatU instructionU (Instruction.InstructionInfo op, int rd, int imm) { return new InstructionFormatU(op.getOpcode(), rd, imm);}
+    public static InstructionFormatSB instructionSB(Instruction.InstructionInfo op, int rs1, int rs2, int imm) { return new InstructionFormatSB(op.getOpcode(),op.getFunct3(),rs1, rs2, imm);}
+    public static InstructionFormatUJ instructionUJ(Instruction.InstructionInfo op, int rd, int imm) { return new InstructionFormatUJ(op.getOpcode(), rd, imm);}
 
     public final class OpcodeTypes {
         public static final int OP_IMM = 0x13;

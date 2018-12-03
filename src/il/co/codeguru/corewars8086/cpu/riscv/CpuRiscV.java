@@ -1,7 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionBase;
+import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatBase;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
@@ -34,7 +34,7 @@ public class CpuRiscV {
     public void nextOpcode() throws CpuException, MemoryException
     {
         int rawCode = memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)state.getPc()));
-        InstructionBase instructionRaw = new InstructionBase(rawCode);
+        InstructionFormatBase instructionRaw = new InstructionFormatBase(rawCode);
 
         Instruction instruction = decoder.decode(instructionRaw);
 

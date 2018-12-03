@@ -118,6 +118,7 @@
           </fileset>
         </batchtest>
         <formatter type="plain"/>
+        <formatter type="xml" />
       </junit>
     </jacoco:coverage>
   </target>

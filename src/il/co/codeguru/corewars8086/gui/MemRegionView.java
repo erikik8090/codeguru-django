@@ -5,6 +5,7 @@ import elemental2.dom.DocumentFragment;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLElement;
+import il.co.codeguru.corewars8086.gui.code_editor.CodeEditor;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.*;
 import il.co.codeguru.corewars8086.utils.Unsigned;

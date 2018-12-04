@@ -2,6 +2,7 @@ package il.co.codeguru.corewars8086.gui;
 
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
+import il.co.codeguru.corewars8086.gui.code_editor.CodeEditor;
 import il.co.codeguru.corewars8086.war.*;
 import com.google.gwt.animation.client.AnimationScheduler;
 

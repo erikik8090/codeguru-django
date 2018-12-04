@@ -1,4 +1,6 @@
-package il.co.codeguru.corewars8086.gui;
+package il.co.codeguru.corewars8086.gui.code_editor;
+
+import il.co.codeguru.corewars8086.gui.PlayersPanel;
 
 import java.util.ArrayList;
 import java.util.ListIterator;

@@ -1,41 +1,42 @@
-package il.co.codeguru.corewars8086.gui;
-
+package il.co.codeguru.corewars8086.gui.code_editor;
 
 import com.google.gwt.typedarrays.client.Uint8ArrayNative;
 import elemental2.dom.*;
-import elemental2.dom.EventListener;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
+import il.co.codeguru.corewars8086.gui.IBreakpointCheck;
+import il.co.codeguru.corewars8086.gui.PlayersPanel;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Disassembler;
 import il.co.codeguru.corewars8086.war.*;
 
-
-import java.util.*;
+import java.util.ArrayList;
 
 public class CodeEditor implements CompetitionEventListener, MemoryEventListener, IBreakpointCheck
 {
     private final LstParser lstParser = new LstParser(this);
+    private final Debugger debugger = new Debugger(this);
     private EditorBreakpointManager breakpointManager = new EditorBreakpointManager(this);
-    private HTMLElement asm_output, opcodes_edit, asm_linenums, asm_show, debug_area, editor_bottom;
+    private HTMLElement asm_output;
+    private HTMLElement opcodes_edit;
+    private HTMLElement asm_linenums;
+    private HTMLElement asm_show;
+    private HTMLElement editor_bottom;
     private HTMLInputElement editor_title;
     private HTMLTextAreaElement asm_edit;
 
     private boolean m_isDebugMode = false;
-    private MemoryEventListener.EWriteState m_memWriteState = MemoryEventListener.EWriteState.INIT;
 
 
-    public static final int CODE_ARENA_OFFSET = 0x10000;
+    static final int CODE_ARENA_OFFSET = 0x10000;
 
-    private RealModeMemoryImpl m_mem = null;
     @Override
     public void onWarPreStartClear() {}
     @Override
     public void onWarStart() {
-        m_mem = m_competition.getCurrentWar().getMemory();
+        debugger.setMemory(m_competition.getCurrentWar().getMemory());
     }
     @Override
     public void onWarEnd(int reason, String winners, boolean inDebug) {
@@ -58,83 +59,18 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     public void onNoneAlive() {}
     @Override
     public void onEndRound() {
-        updateDebugLine();
-    }
-
-    DbgLine getSingleByteLine(byte bval) {
-        int val = bval & 0xff; // to unsigned int
-        DbgLine byteline = m_singleByte[val];
-        if (byteline == null) {
-            byteline = new DbgLine();
-            String hexVal = Format.hex2(val);
-            byteline.text = "<span class='dbg_opcodes'>" + hexVal + "</span>db " + hexVal + "h";
-            byteline.flags = FLAG_UNPARSED;
-        }
-        m_singleByte[val] = byteline;
-        return byteline;
-    }
-
-    private void setByte(int address, byte value) {
-        DbgLine dbgline = getSingleByteLine(value);
-        m_dbglines[address] = dbgline;
-        renderLineIfInView(address, dbgline);
-    }
-
-    private void renderLineIfInView(int address, DbgLine dbgline) {
-        int page = address / PAGE_SIZE;
-        if (page == m_atScrollP1 || page == m_atScrollP2) {
-            renderLine(address, dbgline);
-        }
+        debugger.updateDebugLine();
     }
 
     // MemoryEventListener
     @Override
-    public void onMemoryWrite(RealModeAddress address, byte value)
-    {
-        // don't rewrite lines if we're in the stage of putting warriors in memory
-        if (m_memWriteState != EWriteState.RUN)
-            return;
-        int absAddr = address.getLinearAddress();
-        if (absAddr < War.ARENA_SEGMENT*RealModeAddress.PARAGRAPH_SIZE || absAddr >= War.ARENA_SEGMENT*RealModeAddress.PARAGRAPH_SIZE + War.ARENA_SIZE)
-            return;
-        int ipInsideArena = absAddr - 0x1000 *0x10; // arena * paragraph
-        final int cIpInsideArea = ipInsideArena;
-
-        int page = ipInsideArena / PAGE_SIZE;
-        if (page < 0 || page >= m_pages.length)
-            return;
-
-        m_pages[page].isDirty = true;
-
-        DbgLine existing = m_dbglines[ipInsideArena];
-
-        if (existing == m_fillCmd) {
-            setByte(ipInsideArena, value);
-        }
-        else  {
-            // find where this Opcode starts
-            while (m_dbglines[ipInsideArena] == null)
-                --ipInsideArena;
-
-            do {
-                // rewriting only a single Opcode so its not possible to cross to a new Opcode which will need reparsing
-                setByte(ipInsideArena, m_mem.readByte(ipInsideArena + CODE_ARENA_OFFSET));
-                ++ipInsideArena;
-            } while (ipInsideArena < 0x10000 && m_dbglines[ipInsideArena] == null);
-        }
-
-        // if we just edited the byte under the debugger, need to reparse it
-        if (cIpInsideArea >= m_lastDbgAddr && cIpInsideArea < m_lastDbgAddrEnd) {
-            m_lastDbgAddr = -1; // make it go inside the next function
-            updateDebugLine();
-        }
-
-
+    public void onMemoryWrite(RealModeAddress address, byte value) {
+        debugger.getMemoryListener().onMemoryWrite(address, value);
     }
 
     @Override
     public void onWriteState(EWriteState state) {
-        m_memWriteState = state;
+        debugger.getMemoryListener().onWriteState(state);
     }
 
     public static class LstLine {
@@ -148,46 +84,42 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         PlayersPanel.Breakpoint tmp_br = null; // used when initializing debug view (doesn't hold info when editing)
     }
 
-    public static final int FLAG_UNPARSED = 1;  // means this is a DbgLine of a value written by a warrior and not yet parsed by the disassembler
-    public static final int FLAG_DEFINE_CODE = 2; // line that came from the user typed text that defines a number (db 123)
-    public static final int FLAG_HAS_COMMENT = 4; // This DbgLine has comment lines after the first code line so when highlighting this line, need to highlight dfXXXXX instead of dXXXXX
-
-    public static final int FLAG_LSTLINE_MAX = 0x7ff;
-    public static final int FLAG_LSTLINE_SHIFT = 16;
-    public static final int FLAG_LSTLINE = 0x07ff0000; // 5 - upper 12 bits of the flat is a 1-based line number of the LstLine that created this DbgLine or 0 if there isn't one
-    public static final int FLAG_PLAYER_NUM_SHIFT = 27;
-    public static final int FLAG_PLAYER_NUM = 0xf8000000; // upper 5 bits is the player number, valid only if there is a non-zero LstLine
-
-    // one such object can appear in multiple addresses for instance the comment int3 line
-    public static class DbgLine {
-        String text; // includes the command and any comment lines after it
-        int flags = 0;
-    }
-    private DbgLine[] m_dbglines;  // for every address, the line of display in the debugger panel or null if line is not displayed
-    private PlayersPanel.Breakpoint[] m_dbgBreakpoints; // for every address, reference to a Breakpoint object if one exists
-                                                        // this is initialized a new every debug session
-
     public static class PageInfo {
         boolean isDirty;
         int startAddr;
         int endAddr;
     }
-    private PageInfo[] m_pages; // marks when a page of 500 addresses should be redrawn in the next required time
-    private int m_atScrollP1 = -1, m_atScrollP2 = -1;
-    private DbgLine[] m_singleByte = new DbgLine[256]; // hold lines with db XXh for memory write events
 
-    public ArrayList<LstLine> getCurrentListing() {
+    public PageInfo[] getPages()
+    {
+        return m_pages;
+    }
+
+    private PageInfo[] m_pages; // marks when a page of 500 addresses should be redrawn in the next required time
+
+
+    PlayersPanel getPlayerPanel()
+    {
+        return m_playersPanel;
+    }
+
+    Competition getCurrentCompetition()
+    {
+        return m_competition;
+    }
+
+    ArrayList<LstLine> getCurrentListing() {
         return m_currentListing;
     }
 
-    public void setCurrentListing(ArrayList<LstLine> m_currentListing) {
+    void setCurrentListing(ArrayList<LstLine> m_currentListing) {
         this.m_currentListing = m_currentListing;
     }
 
     private ArrayList<LstLine> m_currentListing;
     public PlayersPanel m_playersPanel = null;
-    private Competition m_competition = null;
-    private int PAGE_SIZE = _PAGE_SIZE();
+    private Competition m_competition;
+    final int PAGE_SIZE = _PAGE_SIZE();
 
     private static native int _PAGE_SIZE() /*-{
         return $wnd.PAGE_SIZE
@@ -208,12 +140,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         editor_title = (HTMLInputElement)DomGlobal.document.getElementById("editor_title");
 
         asm_edit.addEventListener("input", (event) -> assemblyEditorChanged());
-
-        editor_title.addEventListener("input", (event) -> {
-            m_playersPanel.updateTitle(editor_title.value);
-        });
-
-        m_dbglines = new DbgLine[War.ARENA_SIZE];
+        editor_title.addEventListener("input", (event) -> m_playersPanel.updateTitle(editor_title.value));
 
         m_pages = new PageInfo[ (War.ARENA_SIZE / PAGE_SIZE) + 1 ];
         for(int i = 0; i < m_pages.length; ++i) {
@@ -225,14 +152,14 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
 
         exportMethods();
-
     }
 
     public native void exportMethods() /*-{
-        var that = this
-        $wnd.j_renderIfDirty = $entry(function(i) { that.@il.co.codeguru.corewars8086.gui.CodeEditor::j_renderIfDirty(I)(i) });
-        $wnd.j_setScrollAt = $entry(function(i,j) { that.@il.co.codeguru.corewars8086.gui.CodeEditor::j_setScrollAt(II)(i,j) });
-        $wnd.j_asm_edit_changed = $entry(function() { that.@il.co.codeguru.corewars8086.gui.CodeEditor::assemblyEditorChanged()() });
+        var that = this;
+        var debug = this.@il.co.codeguru.corewars8086.gui.code_editor.CodeEditor::debugger;
+        $wnd.j_renderIfDirty = $entry(function(i) { debug.@il.co.codeguru.corewars8086.gui.code_editor.Debugger::j_renderIfDirty(I)(i) });
+        $wnd.j_setScrollAt = $entry(function(i,j) { debug.@il.co.codeguru.corewars8086.gui.code_editor.Debugger::j_setScrollAt(II)(i,j) });
+        $wnd.j_asm_edit_changed = $entry(function() { that.@il.co.codeguru.corewars8086.gui.code_editor.CodeEditor::assemblyEditorChanged()() });
     }-*/;
 
     private static native int run_nasm(String asmname, String text, String lstname)     /*-{
@@ -263,7 +190,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
 
     public static final char SPACE_FOR_HEX_CHAR = '\u202f';
-    public static final String SPACE_FOR_HEX = "&#x202f;";
+    static final String SPACE_FOR_HEX = "&#x202f;";
 
     private static native Element DocumentFragment_getElementById(DocumentFragment df, String id) /*-{
         return df.getElementById(id)
@@ -359,8 +286,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         $wnd.asm_edit.selectionEnd = end
     }-*/;
 
-
-
     private void toggleBreakpointEdit(int atline)
     {
         int atindex = atline - 1; // 0 base index
@@ -368,7 +293,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             Console.error("addBreakpointEdit invalid line " + Integer.toString(atline));
             return;
         }
-
         breakpointManager.toggleBreakpointEdit(atline);
     }
 
@@ -395,7 +319,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                 e.setAttribute("id", "ln" + Integer.toString(lineCount));
                 e.appendChild(DomGlobal.document.createTextNode(Integer.toString(lineCount)));
                 lndf.appendChild(e);
-
 
                 ++lineCount;
                 m_lineOffsets.add(i);
@@ -443,15 +366,11 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         return opcodesText.toString();
     }
 
-    public void removeCurrentBreakpoints() {
-        breakpointManager.removeCurrentBreakpoints();
-    }
-
     // from PlayersPanel
     public void playerSelectionChanged(PlayersPanel.Code incode, PlayersPanel callback)
     {
         // remove the prev code breakpoints before it's lines will be erased by setText
-        removeCurrentBreakpoints();
+        breakpointManager.removeCurrentBreakpoints();
 
         asm_edit.value = incode.asmText;
         editor_title.value = incode.player.title;
@@ -462,7 +381,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         breakpointManager.changePlayer(incode.breakpoints);
 
         if (m_isDebugMode) {
-            updateDebugLine();
+            debugger.updateDebugLine();
         }
     }
 
@@ -481,7 +400,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         if (m_isDebugMode)
             return; // should not happen. can't load new code in debug
 
-        removeCurrentBreakpoints();
+        breakpointManager.removeCurrentBreakpoints();
 
         StringBuilder sb = new StringBuilder();
         Disassembler dis = new Disassembler.ArrDisassembler(incode.bin, 0, incode.bin.length);
@@ -579,7 +498,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     }-*/;
 
 
-    public int getLineCount() {
+    int getLineCount() {
         return m_lineCount;
     }
 
@@ -695,7 +614,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     }
 
     // check if code text is db ..
-    private boolean isDefineCode(String code) {
+    public boolean isDefineCode(String code) {
         int start = -1, end = -1;
         for(int i = 0; i < code.length(); ++i) {
             char c = code.charAt(i);
@@ -796,7 +715,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
 
     // defer if we're inside setDebugMode
-    private static native void scrollToAddr(int addr, boolean defer) /*-{
+    public static native void scrollToAddr(int addr, boolean defer) /*-{
         if (defer)
             $wnd.deferredEditorToAddress = addr
         else {
@@ -808,375 +727,19 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         editor_title.value = s;
     }
 
-
-    private void setDbgAddrBreakpoint(int addr, boolean     v) {
-        Element e = DomGlobal.document.getElementById("da" + Integer.toString(addr));
-        if (v)
-            e.classList.add("dbg_breakpoint");
-        else
-            e.classList.remove("dbg_breakpoint");
-    }
-
-
-    DbgLine m_fillCmd;
-
-    private void initDebugAreaLines()
-    {
-        War war = m_competition.getCurrentWar();
-
-        if (m_fillCmd == null) {
-            m_fillCmd = new DbgLine();
-            m_fillCmd.text = "<span class='dbg_backfill'><span class='dbg_opcodes'>CC</span>int 3</span>";
-        }
-
-        for(int addr = 0; addr < War.ARENA_SIZE; ++addr) {
-            m_dbglines[addr] = m_fillCmd;
-        }
-        for(PageInfo p: m_pages)
-            p.isDirty = true;
-
-        m_dbgBreakpoints = new PlayersPanel.Breakpoint[War.ARENA_SIZE];
-
-        for(int i = 0; i < war.getNumWarriors(); ++i)
-        {
-            Warrior w = war.getWarrior(i);
-            int playerLoadOffset = w.getLoadOffsetInt(); // in the area segment
-
-            PlayersPanel.Code code = m_playersPanel.findCode(w.getLabel());
-
-            // transfer breakpoints
-            assert code.lines != null: "unexpected null lines for code " + code.label + " of player" + code.player.getName();
-            for(LstLine lstline : code.lines)
-                lstline.tmp_br = null;
-            for(PlayersPanel.Breakpoint br : code.breakpoints) {
-                assert br.lineNum - 1 < code.lines.size() : "unexpected lineNum in breakpoint";
-                code.lines.get(br.lineNum - 1).tmp_br = br;
-            }
-
-
-            DbgLine last_dbgline = null;
-
-            // comment or label on the first line, need to belong to the address before first
-            if (code.lines.get(0).address == -1)
-            {
-                int befFirst = playerLoadOffset - 1;
-                if (m_dbglines[befFirst] != null) {
-                    last_dbgline = m_dbglines[befFirst];
-                    if (last_dbgline == m_fillCmd) { // it's the shared DbgLine from above, make a copy of it since we don't want to change it
-                        DbgLine copy = new DbgLine();
-                        copy.text = last_dbgline.text;
-                        last_dbgline = copy;
-                        m_dbglines[befFirst] = last_dbgline;
-                    }
-                }
-                else {
-                    last_dbgline = new DbgLine();
-                    last_dbgline.text = "";
-                    m_dbglines[befFirst] = last_dbgline;
-                }
-            }
-
-            for(int lsti = 0; lsti < code.lines.size(); ++lsti)
-            {
-                LstLine lstline = code.lines.get(lsti);
-                if (lstline.address == -1) {
-                    assert last_dbgline != null: "Unexpected blank prev line";
-                    last_dbgline.flags |= FLAG_HAS_COMMENT;
-                    last_dbgline.text += "</div><div class='dbg_comment_line'>      <span class='dbg_opcodes'></span>" + lstline.code + "</div>";
-                }
-                else {
-                    int loadAddr = lstline.address + playerLoadOffset;
-                    DbgLine dbgline = new DbgLine();
-                    String opcode = lstline.opcode;
-
-                    dbgline.text = "<span class='dbg_opcodes'>" + opcode + "</span>" + lstline.code;
-                    if (isDefineCode(lstline.code))
-                        dbgline.flags = FLAG_DEFINE_CODE;
-
-                    if (lsti <= FLAG_LSTLINE_MAX) {// lines above 2^16 are not tracked... should not come to this but just to be safe
-                        dbgline.flags |= ((lsti+1) << FLAG_LSTLINE_SHIFT);
-                        dbgline.flags |= (i << FLAG_PLAYER_NUM_SHIFT);
-                    }
-                    m_dbglines[loadAddr] = dbgline;
-
-                    last_dbgline = dbgline;
-
-                    for(int j = 1; j < lstline.opcodesCount; ++j) {
-                        m_dbglines[loadAddr + j] = null;
-                    }
-
-                    if (lstline.tmp_br != null)
-                        m_dbgBreakpoints[loadAddr] = lstline.tmp_br;
-
-                }
-
-            }
-
-
-        }
-
-
-    }
-
-    public void j_setScrollAt(int p1, int p2) {
-        j_renderIfDirty(p1);
-        j_renderIfDirty(p2);
-
-        m_atScrollP1 = p1;
-        m_atScrollP2 = p2;
-    }
-
-
-
-    // dbgline should already be in m_dgblines
-    // dXXXXX is the whole line, possible containing the following comment lines
-    // dfXXXXX is just the first line that is not a comment - markable by debugger when stepping
-    // daXXXXX is the address of the line (not preset in comment lines)
-    public void renderLine(int addr, DbgLine dbgline) {
-        String addrstr = Integer.toString(addr);
-        HTMLElement dline = (HTMLElement)DomGlobal.document.getElementById("d" + addrstr);
-        if (dbgline == null) {
-            dline.style.display = "none";
-            return;
-        }
-
-        String addrhex = Format.hex4(addr);
-        if ((dbgline.flags & FLAG_HAS_COMMENT) != 0) // this div tag is closed inside dbgline.text before the comment starts
-            dline.innerHTML = "<div id='df" + addrstr + "'><span id='da" + addrstr + "'>" + addrhex + "</span>  " + dbgline.text;
-        else
-            dline.innerHTML = "<span id='da" + addrstr + "'>" + addrhex + "</span>  " + dbgline.text;
-        dline.removeAttribute("style");
-
-        HTMLElement da = (HTMLElement)DomGlobal.document.getElementById("da" + addrstr);
-        da.addEventListener("click", m_dbgBrClickHandler);
-
-        // mark breakpoint?
-        PlayersPanel.Breakpoint br = m_dbgBreakpoints[addr];
-        if (br != null) {
-            setDbgAddrBreakpoint(addr, true);
-        }
-    }
-
-    // from javascript scroll of debug area
-    public void j_renderIfDirty(int pagenum)
-    {
-        if (pagenum == -1)
-            return;
-        PageInfo page = m_pages[pagenum];
-        if (!page.isDirty)
-             return;
-        for(int addr = page.startAddr; addr < page.endAddr; ++addr)
-        {
-            DbgLine dbgline = m_dbglines[addr];
-            renderLine(addr, dbgline);
-        }
-        page.isDirty = false;
-    }
-
     public boolean shouldBreak(CpuStateRiscV state)
     {
         int absAddr = RealModeAddress.linearAddress(state.getCS(), (short)state.getPc());
         int arenaAddr = absAddr - CODE_ARENA_OFFSET;
-        return m_dbgBreakpoints[arenaAddr] != null;
-    }
-
-    // called when an address is clicked to add a breakpoint for a line
-    // all breakpoints of all players are visible and active
-    // breakpoints in the debug view that are in addresses that don't correspond to code lines are transient.
-    // they disappear once the debug session is over. They are not saved in the players m_breakpoints since it's unknown what players are they of
-    private void toggleBreakpointDbg(int addr)
-    {
-        PlayersPanel.Breakpoint br = null;
-        boolean wasAdded = false;
-
-        if (m_dbgBreakpoints[addr] == null) {
-            br = new PlayersPanel.Breakpoint(-1);
-            m_dbgBreakpoints[addr] = br;
-            wasAdded = true;
-        }
-        else {
-            br = m_dbgBreakpoints[addr];
-            m_dbgBreakpoints[addr] = null;
-            wasAdded = false;
-        }
-
-        War war = m_competition.getCurrentWar();
-
-        DbgLine dbgline = m_dbglines[addr];
-        int lsti = (dbgline.flags & FLAG_LSTLINE) >> FLAG_LSTLINE_SHIFT;
-        if (lsti >= 1) {
-            int playeri = (dbgline.flags & FLAG_PLAYER_NUM) >> FLAG_PLAYER_NUM_SHIFT;
-            Warrior warrior = war.getWarrior(playeri);
-
-            PlayersPanel.Code codeObj = m_playersPanel.findCode(warrior.getLabel());
-
-            if (wasAdded) {
-                br.lineNum = lsti;
-                // check sanity that there isn't a breakpoint in this line
-                for(PlayersPanel.Breakpoint exist_br : codeObj.breakpoints)
-                    assert exist_br.lineNum != br.lineNum : "Breakpoint of this line already exists! " + Integer.toString(br.lineNum);
-                codeObj.breakpoints.add(br);
-            }
-            else {
-                boolean removed = codeObj.breakpoints.remove(br);
-                if (!removed)
-                    Console.error("removed a breakpoint that did not exist?");
-            }
-
-            // add it to the editor as well if needed so it will be visible there when debugging is done
-            if (codeObj == m_playersPanel.getCodeInEditor())
-                setLineNumBreakpoint(lsti, wasAdded);
-        }
-
-
-        renderLine(addr, dbgline);
-    }
-
-    private final EventListener m_dbgBrClickHandler = event -> {
-        Element e = (Element)event.target;
-        //Console.log(e.innerHTML);
-        toggleBreakpointDbg( Integer.parseInt(e.innerHTML, 16));
-    };
-
-    private int m_lastDbgAddr = -1; // for knowing if we need to move it
-    private int m_lastDbgAddrEnd = -1; // end (one after last) of the debugged Opcode (for edit handling)
-    private HTMLElement m_lastDbgElement;
-    private boolean m_lastIsAlive = false;
-
-    private Warrior getCurrentWarrior() {
-        War war = m_competition.getCurrentWar();
-        if (war == null)
-            return null;
-        String label = m_playersPanel.getCodeInEditor().getLabel();
-        return war.getWarriorByLabel(label);
-    }
-    private static int getWarrirorIp(Warrior w) {
-        if (w == null)
-            return -1;
-        CpuStateRiscV state = w.getCpuState();
-
-        short ip = (short) state.getPc();
-        short cs = state.getCS();
-
-        int ipInsideArena = RealModeAddress.linearAddress(cs, ip) - CODE_ARENA_OFFSET;
-        return ipInsideArena;
-    }
-
-    private int getCurrentWarriorIp() {
-        return getWarrirorIp(getCurrentWarrior());
-    }
-
-    private void setByteFromMem(int addrInArea) {
-        int value = m_mem.readByte(addrInArea + CODE_ARENA_OFFSET);
-        setByte(addrInArea, (byte)(value & 0xff) );
+        return debugger.getDbgBreakpoint(arenaAddr) != null;
     }
 
     public void updateDebugLine() {
-        Warrior currentWarrior = getCurrentWarrior();
-        if (currentWarrior == null)
-            return;
-        final int ipInsideArena = getWarrirorIp(currentWarrior);
-        final boolean isAlive = currentWarrior.isAlive();
-
-        scrollToAddr(ipInsideArena, false); // make sure to scroll to it even the current line marker is on it
-        if (ipInsideArena == m_lastDbgAddr && isAlive == m_lastIsAlive) {
-            return; // nothing to do, the line is what we want it to be
-        }
-        if (m_lastDbgElement != null) // remove the last thing we put there
-            m_lastDbgElement.classList.remove(m_lastIsAlive ? "current_dbg" : "current_dbg_dead");
-
         // the first call to this is before debugMode is started to set the first debug line.
         // in this case we don't want to disassemble since the dbglines have not even been inited yet. sort of a hack.
-        if (m_dbglines[ipInsideArena] == null)
-        {
-            // got to a null line, means this address is hidden and is part of a preceding Opcode, first find that
-            int opcodeAddr = ipInsideArena;
-            while (m_dbglines[opcodeAddr] == null)
-                --opcodeAddr;
-            // fill the size of this Opcode with db lines,
-            // do this before disassembly of the IP line to make sure we've erased the old Opcode correctly
-            do {
-                setByteFromMem(opcodeAddr);
-                ++opcodeAddr;
-            } while (m_dbglines[opcodeAddr] == null);
-            // disassemble may eat at any of the db's after it, and might also each Opcode after that
-            disassembleAddress(ipInsideArena + CODE_ARENA_OFFSET, ipInsideArena);
-        }
-        else {
-            DbgLine ipline = m_dbglines[ipInsideArena];
-            int flags = m_dbglines[ipInsideArena].flags;
-            if ((flags & FLAG_UNPARSED) != 0 || (flags & FLAG_DEFINE_CODE) != 0 ) {
-                disassembleAddress(ipInsideArena + CODE_ARENA_OFFSET, ipInsideArena);
-            }
-        }
-
-        String ider = "d";
-        if ( (m_dbglines[ipInsideArena].flags & FLAG_HAS_COMMENT) != 0)
-            ider = "df"; // a line with a comment after, don't highlight the entire line, just the first line. df is assured to exist if we have this flag
-
-        HTMLElement dline = (HTMLElement)DomGlobal.document.getElementById(ider + Integer.toString(ipInsideArena));
-        dline.classList.add( isAlive ? "current_dbg" : "current_dbg_dead");
-        m_lastDbgElement = dline;
-        m_lastDbgAddr = ipInsideArena;
-        m_lastDbgAddrEnd = m_lastDbgAddr + 1;
-        m_lastIsAlive = isAlive;
-        while (m_lastDbgAddrEnd < 0x10000 && m_dbglines[m_lastDbgAddrEnd] == null)
-            ++m_lastDbgAddrEnd;
-
+        debugger.updateDebugLine();
     }
 
-    private void disassembleAddress(int absaddr, int addrInArea)
-    {
-        byte[] memory_bytes = m_mem.getMemory();
-        Disassembler dis = new Disassembler.ArrDisassembler(memory_bytes , absaddr, m_mem.length()); // TBDTBD
-        String text;
-        try {
-            text = dis.nextOpcode();
-        }
-        catch(Disassembler.DisassemblerException e) {
-            return;
-        }
-        eraseOpcode(addrInArea); // for example replacing at the start of a long db "ABC"
-        int len = dis.lastOpcodeSize();
-
-        DbgLine opline = new DbgLine();
-        StringBuilder bs = new StringBuilder();
-        for(int i = 0; i < len; ++i) {
-            bs.append( Format.hex2(m_mem.readByte(absaddr + i) & 0xff));
-            bs.append(SPACE_FOR_HEX);
-        }
-
-        opline.text = "<span class='dbg_opcodes'>" + bs.toString() + "</span>" + text;
-        m_dbglines[addrInArea] = opline;
-        renderLineIfInView(addrInArea, opline);
-        for(int i = 1; i < len; ++i) {
-            // remove the lines of the bytes after it
-            // don't know what opcodes I'm writing so need to make sure it remains consistent
-            eraseOpcode(addrInArea + i);
-            // this erases one line and possible adds db in the lines after it, this is simple good although it can write several times in the same place
-        }
-    }
-
-    // erase the Opcode in addr, and take care to setByte the bytes after it that are affected
-    private void eraseOpcode(int addrInArea) {
-        m_dbglines[addrInArea] = null;
-        renderLineIfInView(addrInArea, null);
-        ++addrInArea;
-        while(m_dbglines[addrInArea] == null) {
-            setByteFromMem(addrInArea);
-            ++addrInArea;
-        }
-    }
-
-
-    public void scrollToCodeInEditor(boolean defer) {
-        int ipInsideArena = getCurrentWarriorIp();
-        if (ipInsideArena == -1) // not in competition
-            return;
-
-        scrollToAddr(ipInsideArena, defer);
-
-    }
 
     public void setDebugMode(boolean v) {
         if (v) {
@@ -1184,16 +747,15 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             asm_edit.style.display= "none"; // just the textarea
             editor_title.readOnly = true;
 
-            initDebugAreaLines();
-            scrollToCodeInEditor(true); // defer scrolling since we want to do this only after all sizes are correct and everything shown
+            debugger.initDebugAreaLines();
         }
         else {
             editor_bottom.style.display = "";
             asm_edit.style.display = "";
             editor_title.readOnly = false;
         }
+        debugger.setDebugMode(v);
         m_isDebugMode = v;
-
     }
 
     public void setLineNumBreakpoint(int lineNum, boolean v) {
@@ -1203,5 +765,4 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         else
             e.classList.remove("edit_breakpoint");
     }
-
 }

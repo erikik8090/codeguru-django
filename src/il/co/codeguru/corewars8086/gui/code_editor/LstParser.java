@@ -1,4 +1,4 @@
-package il.co.codeguru.corewars8086.gui;
+package il.co.codeguru.corewars8086.gui.code_editor;
 
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.war.WarriorRepository;
@@ -20,8 +20,7 @@ public class LstParser {
         CODE,
         PARSE_ERR
     }
-    
-    public static final char SPACE_FOR_HEX_CHAR = '\u202f';
+
     public static final String SPACE_FOR_HEX = "&#x202f;";
     
     public LstParser(CodeEditor codeEditor) {

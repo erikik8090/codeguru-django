@@ -5,8 +5,8 @@ import com.google.gwt.typedarrays.client.Int8ArrayNative;
 import com.google.gwt.typedarrays.shared.ArrayBuffer;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
+import il.co.codeguru.corewars8086.gui.code_editor.CodeEditor;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
-import org.eclipse.jdt.internal.compiler.codegen.IntegerCache;
 
 import java.util.ArrayList;
 

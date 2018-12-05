@@ -9,12 +9,11 @@ import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.utils.Disassembler;
-import il.co.codeguru.corewars8086.utils.Logger;
+import il.co.codeguru.corewars8086.utils.disassembler.DisassemblerX86;
+import il.co.codeguru.corewars8086.utils.disassembler.IDisassembler;
 import il.co.codeguru.corewars8086.war.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static elemental2.dom.DomGlobal.document;
 
@@ -407,7 +406,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         breakpointManager.removeCurrentBreakpoints();
 
         StringBuilder sb = new StringBuilder();
-        Disassembler dis = new Disassembler.ArrDisassembler(incode.bin, 0, incode.bin.length);
+        IDisassembler dis = new DisassemblerX86(incode.bin, 0, incode.bin.length);
         int offset = 0;
         try {
             while (offset < incode.bin.length) {
@@ -418,7 +417,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                 offset += len;
             }
         }
-        catch(Disassembler.DisassemblerException e) {
+        catch(IDisassembler.DisassemblerException e) {
             // do nothing
         }
 
@@ -433,7 +432,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         incode.asmText = text;
         asm_edit.value = text;
         byte[] setbin = incode.bin;
-        // setting the text will redo the bin according to the disassemler. due to disassembler bugs this may be different
+        // setting the text will redo the bin according to the disassembler. due to disassembler bugs this may be different
         // than the original, check it
         setText(incode.asmText, callback);
 
@@ -458,7 +457,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         DocumentFragment df = document.createDocumentFragment();
         int lineNum = 1;
         String[] lines = intext.split("\\n");
-        Arrays.stream(lines).forEach(Logger::log);
 
         for(String line : lines)
         {
@@ -589,6 +587,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
         opcodes_edit.innerHTML = opcodesText.toString();
 
+        //TODO: Check if file returns things little-endian or big-endian
         byte[] buf = read_file_bin_arr("player");
         if (buf.length > WarriorRepository.MAX_WARRIOR_SIZE) {
             String msg = "Code is longer than the maximum allowed " + Integer.toString(WarriorRepository.MAX_WARRIOR_SIZE) + " bytes";
@@ -639,7 +638,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     // check opcodes that are emitten are supported by codewars8086 and issue warnings if not
     private void checkDisasmLines(byte[] binbuf, ArrayList<LstLine> listing, DocumentFragment asmElem, String intext)
     {
-        Disassembler dis = new Disassembler.ArrDisassembler(binbuf, 0, binbuf.length);
+        IDisassembler dis = new DisassemblerX86(binbuf, 0, binbuf.length);
 
         // process each line independently
         for(int lineNum = 0; lineNum < listing.size(); ++lineNum)
@@ -664,10 +663,8 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                         asm_show.appendChild(asmElem); // this is somewhat replicated code from above that there's no easy way to avoid it
                     }
                     Element e = document.getElementById("mline_" + Integer.toString(lineNum+1));
-                    if (e == null) {
-                        Console.error("did not find line?");
-                        return;
-                    }
+                    assert e!=null : "did not find line?";
+
                     e.classList.add("edit_warning");
 
                     Element omsgdiv = document.createElement("div");
@@ -685,21 +682,22 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
     }
 
-    private String getDisassemblerErrorMessage(byte[] binbuf, Disassembler dis, int lineNum, LstLine line) {
+    private String getDisassemblerErrorMessage(byte[] binbuf, IDisassembler dis, int lineNum, LstLine line) {
         String msg = null;
         try {
             dis.reset(line.address, line.address + line.opcodesCount);
             dis.nextOpcode();
             dis.lastOpcodeSize();
         }
-        catch(Disassembler.DisassemblerLengthException e) {
+        catch(DisassemblerX86.DisassemblerLengthException e) {
             msg = Integer.toString(lineNum+1) + ": not enough bytes to parse"; // can happen if we db 09h for example, or just 'rep'
         }
-        catch(Disassembler.DisassemblerException e) {
+        //TODO: Change this to it's own exception type
+        catch(DisassemblerX86.DisassemblerException e) {
             msg = Integer.toString(lineNum+1) + ": Although this is a legal x86 Opcode, codewars8086 does not support it";
-            int eptr = dis.getPointer() - 1;
-            if (eptr >= 0 && eptr < binbuf.length)
-                msg += ", Opcode = 0x" + Format.hex2(binbuf[eptr] & 0xff);
+            //int eptr = dis.getPointer() - 1;
+            //if (eptr >= 0 && eptr < binbuf.length)
+            //   msg += ", Opcode = 0x" + Format.hex2(binbuf[eptr] & 0xff);
         }
         catch(RuntimeException e) {
             Console.error("failed parsing binbuf RuntimeException"); // this should not happen. only happens for missing cases
@@ -727,13 +725,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         int arenaAddr = absAddr - CODE_ARENA_OFFSET;
         return debugger.getDbgBreakpoint(arenaAddr) != null;
     }
-
-    public void updateDebugLine() {
-        // the first call to this is before debugMode is started to set the first debug line.
-        // in this case we don't want to disassemble since the dbglines have not even been inited yet. sort of a hack.
-        debugger.updateDebugLine();
-    }
-
 
     public void setDebugMode(boolean v) {
         if (v) {

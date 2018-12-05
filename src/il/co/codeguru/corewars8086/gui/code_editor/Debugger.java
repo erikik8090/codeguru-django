@@ -11,7 +11,8 @@ import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
-import il.co.codeguru.corewars8086.utils.Disassembler;
+import il.co.codeguru.corewars8086.utils.disassembler.DisassemblerX86;
+import il.co.codeguru.corewars8086.utils.disassembler.IDisassembler;
 import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.war.Warrior;
 
@@ -90,6 +91,8 @@ public class Debugger {
     }
 
     public void updateDebugLine() {
+        // the first call to this is before debugMode is started to set the first debug line.
+        // in this case we don't want to disassemble since the dbglines have not even been inited yet. sort of a hack.
         Warrior currentWarrior = getCurrentWarrior();
         if (currentWarrior == null)
             return;
@@ -142,11 +145,11 @@ public class Debugger {
 
     private void disassembleAddress(int absaddr, int addrInArea) {
         byte[] memory_bytes = m_mem.getMemory();
-        Disassembler dis = new Disassembler.ArrDisassembler(memory_bytes, absaddr, m_mem.length()); // TBDTBD
+        IDisassembler dis = new DisassemblerX86(memory_bytes, absaddr, m_mem.length());
         String text;
         try {
             text = dis.nextOpcode();
-        } catch (Disassembler.DisassemblerException e) {
+        } catch (IDisassembler.DisassemblerException e) {
             return;
         }
         eraseOpcode(addrInArea); // for example replacing at the start of a long db "ABC"

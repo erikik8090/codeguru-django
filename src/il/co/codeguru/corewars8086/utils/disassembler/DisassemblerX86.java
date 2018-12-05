@@ -1,78 +1,70 @@
-package il.co.codeguru.corewars8086.utils;
+package il.co.codeguru.corewars8086.utils.disassembler;
+
+import il.co.codeguru.corewars8086.utils.Unsigned;
 
 /**
  * A fast disassembler, similar to Cpu.java
  */
-public abstract class Disassembler
+public class DisassemblerX86 implements IDisassembler
 {
-
-	public static class DisassemblerException extends Exception {
-		private static final long serialVersionUID = 1L;
-	}
-	public static class DisassemblerLengthException extends DisassemblerException {
-		private static final long serialVersionUID = 1L;
-	}
-
-	public static class ArrDisassembler extends Disassembler
-	{
-		private byte[] bytes;
-		public ArrDisassembler(byte[] memory, int offset, int endOffset) {
-			super(offset, endOffset);
-			bytes = memory;
-		}
-
-		protected byte getByte() throws DisassemblerException
-		{
-			if (!hasNextByte())
-				throw new DisassemblerLengthException();
-			return bytes[pointer];
-		}
-
-		protected byte nextByte() throws DisassemblerException
-		{
-			if (!hasNextByte())
-				throw new DisassemblerLengthException();
-			pointer++;
-			return bytes[pointer -1];
-		}
-	}
 
 	/**
 	 * the pointer to the next byte to disassemble.
 	 */
 	protected int pointer;
 
-	protected int startOffset; // start of current Opcode
-	protected int progStartOffset; // offset the program is loaded to
-	protected int endOffset;
+	private int startOffset; // start of current Opcode
+	private int progStartOffset; // offset the program is loaded to
+	private int endOffset;
 	
 	/**
 	 * the current mode or register index or memory index of the indirect address function
 	 */
 	private byte mode, regIndex, memIndex;
 
-	public Disassembler(int offset, int endOffset) {
-		reset(offset, endOffset);
+	private byte[] bytes;
+
+	protected byte getByte() throws DisassemblerException
+	{
+		if (!hasNextByte())
+			throw new DisassemblerLengthException();
+		return bytes[pointer];
 	}
 
+	/**
+	 * similar to OpcodeFetcher#nextByte()
+	 * @return the next byte to disassemble
+	 * @throws DisassemblerException
+	 */
+	protected byte nextByte() throws DisassemblerException
+	{
+		if (!hasNextByte())
+			throw new DisassemblerLengthException();
+		pointer++;
+		return bytes[pointer -1];
+	}
+
+	public DisassemblerX86(byte[] memory, int offset, int endOffset) {
+		reset(offset, endOffset);
+		bytes = memory;
+	}
+
+	@Override
 	public void reset(int offset, int endOffset) {
 
-		pointer = offset;
-		startOffset = offset;
-		progStartOffset = offset;
+		this.pointer = offset;
+		this.startOffset = offset;
+		this.progStartOffset = offset;
 		this.endOffset = endOffset;
 	}
 
+	@Override
 	public int lastOpcodeSize() {
 		int ret = pointer - startOffset;
 		startOffset = pointer;
 		return ret;
 	}
 
-	public void skipBytes(int len) {
-	    pointer += len;
-        startOffset = pointer;
-    }
     public void setPointer(int ptr) {
 	    pointer = ptr;
     }
@@ -86,15 +78,6 @@ public abstract class Disassembler
 	{
 		return pointer < endOffset; //bytes.length;
 	}
-	
-	protected abstract byte getByte() throws DisassemblerException;
-
-	/**
-	 * similar to OpcodeFetcher#nextByte()
-	 * @return the next byte to disassemble
-	 * @throws DisassemblerException 
-	 */
-	protected abstract byte nextByte() throws DisassemblerException;
 
 	/**
 	 * similar to OpcodeFetcher#nextWord()
@@ -328,7 +311,8 @@ public abstract class Disassembler
 			offsetS = "0x0" + offsetS.substring(2);
 		return segmentS + ":" + offsetS;
 	}
-	
+
+	@Override
 	public String nextOpcode() throws DisassemblerException {
         byte opcode = nextByte();
         switch(opcode & 0xF0) {

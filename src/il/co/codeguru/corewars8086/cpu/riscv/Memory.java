@@ -9,6 +9,11 @@ public class Memory {
         memory = new byte[size];
     }
 
+    public Memory(byte[] memory)
+    {
+        this.memory = memory;
+    }
+
     public void storeByte(int index, byte value)
     {
         memory[index] = value;

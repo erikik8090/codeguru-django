@@ -1,5 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.riscv.instruction_formats;
 
+import il.co.codeguru.corewars8086.cpu.riscv.Instruction;
+
 public class InstructionFormatUJ extends InstructionFormatBase {
     public InstructionFormatUJ(int raw)
     {
@@ -21,6 +23,12 @@ public class InstructionFormatUJ extends InstructionFormatBase {
                         (((imm >> 11) & 1) << 20) |
                         (((imm >> 12) & mask(8)) << 12)
         );
+    }
+
+    @Override
+    public String format(Instruction.InstructionInfo info)
+    {
+        return info.getName() + " " + getRd() + " ," + getImmediate();
     }
 
     public byte getRd()

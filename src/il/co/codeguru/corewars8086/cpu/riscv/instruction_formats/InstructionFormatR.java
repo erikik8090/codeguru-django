@@ -1,5 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.riscv.instruction_formats;
 
+import il.co.codeguru.corewars8086.cpu.riscv.Instruction;
+
 public class InstructionFormatR extends InstructionFormatBase
 {
     public InstructionFormatR(int raw)
@@ -22,6 +24,12 @@ public class InstructionFormatR extends InstructionFormatBase
                         ((rs2 & mask(5)) << 20) |
                         ((funct7 & mask(7)) << 25)
         );
+    }
+
+    @Override
+    public String format(Instruction.InstructionInfo info)
+    {
+        return info.getName().toUpperCase() + " #" + getRd() + ", #" + getRs1() + ", #" + getRs2();
     }
 
     public byte getRd()

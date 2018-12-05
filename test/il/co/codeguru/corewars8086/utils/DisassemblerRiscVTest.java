@@ -36,7 +36,7 @@ public class DisassemblerRiscVTest {
     }
 
     @Test
-    public void testSimpleAdd() throws IDisassembler.DisassemblerException
+    public void testSingleAdd() throws IDisassembler.DisassemblerException
     {
         byte[] testData = loadInstructions(new InstructionFormatBase[]{
                 RV32I.instructionR(RV32I.Opcodes.Add, 3,1,2)
@@ -47,5 +47,44 @@ public class DisassemblerRiscVTest {
 
         assertEquals("ADD #3, #1, #2", opcode);
         assertEquals(4, disassembler.lastOpcodeSize());
+    }
+
+    @Test
+    public void testStartFromMiddle() throws IDisassembler.DisassemblerException
+    {
+        byte[] testData = loadInstructions(new InstructionFormatBase[]{
+                RV32I.instructionI(RV32I.Opcodes.Addi, 1,1,4),
+                RV32I.instructionS(RV32I.Opcodes.Sw, 1,2, 0),
+                RV32I.instructionUJ(RV32I.Opcodes.Jal, 0, 8)
+        });
+
+        disassembler = new DisassemblerRiscV(testData, 4, 12);
+
+        String opcode = disassembler.nextOpcode();
+        assertEquals("SW #2, 0 (#1)", opcode);
+        assertEquals(4, disassembler.lastOpcodeSize());
+
+        opcode = disassembler.nextOpcode();
+        assertEquals("JAL #0, 8", opcode);
+        assertEquals(4, disassembler.lastOpcodeSize());
+
+        disassembler.reset(4, 12);
+
+        opcode = disassembler.nextOpcode();
+        assertEquals("SW #2, 0 (#1)", opcode);
+        assertEquals(4, disassembler.lastOpcodeSize());
+
+        opcode = disassembler.nextOpcode();
+        assertEquals("JAL #0, 8", opcode);
+        assertEquals(4, disassembler.lastOpcodeSize());
+    }
+
+    @Test(expected = IDisassembler.DisassemblerException.class)
+    public void testFailNonExistentInstruction() throws IDisassembler.DisassemblerException
+    {
+        byte[] testData = new byte[]{0,0,0,0};
+        disassembler = new DisassemblerRiscV(testData, 0, 4);
+
+        disassembler.nextOpcode();
     }
 }

@@ -1,9 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
-import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.exceptions.InvalidOpcodeException;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
-import il.co.codeguru.corewars8086.memory.MemoryException;
 
 public class InstructionDecoder {
     public Instruction decode(InstructionFormatBase i) throws InvalidOpcodeException

@@ -14,8 +14,6 @@ public class CInstructionFormatBase {
         return (1<<len) - 1;
     }
 
-
-
     public String format(Instruction.InstructionInfo info)
     {
         throw new UnsupportedOperationException("Trying to get formatted instruction from the base instruction format");
@@ -26,9 +24,9 @@ public class CInstructionFormatBase {
         return this.raw;
     }
 
-    public byte getOpcode()
+    public int getOpcode()
     {
         return (byte)(this.raw & mask(2));
     }
-    public byte getFunct3() {return (byte)((this.raw >> 13) & mask(3));}
+    public int getFunct3() {return (byte)((this.raw >> 13) & mask(3));}
 }

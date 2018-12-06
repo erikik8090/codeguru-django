@@ -21,12 +21,13 @@ public class InstructionFormatTest {
         assertEquals(9, cr.getFunct4());
     }
 
+    @Test
     public void testCrConstructor()
     {
         CInstructionFormatCR cr = new CInstructionFormatCR((byte)0,(byte)0,(byte)0,(byte)0);
         assertEquals((short)0, cr.getRaw());
 
-        cr = new CInstructionFormatCR((byte)2, (byte)1, (byte)2, (byte)4);
+        cr = new CInstructionFormatCR((byte)2, (byte)1, (byte)2, (byte)9);
         assertEquals((short)0x908a, cr.getRaw());
     }
 

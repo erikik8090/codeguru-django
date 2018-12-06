@@ -1,9 +1,17 @@
 package il.co.codeguru.corewars8086.cpu.riscv.rv32c;
 
 import il.co.codeguru.corewars8086.cpu.riscv.Instruction;
+import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCR;
+import il.co.codeguru.corewars8086.utils.Logger;
 
 public final class RV32C {
     private RV32C() {}
+
+    public static CInstructionFormatCR cInstructionFormatCR(Instruction.InstructionInfo info, int rs1, int rs2)
+    {
+        Logger.log("rv32c "  + info.getFunct3());
+        return new CInstructionFormatCR((byte)info.getOpcode(), (byte)rs1, (byte)rs2, (byte)info.getFunct3());
+    }
 
     public static final class OpcodeTypes {
         public static final int C0 = 0;
@@ -34,8 +42,8 @@ public final class RV32C {
         public static final Instruction.InstructionInfo CSRAI = new Instruction.InstructionInfo("C.srai",OpcodeTypes.C1, 4);
         public static final Instruction.InstructionInfo CANDI = new Instruction.InstructionInfo("C.andi",OpcodeTypes.C1, 4);
 
-        public static final Instruction.InstructionInfo CMV = new Instruction.InstructionInfo("C.mv",OpcodeTypes.C2, 4);
-        public static final Instruction.InstructionInfo CADD = new Instruction.InstructionInfo("C.add",OpcodeTypes.C2, 4);
+        public static final Instruction.InstructionInfo CMV = new Instruction.InstructionInfo("C.mv",OpcodeTypes.C2, 8);
+        public static final Instruction.InstructionInfo CADD = new Instruction.InstructionInfo("C.add",OpcodeTypes.C2, 9);
         public static final Instruction.InstructionInfo CAND = new Instruction.InstructionInfo("C.and",OpcodeTypes.C1, 4);
         public static final Instruction.InstructionInfo COR = new Instruction.InstructionInfo("C.or", OpcodeTypes.C1, 4);
         public static final Instruction.InstructionInfo CXOR = new Instruction.InstructionInfo("C.xor", OpcodeTypes.C1, 4);

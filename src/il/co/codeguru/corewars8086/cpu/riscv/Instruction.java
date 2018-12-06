@@ -41,7 +41,7 @@ public class Instruction {
     public static class InstructionInfo {
         final private String name;
         final private int opcode;
-        final private int funct3;
+        final private int funct3; //Or funct4 in the case of RV32C
         final private int funct7;
 
         public InstructionInfo(String name, int type)

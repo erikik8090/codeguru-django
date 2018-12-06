@@ -12,9 +12,9 @@ public class CInstructionFormatCR extends CInstructionFormatBase {
 
     public CInstructionFormatCR(byte opcode, byte rs1, byte rs2, byte funct4) {
         this((short)((opcode & mask(2)) |
-                ((opcode & mask(5)) << 2) |
-                ((opcode & mask(5)) << 7) |
-                ((opcode & mask(4)) << 12)));
+                ((rs2 & mask(5)) << 2) |
+                ((rs1 & mask(5)) << 7) |
+                ((funct4 & mask(4)) << 12)));
     }
 
     public byte getRs2() {

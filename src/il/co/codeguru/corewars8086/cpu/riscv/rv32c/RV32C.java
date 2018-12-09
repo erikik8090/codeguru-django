@@ -9,7 +9,6 @@ public final class RV32C {
 
     public static CInstructionFormatCR cInstructionFormatCR(Instruction.InstructionInfo info, int rs1, int rs2)
     {
-        Logger.log("rv32c "  + info.getFunct3());
         return new CInstructionFormatCR((byte)info.getOpcode(), (byte)rs1, (byte)rs2, (byte)info.getFunct3());
     }
 
@@ -27,8 +26,8 @@ public final class RV32C {
 
         public static final Instruction.InstructionInfo CJ = new Instruction.InstructionInfo("C.j", OpcodeTypes.C1, 5);
         public static final Instruction.InstructionInfo CJAL = new Instruction.InstructionInfo("C.jal", OpcodeTypes.C1, 1);
-        public static final Instruction.InstructionInfo CJR = new Instruction.InstructionInfo("C.jr", OpcodeTypes.C2, 4);
-        public static final Instruction.InstructionInfo CJALR = new Instruction.InstructionInfo("C.jalr", OpcodeTypes.C2, 4);
+        public static final Instruction.InstructionInfo CJR = new Instruction.InstructionInfo("C.jr", OpcodeTypes.C2, 8);
+        public static final Instruction.InstructionInfo CJALR = new Instruction.InstructionInfo("C.jalr", OpcodeTypes.C2, 9);
         public static final Instruction.InstructionInfo CBEQZ = new Instruction.InstructionInfo("C.beqz", OpcodeTypes.C1, 6);
         public static final Instruction.InstructionInfo CBNEZ = new Instruction.InstructionInfo("C.bnez", OpcodeTypes.C1, 7);
 

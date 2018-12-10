@@ -202,7 +202,6 @@ public class InstructionRunner {
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
     public void lw(InstructionFormatI i) throws MemoryException {
-
         state.setReg(i.getRd(), memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImmediate()))));
     }
 

@@ -159,7 +159,7 @@ public class InstructionTest {
 
     private final int VAL = 25;
     @Test
-    public void testLw() throws MemoryException, CpuException {
+    public void testLwsp() throws MemoryException, CpuException {
         state.setReg(2, 15);
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 15), VAL);
         loadInstruction(RV32C.cInstructionFormatCI(RV32C.Opcodes.CLWSP, RS1, 0));
@@ -171,6 +171,21 @@ public class InstructionTest {
         loadInstruction(RV32C.cInstructionFormatCI(RV32C.Opcodes.CLWSP, RS1, 20));
         cpu.nextOpcode();
         assertEquals(VAL, state.getReg(RS1));
+    }
+
+    @Test
+    public void testSwsp() throws MemoryException, CpuException {
+        state.setReg(RS1, VAL);
+        state.setReg(2, 15);
+        loadInstruction(RV32C.cInstructionFormatCSS(RV32C.Opcodes.CSWSP, RS1, 0));
+        cpu.nextOpcode();
+        assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)15)));
+
+        state.setReg(RS1, VAL);
+        state.setReg(2, 15);
+        loadInstruction(RV32C.cInstructionFormatCSS(RV32C.Opcodes.CSWSP, RS1, 20));
+        cpu.nextOpcode();
+        assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)35)));
     }
 
 

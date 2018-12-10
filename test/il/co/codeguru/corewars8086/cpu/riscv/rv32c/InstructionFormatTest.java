@@ -3,6 +3,8 @@ package il.co.codeguru.corewars8086.cpu.riscv.rv32c;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCI;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCR;
 import static org.junit.Assert.*;
+
+import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCSS;
 import org.junit.Test;
 
 public class InstructionFormatTest {
@@ -55,6 +57,31 @@ public class InstructionFormatTest {
 
         cr = new CInstructionFormatCI((byte)1, (byte)0, (byte)3, (byte)7);
         assertEquals((short)0x19D, cr.getRaw());
+    }
+
+    @Test
+    public void testCss()
+    {
+        CInstructionFormatCSS css = new CInstructionFormatCSS((short)0);
+        assertEquals(0, css.getRs2());
+        assertEquals(0, css.getImmediate());
+        assertEquals(0,css.getFunct3());
+
+        css = new CInstructionFormatCSS((short)0xCA16); //c.swsp x5, 20(x2)
+        assertEquals(2,css.getOpcode());
+        assertEquals(5, css.getRs2());
+        assertEquals(6, css.getFunct3());
+        assertEquals(20, css.getImmediate());
+    }
+
+    @Test
+    public void testCssConstructor()
+    {
+        CInstructionFormatCSS css = new CInstructionFormatCSS((byte)0,(byte)0,(byte)0,(byte)0);
+        assertEquals((short)0, css.getRaw());
+
+        css = new CInstructionFormatCSS((byte)2, (byte)6, (byte)5, (byte)20);
+        assertEquals((short)0xCA16, css.getRaw());
     }
 
 }

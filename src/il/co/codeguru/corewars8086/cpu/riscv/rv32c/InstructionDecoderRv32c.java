@@ -3,13 +3,11 @@ package il.co.codeguru.corewars8086.cpu.riscv.rv32c;
 import il.co.codeguru.corewars8086.cpu.riscv.Instruction;
 import il.co.codeguru.corewars8086.cpu.riscv.InstructionRunner;
 import il.co.codeguru.corewars8086.cpu.riscv.RV32I;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatBase;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatI;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatR;
-import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatU;
+import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCI;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCR;
+import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCSS;
 import il.co.codeguru.corewars8086.utils.Logger;
 
 public class InstructionDecoderRv32c {
@@ -95,6 +93,13 @@ public class InstructionDecoderRv32c {
                             }
                         }
                         break;
+                    case 6:
+                        CInstructionFormatCSS css = new CInstructionFormatCSS(i);
+                        int cssbit76 = css.getImmediate() & 3;
+                        int cssbit52 = (css.getImmediate() >> 2) & 15;
+                        int cssuimm = (cssbit52 | (cssbit76 << 4)) << 2;
+                        return new Instruction(RV32C.Opcodes.CSWSP, RV32I.instructionS(RV32I.Opcodes.Sw, 2, css.getRs2(), cssuimm),
+                                (InstructionFormatBase format, InstructionRunner runner) -> runner.sw(new InstructionFormatS(format)));
                 }
                 break;
         }

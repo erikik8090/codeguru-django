@@ -1,11 +1,9 @@
 package il.co.codeguru.corewars8086.cpu.riscv.rv32c;
 
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCI;
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCIW;
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCR;
+import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.*;
+
 import static org.junit.Assert.*;
 
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCSS;
 import org.junit.Test;
 
 public class InstructionFormatTest {
@@ -105,6 +103,24 @@ public class InstructionFormatTest {
     {
         CInstructionFormatCIW ciw = new CInstructionFormatCIW((byte)0, (byte)0, (byte)9, (byte)0x80);
         assertEquals((short)0x1004, ciw.getRaw());
+    }
+
+    @Test
+    public void testCl()
+    {
+        CInstructionFormatCL cl = new CInstructionFormatCL((short)0x4880); //c.lw x8,0x10(x9)
+        assertEquals(0,cl.getOpcode());
+        assertEquals(8, cl.getRd());
+        assertEquals(9, cl.getRs1());
+        assertEquals(2, cl.getFunct3());
+        assertEquals(0x10, cl.getImmediate() & 0xFF);
+    }
+
+    @Test
+    public void testClConstructor()
+    {
+        CInstructionFormatCL ciw = new CInstructionFormatCL((byte)0, (byte)2, (byte)8,(byte)9, (byte)0x10);
+        assertEquals((short)0x4880, ciw.getRaw());
     }
 
 }

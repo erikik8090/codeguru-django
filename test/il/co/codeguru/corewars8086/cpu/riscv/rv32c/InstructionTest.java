@@ -23,8 +23,9 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnitParamsRunner.class)
 public class InstructionTest {
-    private static final int RS1 = 5;
-    private static final int RS2 = 6;
+    private static final int RS1 = 8;
+    private static final int RS2 = 9;
+    private static final int RD = 10;
 
     private CpuStateRiscV state;
     private CpuRiscV cpu;
@@ -194,8 +195,24 @@ public class InstructionTest {
         state.setReg(2, 0x12);
         loadInstruction(RV32C.cInstructionFormatCIW(RV32C.Opcodes.CADDI4SPN, RS1, 0x80));
         cpu.nextOpcode();
-        assertEquals(0x12 + 0x20, state.getReg(RS1 + 8));
+        assertEquals(0x12 + 0x20, state.getReg(RS1));
     }
+
+    @Test
+    public void testLw() throws MemoryException, CpuException {
+        state.setReg(RS1, 15);
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 15), VAL);
+        loadInstruction(RV32C.cInstructionFormatCL(RV32C.Opcodes.CLW, RD, RS1, 0));
+        cpu.nextOpcode();
+        assertEquals(VAL, state.getReg(RD));
+
+        state.setReg(RS1, 15);
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 35), VAL);
+        loadInstruction(RV32C.cInstructionFormatCL(RV32C.Opcodes.CLW, RD, RS1, 20));
+        cpu.nextOpcode();
+        assertEquals(VAL, state.getReg(RD ));
+    }
+
 
 
 

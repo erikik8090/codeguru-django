@@ -21,7 +21,14 @@ public final class RV32C {
     }
 
     public static CInstructionFormatCIW cInstructionFormatCIW(Instruction.InstructionInfo info, int rd, int imm) {
-        return new CInstructionFormatCIW((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)rd, (byte)imm);
+        assert rd >= 8 && rd < 16;
+        return new CInstructionFormatCIW((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)(rd-8), (byte)imm);
+    }
+
+    public static CInstructionFormatCL cInstructionFormatCL(Instruction.InstructionInfo info, int rd, int rs1, int imm) {
+        assert rd >= 8 && rd < 16;
+        assert rs1 >= 8 && rs1 < 16;
+        return new CInstructionFormatCL((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)(rd-8), (byte)(rs1-8), (byte)imm);
     }
 
     public static final class OpcodeTypes {

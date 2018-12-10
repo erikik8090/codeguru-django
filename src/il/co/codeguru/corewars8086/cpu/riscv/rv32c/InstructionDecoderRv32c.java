@@ -24,6 +24,10 @@ public class InstructionDecoderRv32c {
                         int nzuimm = (bit2 | (bit3 << 1) | (bit54 << 2) | (bit96 << 4)) << 2;
                         return new Instruction(RV32C.Opcodes.CADDI4SPN, RV32I.instructionI(RV32I.Opcodes.Addi, ciw.getRd(), 2, nzuimm),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.addi(new InstructionFormatI(format)));
+                    case 2:
+                        CInstructionFormatCL cl = new CInstructionFormatCL(i);
+                        return new Instruction(RV32C.Opcodes.CLW, RV32I.instructionI(RV32I.Opcodes.Lw, cl.getRd(), cl.getRs1(), cl.getImmediate()),
+                                (InstructionFormatBase format, InstructionRunner runner) -> runner.lw(new InstructionFormatI(format)));
                 }
                 break;
             case RV32C.OpcodeTypes.C1:

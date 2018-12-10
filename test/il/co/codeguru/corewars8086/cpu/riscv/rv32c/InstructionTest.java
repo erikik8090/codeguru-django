@@ -188,5 +188,15 @@ public class InstructionTest {
         assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)35)));
     }
 
+    @Test
+    public void testAddi4spn() throws MemoryException, CpuException
+    {
+        state.setReg(2, 0x12);
+        loadInstruction(RV32C.cInstructionFormatCIW(RV32C.Opcodes.CADDI4SPN, RS1, 0x80));
+        cpu.nextOpcode();
+        assertEquals(0x12 + 0x20, state.getReg(RS1 + 8));
+    }
+
+
 
 }

@@ -1,10 +1,7 @@
 package il.co.codeguru.corewars8086.cpu.riscv.rv32c;
 
 import il.co.codeguru.corewars8086.cpu.riscv.Instruction;
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCI;
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCR;
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCSS;
+import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.*;
 import il.co.codeguru.corewars8086.utils.Logger;
 
 public final class RV32C {
@@ -21,6 +18,10 @@ public final class RV32C {
 
     public static CInstructionFormatCSS cInstructionFormatCSS(Instruction.InstructionInfo info, int rs2, int imm) {
         return new CInstructionFormatCSS((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)rs2, (byte) imm);
+    }
+
+    public static CInstructionFormatCIW cInstructionFormatCIW(Instruction.InstructionInfo info, int rd, int imm) {
+        return new CInstructionFormatCIW((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)rd, (byte)imm);
     }
 
     public static final class OpcodeTypes {

@@ -4,10 +4,7 @@ import il.co.codeguru.corewars8086.cpu.riscv.Instruction;
 import il.co.codeguru.corewars8086.cpu.riscv.InstructionRunner;
 import il.co.codeguru.corewars8086.cpu.riscv.RV32I;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCI;
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCR;
-import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatCSS;
+import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.*;
 import il.co.codeguru.corewars8086.utils.Logger;
 
 public class InstructionDecoderRv32c {
@@ -16,7 +13,18 @@ public class InstructionDecoderRv32c {
         switch(i.getOpcode())
         {
             case RV32C.OpcodeTypes.C0:
-
+                CInstructionFormatCIW ciw = new CInstructionFormatCIW(i);
+                switch(i.getFunct3())
+                {
+                    case 0:
+                        int bit3 = ciw.getImmediate() & 1;
+                        int bit2 = (ciw.getImmediate() >> 1) & 1;
+                        int bit96= (ciw.getImmediate() >> 2) & 15;
+                        int bit54= (ciw.getImmediate() >> 6) & 3;
+                        int nzuimm = (bit2 | (bit3 << 1) | (bit54 << 2) | (bit96 << 4)) << 2;
+                        return new Instruction(RV32C.Opcodes.CADDI4SPN, RV32I.instructionI(RV32I.Opcodes.Addi, ciw.getRd(), 2, nzuimm),
+                                (InstructionFormatBase format, InstructionRunner runner) -> runner.addi(new InstructionFormatI(format)));
+                }
                 break;
             case RV32C.OpcodeTypes.C1:
                 switch(i.getFunct3())

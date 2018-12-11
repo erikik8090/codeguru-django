@@ -39,6 +39,14 @@ public final class RV32C {
         return CInstructionFormatCS.fromFunct6((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)info.getFunct7(), (byte)rs1, (byte)rs2);
     }
 
+    public static CInstructionFormatCB cInstructionFormatCB(Instruction.InstructionInfo info, int rs1, int imm) {
+        return new CInstructionFormatCB((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)info.getFunct7(), (byte)rs1, (byte)imm);
+    }
+
+    public static CInstructionFormatCB cInstructionFormatCBBranch(Instruction.InstructionInfo info, int rs1, int imm) {
+        return CInstructionFormatCB.forBranch((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)rs1, (byte)imm);
+    }
+
     public static final class OpcodeTypes {
         public static final int C0 = 0;
         public static final int C1 = 1;
@@ -64,9 +72,9 @@ public final class RV32C {
         public static final Instruction.InstructionInfo CADDI16SP = new Instruction.InstructionInfo("C.addi16sp",OpcodeTypes.C1, 3);
         public static final Instruction.InstructionInfo CADDI4SPN = new Instruction.InstructionInfo("C.addi4spn", OpcodeTypes.C0, 0);
         public static final Instruction.InstructionInfo CSLLI = new Instruction.InstructionInfo("C.slli",OpcodeTypes.C2, 0);
-        public static final Instruction.InstructionInfo CSRLI = new Instruction.InstructionInfo("C.srli",OpcodeTypes.C1, 4);
-        public static final Instruction.InstructionInfo CSRAI = new Instruction.InstructionInfo("C.srai",OpcodeTypes.C1, 4);
-        public static final Instruction.InstructionInfo CANDI = new Instruction.InstructionInfo("C.andi",OpcodeTypes.C1, 4);
+        public static final Instruction.InstructionInfo CSRLI = new Instruction.InstructionInfo("C.srli",OpcodeTypes.C1, 4, 0);
+        public static final Instruction.InstructionInfo CSRAI = new Instruction.InstructionInfo("C.srai",OpcodeTypes.C1, 4, 1);
+        public static final Instruction.InstructionInfo CANDI = new Instruction.InstructionInfo("C.andi",OpcodeTypes.C1, 4, 2);
 
         public static final Instruction.InstructionInfo CMV = new Instruction.InstructionInfo("C.mv",OpcodeTypes.C2, 8);
         public static final Instruction.InstructionInfo CADD = new Instruction.InstructionInfo("C.add",OpcodeTypes.C2, 9);

@@ -269,14 +269,22 @@ public class InstructionRunner {
      * BEQ (Branch if Equal) takes the branch if registers rs1 and rs2 are equal
      */
     public void beq(InstructionFormatSB i) throws MisalignedMemoryLoadException {
-        if (state.getReg(i.getRs1()) == state.getReg(i.getRs2())) jump(state, i.getImm());
+        beq(i,4);
+    }
+
+    public void beq(InstructionFormatSB i, int instructionSize) throws MisalignedMemoryLoadException {
+        if (state.getReg(i.getRs1()) == state.getReg(i.getRs2())) jump(state, i.getImm(), instructionSize);
     }
 
     /**
      * BNE (Branch if Not Equal) takes the branch if registers rs1 and rs2 are not equal
      */
     public void bne(InstructionFormatSB i) throws MisalignedMemoryLoadException {
-        if (state.getReg(i.getRs1()) != state.getReg(i.getRs2())) jump(state, i.getImm());
+        bne(i, 4);
+    }
+
+    public void bne(InstructionFormatSB i, int instructionSize) throws MisalignedMemoryLoadException {
+        if (state.getReg(i.getRs1()) != state.getReg(i.getRs2())) jump(state, i.getImm(), instructionSize);
     }
 
     /**
@@ -308,7 +316,6 @@ public class InstructionRunner {
     }
 
 
-
     private void jump(CpuStateRiscV state, int immediate, int instructionSize) throws MisalignedMemoryLoadException {
         state.setPc(state.getPc() + immediate - instructionSize);
     }
@@ -316,5 +323,6 @@ public class InstructionRunner {
     private void jump(CpuStateRiscV state, int immediate) throws MisalignedMemoryLoadException {
         jump(state, immediate, 4);
     }
+
 
 }

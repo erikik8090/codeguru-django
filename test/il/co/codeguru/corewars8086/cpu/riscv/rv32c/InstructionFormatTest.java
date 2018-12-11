@@ -152,5 +152,32 @@ public class InstructionFormatTest {
         assertEquals((short)0xc988, cs.getRaw());
     }
 
+    @Test
+    public void testCb()
+    {
+        CInstructionFormatCB cb = new CInstructionFormatCB((short)0x8015); //c.srli x8, 5
+        assertEquals(1 ,cb.getOpcode());
+        assertEquals(8, cb.getRs1());
+        assertEquals(4, cb.getFunct3());
+        assertEquals(5, cb.getImmediate());
+        assertEquals(0, cb.getFunct2());
+
+        cb = new CInstructionFormatCB((short)0xdcfd); //c.beqz x9, -2
+        assertEquals(1, cb.getOpcode());
+        assertEquals(9, cb.getRs1());
+        assertEquals(6, cb.getFunct3());
+        assertEquals(-2, cb.getBranchImmediate());
+    }
+
+    @Test
+    public void testCbConstructor()
+    {
+        CInstructionFormatCB cb = new CInstructionFormatCB((byte)1, (byte)4, (byte)0, (byte)8, (byte)5);
+        assertEquals((short)0x8015, cb.getRaw());
+
+        cb = CInstructionFormatCB.forBranch((byte)1, (byte)6, (byte)9, (byte)-2);
+        assertEquals((short)0xdcfd, cb.getRaw());
+    }
+
 
 }

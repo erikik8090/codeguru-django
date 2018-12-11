@@ -266,4 +266,54 @@ public class InstructionTest {
         assertEquals(5, state.getReg(RS1));
     }
 
+    @Test
+    public void testSrli() throws MemoryException, CpuException {
+        state.setReg(RS1, 4);
+        loadInstruction(RV32C.cInstructionFormatCB(RV32C.Opcodes.CSRLI, RS1, 1));
+        cpu.nextOpcode();
+        assertEquals(2, state.getReg(RS1));
+    }
+
+    @Test
+    public void testSrai() throws MemoryException, CpuException {
+        state.setReg(RS1, 4);
+        loadInstruction(RV32C.cInstructionFormatCB(RV32C.Opcodes.CSRAI, RS1, 1));
+        cpu.nextOpcode();
+        assertEquals(2, state.getReg(RS1));
+    }
+
+    @Test
+    public void testAndi() throws MemoryException, CpuException {
+        state.setReg(RS1, 19);
+        loadInstruction(RV32C.cInstructionFormatCB(RV32C.Opcodes.CANDI, RS1, 22));
+        cpu.nextOpcode();
+        assertEquals(18, state.getReg(RS1));
+    }
+
+    @Test
+    public void testBeqz() throws MemoryException, CpuException {
+        state.setReg(RS1, 0);
+        loadInstruction(RV32C.cInstructionFormatCBBranch(RV32C.Opcodes.CBEQZ, RS1, -8));
+        cpu.nextOpcode();
+        assertEquals(-8, state.getPc());
+
+        state.setReg(RS1, 5);
+        loadInstruction(RV32C.cInstructionFormatCBBranch(RV32C.Opcodes.CBEQZ, RS1, -8));
+        cpu.nextOpcode();
+        assertEquals(2, state.getPc());
+    }
+
+    @Test
+    public void testBnez() throws MemoryException, CpuException {
+        state.setReg(RS1, 5);
+        loadInstruction(RV32C.cInstructionFormatCBBranch(RV32C.Opcodes.CBNEZ, RS1, -8));
+        cpu.nextOpcode();
+        assertEquals(-8, state.getPc());
+
+        state.setReg(RS1, 0);
+        loadInstruction(RV32C.cInstructionFormatCBBranch(RV32C.Opcodes.CBNEZ, RS1, -8));
+        cpu.nextOpcode();
+        assertEquals(2, state.getPc());
+    }
+
 }

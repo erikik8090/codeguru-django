@@ -11,6 +11,7 @@ public class InstructionDecoderRv32c {
     public Instruction decode(CInstructionFormatBase i) {
         CInstructionFormatCI ci = new CInstructionFormatCI(i);
         CInstructionFormatCS cs = new CInstructionFormatCS(i);
+        CInstructionFormatCB cb = new CInstructionFormatCB(i);
         switch(i.getOpcode())
         {
             case RV32C.OpcodeTypes.C0:
@@ -66,26 +67,46 @@ public class InstructionDecoderRv32c {
                         }
                         break;
                     case 4:
-                        switch((cs.getFunct6() >> 2) & 1)
+                        if(cb.getFunct2() != 3)
                         {
-                            case 0:
-                                switch(cs.getFunct2())
-                                {
-                                    case 0:
-                                        return new Instruction(RV32C.Opcodes.CSUB, RV32I.instructionR(RV32I.Opcodes.Sub, cs.getRs1(), cs.getRs1(), cs.getRs2()),
-                                                (InstructionFormatBase format, InstructionRunner runner) -> runner.sub(new InstructionFormatR(format)));
-                                    case 1:
-                                        return new Instruction(RV32C.Opcodes.CXOR, RV32I.instructionR(RV32I.Opcodes.Xor, cs.getRs1(), cs.getRs1(), cs.getRs2()),
-                                                (InstructionFormatBase format, InstructionRunner runner) -> runner.xor(new InstructionFormatR(format)));
-                                    case 2:
-                                        return new Instruction(RV32C.Opcodes.COR, RV32I.instructionR(RV32I.Opcodes.Or, cs.getRs1(), cs.getRs1(), cs.getRs2()),
-                                                (InstructionFormatBase format, InstructionRunner runner) -> runner.or(new InstructionFormatR(format)));
-                                    case 3:
-                                        return new Instruction(RV32C.Opcodes.CAND, RV32I.instructionR(RV32I.Opcodes.And, cs.getRs1(), cs.getRs1(), cs.getRs2()),
-                                                (InstructionFormatBase format, InstructionRunner runner) -> runner.and(new InstructionFormatR(format)));
-                                }
-                                break;
+                            switch(cb.getFunct2())
+                            {
+                                case 0:
+                                    return new Instruction(RV32C.Opcodes.CSRLI, RV32I.instructionI(RV32I.Opcodes.Srli, cb.getRs1(), cb.getRs1(), cb.getImmediate()),
+                                            (InstructionFormatBase format, InstructionRunner runner) -> runner.srli(new InstructionFormatI(format)));
+                                case 1:
+                                    return new Instruction(RV32C.Opcodes.CSRAI, RV32I.instructionI(RV32I.Opcodes.Srai, cb.getRs1(), cb.getRs1(), cb.getImmediate()),
+                                            (InstructionFormatBase format, InstructionRunner runner) -> runner.srai(new InstructionFormatI(format)));
+                                case 2:
+                                    return new Instruction(RV32C.Opcodes.CANDI, RV32I.instructionI(RV32I.Opcodes.Andi, cb.getRs1(), cb.getRs1(), cb.getImmediate()),
+                                            (InstructionFormatBase format, InstructionRunner runner) -> runner.andi(new InstructionFormatI(format)));
+                            }
                         }
+                        else if(((cs.getFunct6() >> 2) & 1) == 0)
+                        {
+                            switch(cs.getFunct2())
+                            {
+                                case 0:
+                                    return new Instruction(RV32C.Opcodes.CSUB, RV32I.instructionR(RV32I.Opcodes.Sub, cs.getRs1(), cs.getRs1(), cs.getRs2()),
+                                            (InstructionFormatBase format, InstructionRunner runner) -> runner.sub(new InstructionFormatR(format)));
+                                case 1:
+                                    return new Instruction(RV32C.Opcodes.CXOR, RV32I.instructionR(RV32I.Opcodes.Xor, cs.getRs1(), cs.getRs1(), cs.getRs2()),
+                                            (InstructionFormatBase format, InstructionRunner runner) -> runner.xor(new InstructionFormatR(format)));
+                                case 2:
+                                    return new Instruction(RV32C.Opcodes.COR, RV32I.instructionR(RV32I.Opcodes.Or, cs.getRs1(), cs.getRs1(), cs.getRs2()),
+                                            (InstructionFormatBase format, InstructionRunner runner) -> runner.or(new InstructionFormatR(format)));
+                                case 3:
+                                    return new Instruction(RV32C.Opcodes.CAND, RV32I.instructionR(RV32I.Opcodes.And, cs.getRs1(), cs.getRs1(), cs.getRs2()),
+                                            (InstructionFormatBase format, InstructionRunner runner) -> runner.and(new InstructionFormatR(format)));
+                            }
+                            break;
+                        }
+                    case 6:
+                        return new Instruction(RV32C.Opcodes.CBEQZ, RV32I.instructionSB(RV32I.Opcodes.Beq, cb.getRs1(), 0, cb.getBranchImmediate()),
+                                (InstructionFormatBase format, InstructionRunner runner) -> runner.beq(new InstructionFormatSB(format), 2));
+                    case 7:
+                        return new Instruction(RV32C.Opcodes.CBEQZ, RV32I.instructionSB(RV32I.Opcodes.Beq, cb.getRs1(), 0, cb.getBranchImmediate()),
+                                (InstructionFormatBase format, InstructionRunner runner) -> runner.bne(new InstructionFormatSB(format), 2));
                 }
                 break;
             case RV32C.OpcodeTypes.C2:

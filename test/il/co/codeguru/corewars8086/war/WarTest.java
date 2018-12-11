@@ -78,6 +78,7 @@ public class WarTest {
 
     //TODO: Add this with a new instruction to fail the test
     @Test
+    @Ignore
     public void testNextRoundExceptionThrown()
     {
         byte[] arr = new byte[]{(byte)0xCC};

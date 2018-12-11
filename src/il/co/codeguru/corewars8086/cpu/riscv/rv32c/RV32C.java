@@ -31,6 +31,14 @@ public final class RV32C {
         return new CInstructionFormatCL((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)(rd-8), (byte)(rs1-8), (byte)imm);
     }
 
+    public static CInstructionFormatCS cInstructionFormatCS(Instruction.InstructionInfo info, int rs1, int rs2, int imm) {
+        return new CInstructionFormatCS((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)rs1, (byte)rs2, (byte)imm);
+    }
+
+    public static CInstructionFormatCS cInstructionFormatCS(Instruction.InstructionInfo info, int rs1, int rs2) {
+        return CInstructionFormatCS.fromFunct6((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)info.getFunct7(), (byte)rs1, (byte)rs2);
+    }
+
     public static final class OpcodeTypes {
         public static final int C0 = 0;
         public static final int C1 = 1;
@@ -62,10 +70,10 @@ public final class RV32C {
 
         public static final Instruction.InstructionInfo CMV = new Instruction.InstructionInfo("C.mv",OpcodeTypes.C2, 8);
         public static final Instruction.InstructionInfo CADD = new Instruction.InstructionInfo("C.add",OpcodeTypes.C2, 9);
-        public static final Instruction.InstructionInfo CAND = new Instruction.InstructionInfo("C.and",OpcodeTypes.C1, 4);
-        public static final Instruction.InstructionInfo COR = new Instruction.InstructionInfo("C.or", OpcodeTypes.C1, 4);
-        public static final Instruction.InstructionInfo CXOR = new Instruction.InstructionInfo("C.xor", OpcodeTypes.C1, 4);
-        public static final Instruction.InstructionInfo CSUB = new Instruction.InstructionInfo("C.sub", OpcodeTypes.C1, 4);
+        public static final Instruction.InstructionInfo CAND = new Instruction.InstructionInfo("C.and",OpcodeTypes.C1, 35, 3);
+        public static final Instruction.InstructionInfo COR = new Instruction.InstructionInfo("C.or", OpcodeTypes.C1, 35, 2);
+        public static final Instruction.InstructionInfo CXOR = new Instruction.InstructionInfo("C.xor", OpcodeTypes.C1, 35, 1);
+        public static final Instruction.InstructionInfo CSUB = new Instruction.InstructionInfo("C.sub", OpcodeTypes.C1, 35, 0);
 
         public static final Instruction.InstructionInfo CNOP = new Instruction.InstructionInfo("C.nop", OpcodeTypes.C1, 0);
     }

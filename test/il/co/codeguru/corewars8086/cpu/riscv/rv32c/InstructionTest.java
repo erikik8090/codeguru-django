@@ -1,5 +1,6 @@
 package il.co.codeguru.corewars8086.cpu.riscv.rv32c;
 
+import com.google.gwt.editor.client.Editor;
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
@@ -14,6 +15,7 @@ import il.co.codeguru.corewars8086.utils.Logger;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -25,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 public class InstructionTest {
     private static final int RS1 = 8;
     private static final int RS2 = 9;
-    private static final int RD = 10;
+    private static final int RD = 10    ;
 
     private CpuStateRiscV state;
     private CpuRiscV cpu;
@@ -213,7 +215,55 @@ public class InstructionTest {
         assertEquals(VAL, state.getReg(RD ));
     }
 
+    @Test
+    public void testSw() throws MemoryException, CpuException {
+        state.setReg(RS2, VAL);
+        state.setReg(RS1, 15);
+        loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CSW, RS1, RS2, 0));
+        cpu.nextOpcode();
+        assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)15)));
 
+        state.setReg(RS2, VAL);
+        state.setReg(RS1, 15);
+        loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CSW, RS1, RS2,20));
+        cpu.nextOpcode();
+        assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)35)));
+    }
 
+    @Test
+    public void testAnd() throws MemoryException, CpuException {
+        state.setReg(RS1, 19);
+        state.setReg(RS2, 22);
+        loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CAND, RS1, RS2));
+        cpu.nextOpcode();
+        assertEquals(18, state.getReg(RS1));
+    }
+
+    @Test
+    public void testOr() throws MemoryException, CpuException {
+        state.setReg(RS1, 1);
+        state.setReg(RS2, 2);
+        loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.COR, RS1, RS2));
+        cpu.nextOpcode();
+        assertEquals(3, state.getReg(RS1));
+    }
+
+    @Test
+    public void testXor() throws MemoryException, CpuException {
+        state.setReg(RS1, 3);
+        state.setReg(RS2, 10);
+        loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CXOR, RS1, RS2));
+        cpu.nextOpcode();
+        assertEquals(9, state.getReg(RS1));
+    }
+
+    @Test
+    public void testSub() throws MemoryException, CpuException {
+        state.setReg(RS1, 10);
+        state.setReg(RS2, 5);
+        loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CSUB, RS1, RS2));
+        cpu.nextOpcode();
+        assertEquals(5, state.getReg(RS1));
+    }
 
 }

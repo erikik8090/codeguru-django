@@ -123,4 +123,34 @@ public class InstructionFormatTest {
         assertEquals((short)0x4880, ciw.getRaw());
     }
 
+    @Test
+    public void testCs()
+    {
+        CInstructionFormatCS cs = new CInstructionFormatCS((short)0x8c65); //c.and x8, x9
+        assertEquals(1,cs.getOpcode());
+        assertEquals(8, cs.getRs1());
+        assertEquals(9, cs.getRs2());
+        assertEquals(4, cs.getFunct3());
+        assertEquals(35, cs.getFunct6());
+        assertEquals(3, cs.getFunct2());
+
+        cs = new CInstructionFormatCS((short)0xc988); //c.sw x10,0x10(x11)
+        assertEquals(0, cs.getOpcode());
+        assertEquals(11, cs.getRs1());
+        assertEquals(10, cs.getRs2());
+        assertEquals(6, cs.getFunct3());
+        assertEquals(0x10, cs.getImmediate());
+    }
+
+    @Test
+    public void testCsConstructor()
+    {
+        CInstructionFormatCS cs = CInstructionFormatCS.fromFunct6((byte)1,(byte)35,(byte)3, (byte)8, (byte)9);
+        assertEquals((short)0x8c65, cs.getRaw());
+
+        cs = new CInstructionFormatCS((byte)0,(byte)6,(byte)11,(byte)10,(byte)0x10);
+        assertEquals((short)0xc988, cs.getRaw());
+    }
+
+
 }

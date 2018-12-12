@@ -4,6 +4,7 @@ import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.*;
 
 import static org.junit.Assert.*;
 
+import il.co.codeguru.corewars8086.utils.Logger;
 import org.junit.Test;
 
 public class InstructionFormatTest {
@@ -178,6 +179,32 @@ public class InstructionFormatTest {
         cb = CInstructionFormatCB.forBranch((byte)1, (byte)6, (byte)9, (byte)-2);
         assertEquals((short)0xdcfd, cb.getRaw());
     }
+
+    @Test
+    public void testCj()
+    {
+        Logger.setTestingMode();
+        CInstructionFormatCJ cd = new CInstructionFormatCJ((short)0xbfed);
+        assertEquals(1, cd.getOpcode());
+        assertEquals(5, cd.getFunct3());
+        assertEquals(-6 ,cd.getImmediate());
+
+        cd = new CInstructionFormatCJ((short)0xa009);
+        assertEquals(1, cd.getOpcode());
+        assertEquals(5, cd.getFunct3());
+        assertEquals(2 ,cd.getImmediate());
+    }
+
+    @Test
+    public void testCjConstructor()
+    {
+        CInstructionFormatCJ cj = new CInstructionFormatCJ((byte)1,(byte)5,(short)-6);
+        assertEquals((short)0xbfed, cj.getRaw());
+
+        cj = new CInstructionFormatCJ((byte)1, (byte)5, (short)2);
+        assertEquals((short)0xa009, cj.getRaw());
+    }
+
 
 
 }

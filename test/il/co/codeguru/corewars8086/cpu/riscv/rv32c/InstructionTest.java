@@ -316,4 +316,35 @@ public class InstructionTest {
         assertEquals(2, state.getPc());
     }
 
+    @Test
+    public void testJ() throws MemoryException, CpuException {
+        loadInstruction(RV32C.cInstructionFormatCJ(RV32C.Opcodes.CJ, 24));
+
+        cpu.nextOpcode();
+
+        assertEquals(24, state.getPc());
+
+        loadInstruction(RV32C.cInstructionFormatCJ(RV32C.Opcodes.CJ, -8));
+
+        cpu.nextOpcode();
+
+        assertEquals(-8, state.getPc());
+    }
+
+    @Test
+    public void testJal() throws  MemoryException, CpuException {
+        loadInstruction(RV32C.cInstructionFormatCJ(RV32C.Opcodes.CJAL, 24));
+
+        cpu.nextOpcode();
+
+        assertEquals(24, state.getPc());
+        assertEquals(2, state.getReg(1));
+
+        loadInstruction(RV32C.cInstructionFormatCJ(RV32C.Opcodes.CJAL, -8));
+
+        cpu.nextOpcode();
+
+        assertEquals(-8, state.getPc());
+    }
+
 }

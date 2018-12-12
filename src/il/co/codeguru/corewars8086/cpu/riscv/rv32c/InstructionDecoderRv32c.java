@@ -36,6 +36,7 @@ public class InstructionDecoderRv32c {
                 }
                 break;
             case RV32C.OpcodeTypes.C1:
+                CInstructionFormatCJ cj = new CInstructionFormatCJ(i);
                 switch(i.getFunct3())
                 {
                     case 0:
@@ -45,6 +46,9 @@ public class InstructionDecoderRv32c {
                                     (InstructionFormatBase format, InstructionRunner runner) -> runner.addi(new InstructionFormatI(format)));
                         }
                         break;
+                    case 1:
+                        return new Instruction(RV32C.Opcodes.CJAL, RV32I.instructionUJ(RV32I.Opcodes.Jal, 1, cj.getImmediate()),
+                                (InstructionFormatBase format, InstructionRunner runner) -> runner.jal(new InstructionFormatUJ(format), 2));
                     case 2:
                         return new Instruction(RV32C.Opcodes.CLI, RV32I.instructionI(RV32I.Opcodes.Addi, ci.getRs1(), 0, ci.getImmediate()),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.addi(new InstructionFormatI(format)));
@@ -101,6 +105,9 @@ public class InstructionDecoderRv32c {
                             }
                             break;
                         }
+                    case 5:
+                        return new Instruction(RV32C.Opcodes.CJ, RV32I.instructionUJ(RV32I.Opcodes.Jal, 0, cj.getImmediate()),
+                                (InstructionFormatBase format, InstructionRunner runner) -> runner.jal(new InstructionFormatUJ(format), 2));
                     case 6:
                         return new Instruction(RV32C.Opcodes.CBEQZ, RV32I.instructionSB(RV32I.Opcodes.Beq, cb.getRs1(), 0, cb.getBranchImmediate()),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.beq(new InstructionFormatSB(format), 2));

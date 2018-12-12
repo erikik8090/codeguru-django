@@ -249,6 +249,11 @@ public class InstructionRunner {
         jump(state, i.getImmediate());
     }
 
+    public void jal(InstructionFormatUJ i, int instructionSize) throws MisalignedMemoryLoadException {
+        state.setReg(i.getRd(), state.getPc() + instructionSize);
+        jump(state, i.getImmediate(), instructionSize);
+    }
+
     /**
      * The indirect jump instruction JALR (jump and link register) uses the I-type encoding.
      * The target address is obtained by adding the 12-bit signed I-immediate to the register rs1, then setting the least-significant bit of the result to zero.
@@ -323,6 +328,4 @@ public class InstructionRunner {
     private void jump(CpuStateRiscV state, int immediate) throws MisalignedMemoryLoadException {
         jump(state, immediate, 4);
     }
-
-
 }

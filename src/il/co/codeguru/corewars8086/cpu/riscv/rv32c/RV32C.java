@@ -47,6 +47,10 @@ public final class RV32C {
         return CInstructionFormatCB.forBranch((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)rs1, (byte)imm);
     }
 
+    public static CInstructionFormatCJ cInstructionFormatCJ(Instruction.InstructionInfo info, int imm) {
+        return new CInstructionFormatCJ((byte)info.getOpcode(), (byte)info.getFunct3(), (short)imm);
+    }
+
     public static final class OpcodeTypes {
         public static final int C0 = 0;
         public static final int C1 = 1;

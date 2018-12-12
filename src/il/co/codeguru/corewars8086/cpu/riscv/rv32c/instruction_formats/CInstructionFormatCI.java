@@ -25,7 +25,7 @@ public class CInstructionFormatCI extends CInstructionFormatBase {
     public byte getImmediate()
     {
         byte base = (byte)((((raw >> 12) & 1) << 5) | ((raw >> 2) & mask(5)));
-        return  (byte)((base & 0x10) == 0x10 ? base | (mask(2) << 6) : base);
+        return  (byte)((base & 0x20) == 0x20 ? base | (mask(2) << 6) : base);
     }
 
     public byte getUnsignedImmediate()

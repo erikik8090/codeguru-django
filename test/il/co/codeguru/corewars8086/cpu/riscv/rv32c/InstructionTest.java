@@ -1,12 +1,9 @@
 package il.co.codeguru.corewars8086.cpu.riscv.rv32c;
 
-import com.google.gwt.editor.client.Editor;
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
-import il.co.codeguru.corewars8086.cpu.riscv.RV32I;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
-import il.co.codeguru.corewars8086.cpu.x86.Cpu;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
@@ -15,19 +12,21 @@ import il.co.codeguru.corewars8086.utils.Logger;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 
 @RunWith(JUnitParamsRunner.class)
 public class InstructionTest {
     private static final int RS1 = 8;
     private static final int RS2 = 9;
-    private static final int RD = 10    ;
+    private static final int RD = 10;
+    private final int VAL = 25;
+
 
     private CpuStateRiscV state;
     private CpuRiscV cpu;
@@ -138,10 +137,15 @@ public class InstructionTest {
     @Test
     public void testLi() throws MemoryException, CpuException
     {
-        state.setReg(RS1, 7777);
-        loadInstruction(RV32C.cInstructionFormatCI(RV32C.Opcodes.CLI, RS1, 3));
+        state.setReg(RS1, 124);
+        loadInstruction(RV32C.cInstructionFormatCI(RV32C.Opcodes.CLI, RS1, VAL));
         cpu.nextOpcode();
-        assertEquals(3, state.getReg(RS1));
+        assertEquals(VAL, state.getReg(RS1));
+
+        state.setReg(RS1, 124);
+        loadInstruction(RV32C.cInstructionFormatCI(RV32C.Opcodes.CLI, RS1, -VAL));
+        cpu.nextOpcode();
+        assertEquals(-VAL, state.getReg(RS1));
     }
 
     @Test
@@ -160,7 +164,6 @@ public class InstructionTest {
         assertEquals(expected, state.getReg(RS1));
     }
 
-    private final int VAL = 25;
     @Test
     public void testLwsp() throws MemoryException, CpuException {
         state.setReg(2, 15);
@@ -174,6 +177,12 @@ public class InstructionTest {
         loadInstruction(RV32C.cInstructionFormatCI(RV32C.Opcodes.CLWSP, RS1, 20));
         cpu.nextOpcode();
         assertEquals(VAL, state.getReg(RS1));
+
+        state.setReg(2, 0);
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) -15), VAL);
+        loadInstruction(RV32C.cInstructionFormatCI(RV32C.Opcodes.CLWSP, RS1, -15));
+        cpu.nextOpcode();
+        assertNotEquals(VAL, state.getReg(RS1));
     }
 
     @Test
@@ -189,6 +198,12 @@ public class InstructionTest {
         loadInstruction(RV32C.cInstructionFormatCSS(RV32C.Opcodes.CSWSP, RS1, 20));
         cpu.nextOpcode();
         assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)35)));
+
+        state.setReg(RS1, VAL);
+        state.setReg(2, 0);
+        loadInstruction(RV32C.cInstructionFormatCSS(RV32C.Opcodes.CSWSP, RS1, -15));
+        cpu.nextOpcode();
+        assertNotEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)-15)));
     }
 
     @Test
@@ -213,6 +228,12 @@ public class InstructionTest {
         loadInstruction(RV32C.cInstructionFormatCL(RV32C.Opcodes.CLW, RD, RS1, 20));
         cpu.nextOpcode();
         assertEquals(VAL, state.getReg(RD ));
+
+        state.setReg(RS1, 0);
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) -15), VAL);
+        loadInstruction(RV32C.cInstructionFormatCL(RV32C.Opcodes.CLW, RD, RS1, -15));
+        cpu.nextOpcode();
+        assertNotEquals(VAL, state.getReg(RD));
     }
 
     @Test
@@ -228,70 +249,128 @@ public class InstructionTest {
         loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CSW, RS1, RS2,20));
         cpu.nextOpcode();
         assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)35)));
+
+        state.setReg(RS2, VAL);
+        state.setReg(RS1, 0);
+        loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CSW, RS1, RS2,-15));
+        cpu.nextOpcode();
+        assertNotEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)-15)));
     }
 
     @Test
-    public void testAnd() throws MemoryException, CpuException {
-        state.setReg(RS1, 19);
-        state.setReg(RS2, 22);
+    @Parameters({
+            "5, 6, 4",
+            "5, 5, 5",
+            "5, 0, 0",
+            "5, -1, 5"
+    })
+    public void testAnd(int reg1, int reg2, int expected) throws MemoryException, CpuException {
+        state.setReg(RS1, reg1);
+        state.setReg(RS2, reg2);
         loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CAND, RS1, RS2));
         cpu.nextOpcode();
-        assertEquals(18, state.getReg(RS1));
+        assertEquals(expected, state.getReg(RS1));
     }
 
     @Test
-    public void testOr() throws MemoryException, CpuException {
-        state.setReg(RS1, 1);
-        state.setReg(RS2, 2);
+    @Parameters({
+            "1, 2, 3",
+            "5, 4, 5",
+            "5, 0, 5",
+            "5, -1, -1"
+    })
+    public void testOr(int reg1, int reg2, int expected) throws MemoryException, CpuException {
+        state.setReg(RS1, reg1);
+        state.setReg(RS2, reg2);
         loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.COR, RS1, RS2));
         cpu.nextOpcode();
-        assertEquals(3, state.getReg(RS1));
+        assertEquals(expected, state.getReg(RS1));
     }
 
     @Test
-    public void testXor() throws MemoryException, CpuException {
-        state.setReg(RS1, 3);
-        state.setReg(RS2, 10);
+    @Parameters({
+            " 1,  2,  3",
+            " 3, 10,  9",
+            " 3, -1, -4",
+            "-4, -1,  3",
+            " 5,  0,  5"
+    })
+    public void testXor(int reg1, int reg2, int expected) throws MemoryException, CpuException {
+        state.setReg(RS1, reg1);
+        state.setReg(RS2, reg2);
         loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CXOR, RS1, RS2));
         cpu.nextOpcode();
-        assertEquals(9, state.getReg(RS1));
+        assertEquals(expected, state.getReg(RS1));
     }
 
     @Test
-    public void testSub() throws MemoryException, CpuException {
-        state.setReg(RS1, 10);
-        state.setReg(RS2, 5);
+    @Parameters({
+            " 10, 0, 10",
+            " 10,  5, 5",
+            " 4, -1,  5",
+            " 1, 2, -1",
+            "-1, -1, 0",
+            Integer.MIN_VALUE + ", 1, " + Integer.MAX_VALUE
+    })
+    public void testSub(int reg1, int reg2, int expected) throws MemoryException, CpuException {
+        state.setReg(RS1, reg1);
+        state.setReg(RS2, reg2);
         loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CSUB, RS1, RS2));
         cpu.nextOpcode();
-        assertEquals(5, state.getReg(RS1));
+        assertEquals(expected, state.getReg(RS1));
     }
 
     @Test
-    public void testSrli() throws MemoryException, CpuException {
-        state.setReg(RS1, 4);
-        loadInstruction(RV32C.cInstructionFormatCB(RV32C.Opcodes.CSRLI, RS1, 1));
+    @Parameters({
+            " 4, 2, 1",
+            "12, 2, 3",
+            " 1, 1, 0",
+            " 0, 1, 0",
+            "-1, 1, " + Integer.MAX_VALUE
+    })
+    public void testSrli(int reg, int imm, int expected) throws MemoryException, CpuException {
+        state.setReg(RS1, reg);
+        loadInstruction(RV32C.cInstructionFormatCB(RV32C.Opcodes.CSRLI, RS1, imm));
         cpu.nextOpcode();
-        assertEquals(2, state.getReg(RS1));
+        assertEquals(expected, state.getReg(RS1));
     }
 
     @Test
-    public void testSrai() throws MemoryException, CpuException {
-        state.setReg(RS1, 4);
-        loadInstruction(RV32C.cInstructionFormatCB(RV32C.Opcodes.CSRAI, RS1, 1));
+    @Parameters({
+            " 4, 2, 1",
+            "12, 2, 3",
+            " 1, 1, 0",
+            " 0, 1, 0",
+            "-1, 1, -1"
+    })
+    public void testSrai(int reg, int imm, int expected) throws MemoryException, CpuException {
+        state.setReg(RS1, reg);
+        loadInstruction(RV32C.cInstructionFormatCB(RV32C.Opcodes.CSRAI, RS1, imm));
         cpu.nextOpcode();
-        assertEquals(2, state.getReg(RS1));
+        assertEquals(expected, state.getReg(RS1));
     }
 
     @Test
-    public void testAndi() throws MemoryException, CpuException {
-        state.setReg(RS1, 19);
-        loadInstruction(RV32C.cInstructionFormatCB(RV32C.Opcodes.CANDI, RS1, 22));
+    @Parameters({
+            "5, 6, 4",
+            "5, 5, 5",
+            "5, 0, 0",
+            "5, -1, 5"
+    })
+    public void testAndi(int reg, int imm, int expected) throws MemoryException, CpuException {
+        state.setReg(RS1, reg);
+        loadInstruction(RV32C.cInstructionFormatCB(RV32C.Opcodes.CANDI, RS1, imm));
         cpu.nextOpcode();
-        assertEquals(18, state.getReg(RS1));
+        assertEquals(expected, state.getReg(RS1));
     }
 
     @Test
     public void testBeqz() throws MemoryException, CpuException {
+        state.setReg(RS1, 0);
+        loadInstruction(RV32C.cInstructionFormatCBBranch(RV32C.Opcodes.CBEQZ, RS1, 8));
+        cpu.nextOpcode();
+        assertEquals(8, state.getPc());
+
         state.setReg(RS1, 0);
         loadInstruction(RV32C.cInstructionFormatCBBranch(RV32C.Opcodes.CBEQZ, RS1, -8));
         cpu.nextOpcode();
@@ -305,6 +384,11 @@ public class InstructionTest {
 
     @Test
     public void testBnez() throws MemoryException, CpuException {
+        state.setReg(RS1, 5);
+        loadInstruction(RV32C.cInstructionFormatCBBranch(RV32C.Opcodes.CBNEZ, RS1, 8));
+        cpu.nextOpcode();
+        assertEquals(8, state.getPc());
+
         state.setReg(RS1, 5);
         loadInstruction(RV32C.cInstructionFormatCBBranch(RV32C.Opcodes.CBNEZ, RS1, -8));
         cpu.nextOpcode();
@@ -346,5 +430,4 @@ public class InstructionTest {
 
         assertEquals(-8, state.getPc());
     }
-
 }

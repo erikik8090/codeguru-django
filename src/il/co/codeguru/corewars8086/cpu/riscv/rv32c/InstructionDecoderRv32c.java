@@ -50,6 +50,8 @@ public class InstructionDecoderRv32c {
                         return new Instruction(RV32C.Opcodes.CJAL, RV32I.instructionUJ(RV32I.Opcodes.Jal, 1, cj.getImmediate()),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.jal(new InstructionFormatUJ(format), 2));
                     case 2:
+                        Logger.log(RV32I.instructionI(RV32I.Opcodes.Addi, ci.getRs1(), 0, ci.getImmediate()).format(RV32I.Opcodes.Addi));
+                        Logger.log("" + ci.getImmediate());
                         return new Instruction(RV32C.Opcodes.CLI, RV32I.instructionI(RV32I.Opcodes.Addi, ci.getRs1(), 0, ci.getImmediate()),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.addi(new InstructionFormatI(format)));
                     case 3:

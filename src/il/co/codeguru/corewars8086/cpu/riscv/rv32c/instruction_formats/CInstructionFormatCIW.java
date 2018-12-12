@@ -11,7 +11,7 @@ public class CInstructionFormatCIW extends CInstructionFormatBase {
     }
 
     public CInstructionFormatCIW(byte opcode, byte funct3, byte rd, byte imm) {
-        this((short)((opcode & mask(2)) |
+        this((short) ((opcode & mask(2)) |
                 (((rd - 8) & mask(3)) << 2) |
                 ((imm & mask(8)) << 5) |
                 ((funct3 & mask(3)) << 13)));

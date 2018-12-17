@@ -11,13 +11,16 @@ import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Logger;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
+@RunWith(JUnitParamsRunner.class)
 public class JumpTest {
     private static final int ZERO = 0;
     private static final int RS1 = 1;
@@ -41,328 +44,205 @@ public class JumpTest {
     }
 
     @Test
-    public void testJal() throws MemoryException, CpuException {
-        //J
+    public void testJ() throws MemoryException, CpuException {
         state.setPc(0);
         loadInstruction(RV32I.instructionUJ(RV32I.Opcodes.Jal, ZERO, 4));
         cpu.nextOpcode();
         assertEquals(4, state.getPc());
+    }
 
+    @Test
+    public void testJal() throws MemoryException, CpuException {
         state.setPc(12);
         loadInstruction(RV32I.instructionUJ(RV32I.Opcodes.Jal, RD, -8));
         cpu.nextOpcode();
         assertEquals(4, state.getPc());
         assertEquals(16, state.getReg(RD));
+    }
 
+    @Test(expected = MisalignedMemoryLoadException.class)
+    public void testJalMisalignedAddress() throws MemoryException, CpuException {
         state.setPc(24);
         loadInstruction(RV32I.instructionUJ(RV32I.Opcodes.Jal, RD, 14));
-        try {
-            cpu.nextOpcode();
-        } catch (MisalignedMemoryLoadException e) {
-            return;
-        }
-        fail("JAL should throw exception when loading mis-aligned address");
-
+        cpu.nextOpcode();
     }
 
     @Test
-    public void testJalr() throws MemoryException, CpuException {
-        //J
-        state.setReg(RS1, 4);
-        state.setPc(0);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD, RS1, 0));
+    @Parameters({
+            " 0, 8, 0, 8, 4",
+            "12,-8, 0, 4,16",
+            "12,-8,16,20,16"
+    })
+    public void testJalr(int initialPc, int reg, int imm, int expectedPc, int expectedReg) throws MemoryException, CpuException {
+        state.setReg(RS1, reg);
+        state.setPc(initialPc);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD, RS1, imm));
         cpu.nextOpcode();
-        assertEquals(4, state.getPc());
+        assertEquals(expectedPc, state.getPc());
+        assertEquals(expectedReg, state.getReg(RD));
+    }
 
-        state.setPc(12);
-        state.setReg(RS1, -8);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD, RS1, 0));
-        cpu.nextOpcode();
-        assertEquals(4, state.getPc());
-        assertEquals(16, state.getReg(RD));
-
-        state.setPc(12);
-        state.setReg(RS1, -8);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD, RS1, 16));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-        assertEquals(16, state.getReg(RD));
-
+    @Test(expected = MisalignedMemoryLoadException.class)
+    public void testJalrMisalignedAddress() throws MemoryException, CpuException {
         state.setReg(RS1, 14);
         state.setPc(24);
         loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD, RS1, 0));
-
-        try {
-            cpu.nextOpcode();
-        } catch (MisalignedMemoryLoadException e) {
-            return;
-        }
-        fail("JAL should throw exception when loading mis-aligned address");
-
+        cpu.nextOpcode();
     }
 
     @Test
-    public void testBeq() throws MemoryException, CpuException {
+    public void testBeqAsJ() throws MemoryException, CpuException {
         state.setPc(0);
         loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, ZERO, ZERO, 8));
         cpu.nextOpcode();
         assertEquals(8, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(8, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 6);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 6);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-
-        state.setPc(24);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, ZERO, ZERO, 14));
-        //TODO: Check the behavior of SPIKE - does it crash if the instruction has invalid immidiate even though you dont take it?
-        try {
-            cpu.nextOpcode();
-        } catch (MisalignedMemoryLoadException e) {
-            return;
-        }
-        fail("BEQ should throw exception when loading mis-aligned address");
     }
 
     @Test
-    public void testBne() throws MemoryException, CpuException {
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bne, ZERO, ZERO, -8));
+    @Parameters({
+            "5, 5, 16, -8, 8",
+            "5, 6, 16, -8,20",
+            "6, 5, 16, -8,20"
+    })
+    public void testBeq(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
+        state.setPc(pc);
+        state.setReg(RS1, rs1);
+        state.setReg(RS2, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, RS1, RS2, imm));
         cpu.nextOpcode();
-        assertEquals(20, state.getPc());
+        assertEquals(expected, state.getPc());
 
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 6);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bne, RS1, RS2, -8));
+    }
+
+    @Test(expected = MisalignedMemoryLoadException.class)
+    public void testBeqMisalignedAddressTakenBranch() throws MemoryException, CpuException {
+        state.setPc(24);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, ZERO, ZERO, 14));
         cpu.nextOpcode();
-        assertEquals(8, state.getPc());
+    }
 
-        state.setPc(16);
-        state.setReg(RS1, 6);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bne, RS1, RS2, -8));
+    @Test
+    @Parameters({
+            "5, 5, 16, -8, 20",
+            "5, 6, 16, -8,  8",
+            "6, 5, 16, -8,  8"
+    })
+    public void testBne(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
+        state.setPc(pc);
+        state.setReg(RS1, rs1);
+        state.setReg(RS2, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bne, RS1, RS2, imm));
         cpu.nextOpcode();
-        assertEquals(8, state.getPc());
+        assertEquals(expected, state.getPc());
+    }
 
+    @Test(expected = MisalignedMemoryLoadException.class)
+    public void testBneMisalignedAddressBranchTaken() throws MemoryException, CpuException {
         state.setPc(24);
         state.setReg(RS2, 5);
         loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bne, RS1, RS2, 14));
-        try {
-            cpu.nextOpcode();
-        } catch (MisalignedMemoryLoadException e) {
-            return;
-        }
-        fail("BNE should throw exception when loading mis-aligned address");
+        cpu.nextOpcode();
     }
 
     @Test
-    public void testBlt() throws MemoryException, CpuException {
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, ZERO, ZERO, -8));
+    @Parameters({
+            "5, 5, 16, -8, 20",
+            "5, 6, 16, -8, 8",
+            "6, 6, 16, -8, 20",
+            "-1,1, 16, -8, 8",
+            "1,-1, 16, -8, 20"
+    })
+    public void testBlt(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
+        state.setPc(pc);
+        state.setReg(RS1, rs1);
+        state.setReg(RS2, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, RS1, RS2, imm));
         cpu.nextOpcode();
-        assertEquals(20, state.getPc());
+        assertEquals(expected, state.getPc());
+    }
 
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 6);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(8, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 6);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, -1);
-        state.setReg(RS2, 1);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(8, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 1);
-        state.setReg(RS2, -1);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-
+    @Test(expected = MisalignedMemoryLoadException.class)
+    public void testBltMisalignedAddress() throws MemoryException, CpuException {
         state.setReg(RS1, 5);
         state.setReg(RS2, 6);
         state.setPc(24);
         loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, RS1, RS2, 14));
-        try {
-            cpu.nextOpcode();
-        } catch (MisalignedMemoryLoadException e) {
-            return;
-        }
-        fail("BLT should throw exception when loading mis-aligned address");
+        cpu.nextOpcode();
     }
 
     @Test
-    public void testBltu() throws MemoryException, CpuException {
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, ZERO, ZERO, -8));
+    @Parameters({
+            "5, 5, 16, -8, 20",
+            "5, 6, 16, -8, 8",
+            "6, 6, 16, -8, 20",
+            "-1,1, 16, -8, 20",
+            "1,-1, 16, -8, 8"
+    })
+    public void testBltu(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
+        state.setPc(pc);
+        state.setReg(RS1, rs1);
+        state.setReg(RS2, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, RS1, RS2, imm));
         cpu.nextOpcode();
-        assertEquals(20, state.getPc());
+        assertEquals(expected, state.getPc());
+    }
 
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 6);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(8, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 6);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, -1);
-        state.setReg(RS2, 1);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 1);
-        state.setReg(RS2, -1);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(8, state.getPc());
-
+    @Test(expected = MisalignedMemoryLoadException.class)
+    public void testBltuMisalignedAddressBranchTaken() throws MemoryException, CpuException {
         state.setPc(24);
+        state.setReg(RS1, 5);
+        state.setReg(RS2, 6);
         loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, RS1, RS2, 14));
-        try {
-            cpu.nextOpcode();
-        } catch (MisalignedMemoryLoadException e) {
-            return;
-        }
-        fail("bltu should throw exception when loading mis-aligned address");
+        cpu.nextOpcode();
     }
 
     @Test
-    public void testBge() throws MemoryException, CpuException {
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, ZERO, ZERO, -8));
+    @Parameters({
+            "5, 5, 16, -8, 8",
+            "5, 6, 16, -8, 20",
+            "6, 6, 16, -8, 8",
+            "-1,1, 16, -8, 20",
+            "1,-1, 16, -8, 8"
+    })
+    public void testBge(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
+        state.setPc(pc);
+        state.setReg(RS1, rs1);
+        state.setReg(RS2, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, RS1, RS2, imm));
         cpu.nextOpcode();
-        assertEquals(8, state.getPc());
+        assertEquals(expected, state.getPc());
+    }
 
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 6);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 6);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(8, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, -1);
-        state.setReg(RS2, 1);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 1);
-        state.setReg(RS2, -1);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(8, state.getPc());
-
+    @Test(expected = MisalignedMemoryLoadException.class)
+    public void testBgeMisalignedAddressBranchTaken() throws MemoryException, CpuException {
         state.setReg(RS1, 5);
         state.setPc(24);
         loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, RS1, RS2, 14));
-        try {
-            cpu.nextOpcode();
-        } catch (MisalignedMemoryLoadException e) {
-            return;
-        }
-        fail("bge should throw exception when loading mis-aligned address");
+        cpu.nextOpcode();
     }
 
     @Test
-    public void testBgeu() throws MemoryException, CpuException {
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, ZERO, ZERO, -8));
+    @Parameters({
+            "5, 5, 16, -8, 8",
+            "5, 6, 16, -8, 20",
+            "6, 6, 16, -8, 8",
+            "-1,1, 16, -8, 8",
+            "1,-1, 16, -8, 20"
+    })
+    public void testBgeu(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
+        state.setPc(pc);
+        state.setReg(RS1, rs1);
+        state.setReg(RS2, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, RS1, RS2, imm));
         cpu.nextOpcode();
-        assertEquals(8, state.getPc());
+        assertEquals(expected, state.getPc());
+    }
 
-        state.setPc(16);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 6);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 6);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(8, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, -1);
-        state.setReg(RS2, 1);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(8, state.getPc());
-
-        state.setPc(16);
-        state.setReg(RS1, 1);
-        state.setReg(RS2, -1);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, RS1, RS2, -8));
-        cpu.nextOpcode();
-        assertEquals(20, state.getPc());
-
+    @Test(expected = MisalignedMemoryLoadException.class)
+    public void testBgeuMisalignedAddress() throws MemoryException, CpuException {
         state.setReg(RS1, 5);
         state.setPc(24);
         loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, ZERO, ZERO, 14));
-        try {
-            cpu.nextOpcode();
-        } catch (MisalignedMemoryLoadException e) {
-            return;
-        }
-        fail("bgeu should throw exception when loading mis-aligned address");
+        cpu.nextOpcode();
     }
 }

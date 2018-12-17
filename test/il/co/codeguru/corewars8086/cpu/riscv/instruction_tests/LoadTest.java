@@ -10,13 +10,17 @@ import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Logger;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+@RunWith(JUnitParamsRunner.class)
 public class LoadTest {
     private static final int RS1 = 1;
     private static final int RD = 2;
@@ -31,6 +35,7 @@ public class LoadTest {
         state = new CpuStateRiscV();
         memory = new RealModeMemoryImpl();
         cpu = new CpuRiscV(state, memory);
+        //To not interrupt the 0 memory location
         state.setPc(0x100);
         Logger.setTestingMode();
 
@@ -41,90 +46,57 @@ public class LoadTest {
     }
 
     @Test
-    public void testLw() throws MemoryException, CpuException {
-        state.setReg(RS1, 0);
+    @Parameters({
+            " 0, 0,  0, 17",
+            "15, 0, 15, 17",
+            "15,20, 35, 17",
+            "15,-5, 10, 17",
+            " 0, 0,  0, -1"
+    })
+    public void testLw(int rs1, int imm, int expectedAddress, int val) throws MemoryException, CpuException {
+        state.setReg(RS1, rs1);
         state.setReg(RD, 0);
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 0), VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lw, RD, RS1, 0));
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) expectedAddress), val);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lw, RD, RS1, imm));
         cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 15);
-        state.setReg(RD, 0);
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 15), VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lw, RD, RS1, 0));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 15);
-        state.setReg(RD, 0);
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 35), VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lw, RD, RS1, 20));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 0);
-        state.setReg(RD, 0);
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 0), -1);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lw, RD, RS1, 0));
-        cpu.nextOpcode();
-        assertEquals(-1, state.getReg(RD));
+        assertEquals(val, state.getReg(RD));
     }
 
     @Test
-    public void testLh() throws MemoryException, CpuException {
-        state.setReg(RS1, 0);
+    @Parameters({
+            " 0, 0,  0, 17",
+            "15, 0, 15, 17",
+            "15,20, 35, 17",
+            "15,-5, 10, 17",
+            " 0, 0,  0, -1"
+    })
+    public void testLh(int rs1, int imm, int expectedAddress, int val) throws MemoryException, CpuException {
+        state.setReg(RS1, rs1);
         state.setReg(RD, 0);
-        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 0), (short) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lh, RD, RS1, 0));
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) expectedAddress), val);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lh, RD, RS1, imm));
         cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 15);
-        state.setReg(RD, 0);
-        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 15), (short) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lh, RD, RS1, 0));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 15);
-        state.setReg(RD, 0);
-        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 35), (short) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lh, RD, RS1, 20));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 0);
-        state.setReg(RD, 0);
-        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 0), (short) (-1));
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lh, RD, RS1, 0));
-        cpu.nextOpcode();
-        assertEquals(-1, state.getReg(RD));
+        assertEquals(val, state.getReg(RD));
     }
 
     @Test
-    public void testLhu() throws MemoryException, CpuException {
-        state.setReg(RS1, 0);
+    @Parameters({
+            " 0, 0,  0, 17",
+            "15, 0, 15, 17",
+            "15,20, 35, 17",
+            "15,-5, 10, 17",
+    })
+    public void testLhu(int rs1, int imm, int expectedAddress, int val) throws MemoryException, CpuException {
+        state.setReg(RS1, rs1);
         state.setReg(RD, 0);
-        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 0), (short) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lhu, RD, RS1, 0));
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) expectedAddress), val);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lhu, RD, RS1, imm));
         cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
+        assertEquals(val, state.getReg(RD));
+    }
 
-        state.setReg(RS1, 15);
-        state.setReg(RD, 0);
-        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 15), (short) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lhu, RD, RS1, 0));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 15);
-        state.setReg(RD, 0);
-        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 35), (short) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lhu, RD, RS1, 20));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
+    @Test
+    public void testLhuNegativeValue() throws MemoryException, CpuException {
         state.setReg(RS1, 0);
         state.setReg(RD, 0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 0), (short) (-1));
@@ -134,62 +106,43 @@ public class LoadTest {
     }
 
     @Test
-    public void testlb() throws MemoryException, CpuException {
-        state.setReg(RS1, 0);
+    @Parameters({
+            " 0, 0,  0, 17",
+            "15, 0, 15, 17",
+            "15,20, 35, 17",
+            "15,-5, 10, 17",
+            " 0, 0,  0, -1"
+    })
+    public void testLb(int rs1, int imm, int expectedAddress, int val) throws MemoryException, CpuException {
+        state.setReg(RS1, rs1);
         state.setReg(RD, 0);
-        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short) 0), (byte) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lb, RD, RS1, 0));
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) expectedAddress), val);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lb, RD, RS1, imm));
         cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 15);
-        state.setReg(RD, 0);
-        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short) 15), (byte) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lb, RD, RS1, 0));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 15);
-        state.setReg(RD, 0);
-        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short) 35), (byte) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lb, RD, RS1, 20));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 0);
-        state.setReg(RD, 0);
-        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short) 0), (byte) (-1));
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lb, RD, RS1, 0));
-        cpu.nextOpcode();
-        assertEquals(-1, state.getReg(RD));
+        assertEquals(val, state.getReg(RD));
     }
 
     @Test
-    public void testlbu() throws MemoryException, CpuException {
+    @Parameters({
+            " 0, 0,  0, 17",
+            "15, 0, 15, 17",
+            "15,20, 35, 17",
+            "15,-5, 10, 17",
+    })
+    public void testLbu(int rs1, int imm, int expectedAddress, int val) throws MemoryException, CpuException {
+        state.setReg(RS1, rs1);
+        state.setReg(RD, 0);
+        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) expectedAddress), val);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lbu, RD, RS1, imm));
+        cpu.nextOpcode();
+        assertEquals(val, state.getReg(RD));
+    }
+
+    @Test
+    public void testLbuNegativeValue() throws MemoryException, CpuException {
         state.setReg(RS1, 0);
         state.setReg(RD, 0);
-        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short) 0), (byte) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lbu, RD, RS1, 0));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 15);
-        state.setReg(RD, 0);
-        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short) 15), (byte) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lbu, RD, RS1, 0));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 15);
-        state.setReg(RD, 0);
-        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short) 35), (byte) VAL);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lbu, RD, RS1, 20));
-        cpu.nextOpcode();
-        assertEquals(VAL, state.getReg(RD));
-
-        state.setReg(RS1, 0);
-        state.setReg(RD, 0);
-        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short) 0), (byte) (-1));
+        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 0), (short) (-1));
         loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lbu, RD, RS1, 0));
         cpu.nextOpcode();
         assertNotEquals(-1, state.getReg(RD));

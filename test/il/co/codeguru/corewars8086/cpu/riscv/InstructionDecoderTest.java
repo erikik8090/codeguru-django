@@ -16,7 +16,6 @@ public class InstructionDecoderTest {
     private InstructionDecoder decoder;
 
     @Before
-    //TODO: Replace this with a proper interface
     public void setUp()
     {
         decoder = new InstructionDecoder();
@@ -24,20 +23,7 @@ public class InstructionDecoderTest {
     }
 
     @Test
-    public void decodeTest() throws MemoryException, CpuException {
-        InstructionFormatBase base = new InstructionFormatBase(0x13);
-
-        try {
-            decoder.decode(base);
-        } catch (InvalidOpcodeException e) {
-            fail("Instruction Decoder threw exception on valid instruction");
-        }
-    }
-
-    //TODO:Also return this to effect when all instructions are done
-    @Test
-    @Ignore
-    public void decodeFailTest() throws MemoryException, CpuException
+    public void DecoderFailOnIllegalInstructionTest() throws MemoryException, CpuException
     {
         InstructionFormatBase base = new InstructionFormatBase(0);
 

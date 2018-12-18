@@ -22,10 +22,10 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnitParamsRunner.class)
 public class JumpTest {
-    private static final int ZERO = 0;
-    private static final int RS1 = 1;
-    private static final int RS2 = 2;
-    private static final int RD = 3;
+    private static final int x0 = 0;
+    private static final int RS1_INDEX = 1;
+    private static final int RS2_INDEX = 2;
+    private static final int RD_INDEX = 3;
 
     private CpuStateRiscV state;
     private CpuRiscV cpu;
@@ -46,7 +46,7 @@ public class JumpTest {
     @Test
     public void testJ() throws MemoryException, CpuException {
         state.setPc(0);
-        loadInstruction(RV32I.instructionUJ(RV32I.Opcodes.Jal, ZERO, 4));
+        loadInstruction(RV32I.instructionUJ(RV32I.Opcodes.Jal, x0, 4));
         cpu.nextOpcode();
         assertEquals(4, state.getPc());
     }
@@ -54,16 +54,16 @@ public class JumpTest {
     @Test
     public void testJal() throws MemoryException, CpuException {
         state.setPc(12);
-        loadInstruction(RV32I.instructionUJ(RV32I.Opcodes.Jal, RD, -8));
+        loadInstruction(RV32I.instructionUJ(RV32I.Opcodes.Jal, RD_INDEX, -8));
         cpu.nextOpcode();
         assertEquals(4, state.getPc());
-        assertEquals(16, state.getReg(RD));
+        assertEquals(16, state.getReg(RD_INDEX));
     }
 
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testJalMisalignedAddress() throws MemoryException, CpuException {
         state.setPc(24);
-        loadInstruction(RV32I.instructionUJ(RV32I.Opcodes.Jal, RD, 14));
+        loadInstruction(RV32I.instructionUJ(RV32I.Opcodes.Jal, RD_INDEX, 14));
         cpu.nextOpcode();
     }
 
@@ -74,26 +74,26 @@ public class JumpTest {
             "12,-8,16,20,16"
     })
     public void testJalr(int initialPc, int reg, int imm, int expectedPc, int expectedReg) throws MemoryException, CpuException {
-        state.setReg(RS1, reg);
+        state.setReg(RS1_INDEX, reg);
         state.setPc(initialPc);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD, RS1, imm));
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
         assertEquals(expectedPc, state.getPc());
-        assertEquals(expectedReg, state.getReg(RD));
+        assertEquals(expectedReg, state.getReg(RD_INDEX));
     }
 
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testJalrMisalignedAddress() throws MemoryException, CpuException {
-        state.setReg(RS1, 14);
+        state.setReg(RS1_INDEX, 14);
         state.setPc(24);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD, RS1, 0));
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD_INDEX, RS1_INDEX, 0));
         cpu.nextOpcode();
     }
 
     @Test
     public void testBeqAsJ() throws MemoryException, CpuException {
         state.setPc(0);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, ZERO, ZERO, 8));
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, x0, x0, 8));
         cpu.nextOpcode();
         assertEquals(8, state.getPc());
     }
@@ -106,9 +106,9 @@ public class JumpTest {
     })
     public void testBeq(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
         state.setPc(pc);
-        state.setReg(RS1, rs1);
-        state.setReg(RS2, rs2);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, RS1, RS2, imm));
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RS2_INDEX, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, RS1_INDEX, RS2_INDEX, imm));
         cpu.nextOpcode();
         assertEquals(expected, state.getPc());
 
@@ -117,7 +117,7 @@ public class JumpTest {
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBeqMisalignedAddressTakenBranch() throws MemoryException, CpuException {
         state.setPc(24);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, ZERO, ZERO, 14));
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Beq, x0, x0, 14));
         cpu.nextOpcode();
     }
 
@@ -129,9 +129,9 @@ public class JumpTest {
     })
     public void testBne(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
         state.setPc(pc);
-        state.setReg(RS1, rs1);
-        state.setReg(RS2, rs2);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bne, RS1, RS2, imm));
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RS2_INDEX, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bne, RS1_INDEX, RS2_INDEX, imm));
         cpu.nextOpcode();
         assertEquals(expected, state.getPc());
     }
@@ -139,8 +139,8 @@ public class JumpTest {
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBneMisalignedAddressBranchTaken() throws MemoryException, CpuException {
         state.setPc(24);
-        state.setReg(RS2, 5);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bne, RS1, RS2, 14));
+        state.setReg(RS2_INDEX, 5);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bne, RS1_INDEX, RS2_INDEX, 14));
         cpu.nextOpcode();
     }
 
@@ -154,19 +154,19 @@ public class JumpTest {
     })
     public void testBlt(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
         state.setPc(pc);
-        state.setReg(RS1, rs1);
-        state.setReg(RS2, rs2);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, RS1, RS2, imm));
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RS2_INDEX, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, RS1_INDEX, RS2_INDEX, imm));
         cpu.nextOpcode();
         assertEquals(expected, state.getPc());
     }
 
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBltMisalignedAddress() throws MemoryException, CpuException {
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 6);
+        state.setReg(RS1_INDEX, 5);
+        state.setReg(RS2_INDEX, 6);
         state.setPc(24);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, RS1, RS2, 14));
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Blt, RS1_INDEX, RS2_INDEX, 14));
         cpu.nextOpcode();
     }
 
@@ -180,9 +180,9 @@ public class JumpTest {
     })
     public void testBltu(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
         state.setPc(pc);
-        state.setReg(RS1, rs1);
-        state.setReg(RS2, rs2);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, RS1, RS2, imm));
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RS2_INDEX, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, RS1_INDEX, RS2_INDEX, imm));
         cpu.nextOpcode();
         assertEquals(expected, state.getPc());
     }
@@ -190,9 +190,9 @@ public class JumpTest {
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBltuMisalignedAddressBranchTaken() throws MemoryException, CpuException {
         state.setPc(24);
-        state.setReg(RS1, 5);
-        state.setReg(RS2, 6);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, RS1, RS2, 14));
+        state.setReg(RS1_INDEX, 5);
+        state.setReg(RS2_INDEX, 6);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bltu, RS1_INDEX, RS2_INDEX, 14));
         cpu.nextOpcode();
     }
 
@@ -206,18 +206,18 @@ public class JumpTest {
     })
     public void testBge(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
         state.setPc(pc);
-        state.setReg(RS1, rs1);
-        state.setReg(RS2, rs2);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, RS1, RS2, imm));
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RS2_INDEX, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, RS1_INDEX, RS2_INDEX, imm));
         cpu.nextOpcode();
         assertEquals(expected, state.getPc());
     }
 
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBgeMisalignedAddressBranchTaken() throws MemoryException, CpuException {
-        state.setReg(RS1, 5);
+        state.setReg(RS1_INDEX, 5);
         state.setPc(24);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, RS1, RS2, 14));
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bge, RS1_INDEX, RS2_INDEX, 14));
         cpu.nextOpcode();
     }
 
@@ -231,18 +231,18 @@ public class JumpTest {
     })
     public void testBgeu(int rs1, int rs2, int pc, int imm, int expected) throws MemoryException, CpuException {
         state.setPc(pc);
-        state.setReg(RS1, rs1);
-        state.setReg(RS2, rs2);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, RS1, RS2, imm));
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RS2_INDEX, rs2);
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, RS1_INDEX, RS2_INDEX, imm));
         cpu.nextOpcode();
         assertEquals(expected, state.getPc());
     }
 
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBgeuMisalignedAddress() throws MemoryException, CpuException {
-        state.setReg(RS1, 5);
+        state.setReg(RS1_INDEX, 5);
         state.setPc(24);
-        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, ZERO, ZERO, 14));
+        loadInstruction(RV32I.instructionSB(RV32I.Opcodes.Bgeu, x0, x0, 14));
         cpu.nextOpcode();
     }
 }

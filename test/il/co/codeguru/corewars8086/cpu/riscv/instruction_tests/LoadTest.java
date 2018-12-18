@@ -22,9 +22,8 @@ import static org.junit.Assert.assertNotEquals;
 
 @RunWith(JUnitParamsRunner.class)
 public class LoadTest {
-    private static final int RS1 = 1;
-    private static final int RD = 2;
-    private static final int VAL = 17;
+    private static final int RS1_INDEX = 1;
+    private static final int RD_INDEX = 2;
 
     private CpuStateRiscV state;
     private RealModeMemory memory;
@@ -54,12 +53,12 @@ public class LoadTest {
             " 0, 0,  0, -1"
     })
     public void testLw(int rs1, int imm, int expectedAddress, int val) throws MemoryException, CpuException {
-        state.setReg(RS1, rs1);
-        state.setReg(RD, 0);
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RD_INDEX, 0);
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) expectedAddress), val);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lw, RD, RS1, imm));
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lw, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(val, state.getReg(RD));
+        assertEquals(val, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -71,12 +70,12 @@ public class LoadTest {
             " 0, 0,  0, -1"
     })
     public void testLh(int rs1, int imm, int expectedAddress, int val) throws MemoryException, CpuException {
-        state.setReg(RS1, rs1);
-        state.setReg(RD, 0);
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RD_INDEX, 0);
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) expectedAddress), val);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lh, RD, RS1, imm));
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lh, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(val, state.getReg(RD));
+        assertEquals(val, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -87,22 +86,22 @@ public class LoadTest {
             "15,-5, 10, 17",
     })
     public void testLhu(int rs1, int imm, int expectedAddress, int val) throws MemoryException, CpuException {
-        state.setReg(RS1, rs1);
-        state.setReg(RD, 0);
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RD_INDEX, 0);
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) expectedAddress), val);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lhu, RD, RS1, imm));
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lhu, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(val, state.getReg(RD));
+        assertEquals(val, state.getReg(RD_INDEX));
     }
 
     @Test
     public void testLhuNegativeValue() throws MemoryException, CpuException {
-        state.setReg(RS1, 0);
-        state.setReg(RD, 0);
+        state.setReg(RS1_INDEX, 0);
+        state.setReg(RD_INDEX, 0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 0), (short) (-1));
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lhu, RD, RS1, 0));
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lhu, RD_INDEX, RS1_INDEX, 0));
         cpu.nextOpcode();
-        assertNotEquals(-1, state.getReg(RD));
+        assertNotEquals(-1, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -114,12 +113,12 @@ public class LoadTest {
             " 0, 0,  0, -1"
     })
     public void testLb(int rs1, int imm, int expectedAddress, int val) throws MemoryException, CpuException {
-        state.setReg(RS1, rs1);
-        state.setReg(RD, 0);
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RD_INDEX, 0);
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) expectedAddress), val);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lb, RD, RS1, imm));
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lb, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(val, state.getReg(RD));
+        assertEquals(val, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -130,21 +129,21 @@ public class LoadTest {
             "15,-5, 10, 17",
     })
     public void testLbu(int rs1, int imm, int expectedAddress, int val) throws MemoryException, CpuException {
-        state.setReg(RS1, rs1);
-        state.setReg(RD, 0);
+        state.setReg(RS1_INDEX, rs1);
+        state.setReg(RD_INDEX, 0);
         memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) expectedAddress), val);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lbu, RD, RS1, imm));
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lbu, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(val, state.getReg(RD));
+        assertEquals(val, state.getReg(RD_INDEX));
     }
 
     @Test
     public void testLbuNegativeValue() throws MemoryException, CpuException {
-        state.setReg(RS1, 0);
-        state.setReg(RD, 0);
+        state.setReg(RS1_INDEX, 0);
+        state.setReg(RD_INDEX, 0);
         memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) 0), (short) (-1));
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lbu, RD, RS1, 0));
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Lbu, RD_INDEX, RS1_INDEX, 0));
         cpu.nextOpcode();
-        assertNotEquals(-1, state.getReg(RD));
+        assertNotEquals(-1, state.getReg(RD_INDEX));
     }
 }

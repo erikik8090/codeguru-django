@@ -21,9 +21,9 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnitParamsRunner.class)
 public class RegisterTest {
-    private static final int RS1 = 1;
-    private static final int RS2 = 2;
-    private static final int RD = 3;
+    private static final int RS1_INDEX = 1;
+    private static final int RS2_INDEX = 2;
+    private static final int RD_INDEX = 3;
 
     private CpuStateRiscV state;
     private CpuRiscV cpu;
@@ -50,11 +50,11 @@ public class RegisterTest {
             "" + Integer.MAX_VALUE + ", 1," + Integer.MIN_VALUE
     })
     public void testAdd(int reg1, int reg2, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg1);
-        state.setReg(RS2, reg2);
-        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Add, RD, RS1, RS2));
+        state.setReg(RS1_INDEX, reg1);
+        state.setReg(RS2_INDEX, reg2);
+        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Add, RD_INDEX, RS1_INDEX, RS2_INDEX));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -68,11 +68,11 @@ public class RegisterTest {
     })
     public void testSub(int reg1, int reg2, int expected) throws MemoryException, CpuException {
         Logger.log("here");
-        state.setReg(RS1, reg1);
-        state.setReg(RS2, reg2);
-        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Sub, RD, RS1, RS2));
+        state.setReg(RS1_INDEX, reg1);
+        state.setReg(RS2_INDEX, reg2);
+        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Sub, RD_INDEX, RS1_INDEX, RS2_INDEX));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
 
@@ -84,11 +84,11 @@ public class RegisterTest {
             "5, -1, 5"
     })
     public void testAnd(int reg1, int reg2, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg1);
-        state.setReg(RS2, reg2);
-        loadInstruction(RV32I.instructionR(RV32I.Opcodes.And, RD, RS1, RS2));
+        state.setReg(RS1_INDEX, reg1);
+        state.setReg(RS2_INDEX, reg2);
+        loadInstruction(RV32I.instructionR(RV32I.Opcodes.And, RD_INDEX, RS1_INDEX, RS2_INDEX));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
 
@@ -100,11 +100,11 @@ public class RegisterTest {
             "5, -1, -1"
     })
     public void testOr(int reg1, int reg2, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg1);
-        state.setReg(RS2, reg2);
-        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Or, RD, RS1, RS2));
+        state.setReg(RS1_INDEX, reg1);
+        state.setReg(RS2_INDEX, reg2);
+        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Or, RD_INDEX, RS1_INDEX, RS2_INDEX));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
 
@@ -117,11 +117,11 @@ public class RegisterTest {
             " 5,  0,  5"
     })
     public void testXor(int reg1, int reg2, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg1);
-        state.setReg(RS2, reg2);
-        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Xor, RD, RS1, RS2));
+        state.setReg(RS1_INDEX, reg1);
+        state.setReg(RS2_INDEX, reg2);
+        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Xor, RD_INDEX, RS1_INDEX, RS2_INDEX));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
 
@@ -133,11 +133,11 @@ public class RegisterTest {
             "" + Integer.MIN_VALUE + ", 1, 0"
     })
     public void testSll(int reg1, int reg2, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg1);
-        state.setReg(RS2, reg2);
-        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Sll, RD, RS1, RS2));
+        state.setReg(RS1_INDEX, reg1);
+        state.setReg(RS2_INDEX, reg2);
+        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Sll, RD_INDEX, RS1_INDEX, RS2_INDEX));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
 
@@ -151,11 +151,11 @@ public class RegisterTest {
             "-2, 1, " + Integer.MAX_VALUE,
     })
     public void testSrl(int reg1, int reg2, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg1);
-        state.setReg(RS2, reg2);
-        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Srl, RD, RS1, RS2));
+        state.setReg(RS1_INDEX, reg1);
+        state.setReg(RS2_INDEX, reg2);
+        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Srl, RD_INDEX, RS1_INDEX, RS2_INDEX));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
 
@@ -169,11 +169,11 @@ public class RegisterTest {
             "-2, 1, -1"
     })
     public void testSra(int reg1, int reg2, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg1);
-        state.setReg(RS2, reg2);
-        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Sra, RD, RS1, RS2));
+        state.setReg(RS1_INDEX, reg1);
+        state.setReg(RS2_INDEX, reg2);
+        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Sra, RD_INDEX, RS1_INDEX, RS2_INDEX));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
 
@@ -186,11 +186,11 @@ public class RegisterTest {
 
     })
     public void testSlt(int reg1, int reg2, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg1);
-        state.setReg(RS2, reg2);
-        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Slt, RD, RS1, RS2));
+        state.setReg(RS1_INDEX, reg1);
+        state.setReg(RS2_INDEX, reg2);
+        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Slt, RD_INDEX, RS1_INDEX, RS2_INDEX));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
 
@@ -203,11 +203,11 @@ public class RegisterTest {
 
     })
     public void testSltu(int reg1, int reg2, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg1);
-        state.setReg(RS2, reg2);
-        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Sltu, RD, RS1, RS2));
+        state.setReg(RS1_INDEX, reg1);
+        state.setReg(RS2_INDEX, reg2);
+        loadInstruction(RV32I.instructionR(RV32I.Opcodes.Sltu, RD_INDEX, RS1_INDEX, RS2_INDEX));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
 }

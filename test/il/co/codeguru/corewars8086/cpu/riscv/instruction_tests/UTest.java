@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnitParamsRunner.class)
 public class UTest {
-    private static final int RD = 3;
+    private static final int RD_INDEX = 3;
     private CpuStateRiscV state;
     private CpuRiscV cpu;
 
@@ -48,10 +48,10 @@ public class UTest {
             "-1,  0, 4095"
     })
     public void testLui(int reg, int imm, int expected) throws MemoryException, CpuException {
-        state.setReg(RD, reg);
-        loadInstruction(RV32I.instructionU(RV32I.Opcodes.Lui, RD, imm));
+        state.setReg(RD_INDEX, reg);
+        loadInstruction(RV32I.instructionU(RV32I.Opcodes.Lui, RD_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -65,9 +65,9 @@ public class UTest {
     })
     public void testAuipc(int pc, int imm, int expected) throws MemoryException, CpuException {
         state.setPc(pc);
-        loadInstruction(RV32I.instructionU(RV32I.Opcodes.Auipc, RD, imm));
+        loadInstruction(RV32I.instructionU(RV32I.Opcodes.Auipc, RD_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
 

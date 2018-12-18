@@ -21,8 +21,8 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnitParamsRunner.class)
 public class ImmediateTest {
-    private static final int RS1 = 1;
-    private static final int RD = 3;
+    private static final int RS1_INDEX = 1;
+    private static final int RD_INDEX = 3;
 
     private CpuStateRiscV state;
     private CpuRiscV cpu;
@@ -49,10 +49,10 @@ public class ImmediateTest {
             "" + Integer.MAX_VALUE + ", 1, " + Integer.MIN_VALUE
     })
     public void testAddi(int reg, int imm, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Addi, RD, RS1, imm));
+        state.setReg(RS1_INDEX, reg);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Addi, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -63,10 +63,10 @@ public class ImmediateTest {
             "5, -1, 5"
     })
     public void testAndi(int reg, int imm, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Andi, RD, RS1, imm));
+        state.setReg(RS1_INDEX, reg);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Andi, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -78,10 +78,10 @@ public class ImmediateTest {
 
     })
     public void testOri(int reg, int imm, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Ori, RD, RS1, imm));
+        state.setReg(RS1_INDEX, reg);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Ori, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -94,10 +94,10 @@ public class ImmediateTest {
 
     })
     public void testXori(int reg, int imm, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Xori, RD, RS1, imm));
+        state.setReg(RS1_INDEX, reg);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Xori, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -108,10 +108,10 @@ public class ImmediateTest {
             "" + Integer.MIN_VALUE + ", 1, 0"
     })
     public void testSlli(int reg, int imm, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Slli, RD, RS1, imm));
+        state.setReg(RS1_INDEX, reg);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Slli, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -123,10 +123,10 @@ public class ImmediateTest {
             "-1, 1, " + Integer.MAX_VALUE
     })
     public void testSrli(int reg, int imm, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Srli, RD, RS1, imm));
+        state.setReg(RS1_INDEX, reg);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Srli, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -138,10 +138,10 @@ public class ImmediateTest {
             "-1, 1, -1"
     })
     public void testSrai(int reg, int imm, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Srai, RD, RS1, imm));
+        state.setReg(RS1_INDEX, reg);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Srai, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -152,10 +152,10 @@ public class ImmediateTest {
             "1,-1, 0",
     })
     public void testSlti(int reg, int imm, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Slti, RD, RS1, imm));
+        state.setReg(RS1_INDEX, reg);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Slti, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 
     @Test
@@ -167,9 +167,9 @@ public class ImmediateTest {
 
     })
     public void testSltiu(int reg, int imm, int expected) throws MemoryException, CpuException {
-        state.setReg(RS1, reg);
-        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Sltiu, RD, RS1, imm));
+        state.setReg(RS1_INDEX, reg);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Sltiu, RD_INDEX, RS1_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(expected, state.getReg(RD));
+        assertEquals(expected, state.getReg(RD_INDEX));
     }
 }

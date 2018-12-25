@@ -24,20 +24,13 @@ public class RegisterField /*extends JPanel*/ {
 	public RegisterField(String name, CpuFrame frame) {
 		m_frame = frame;
 		m_name = name;
-	//	super.setLayout(new GridLayout(1, 2));
-	//	super.setSize(50, 20);
-	//	super.add(new JLabel(name + ":"), BorderLayout.LINE_START);
 		String ename = "reg_" + name;
 		textField = (HTMLInputElement) DomGlobal.document.getElementById(ename);
 		if (textField == null) {
 			Console.error("Not found register " + name);
 		}
 
-		//super.add(textField, BorderLayout.LINE_START);
-
-		textField.addEventListener("input", (event) -> {
-			editChanged();
-		});
+		textField.addEventListener("input", event -> editChanged());
 	}
 
 	public void editChanged() {

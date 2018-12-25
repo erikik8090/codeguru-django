@@ -1,7 +1,5 @@
 package il.co.codeguru.corewars8086.gui;
 
-
-import com.gargoylesoftware.htmlunit.html.DomElement;
 import elemental2.dom.*;
 import elemental2.dom.CanvasRenderingContext2D.StrokeStyleUnionType;
 import elemental2.dom.CanvasRenderingContext2D.FillStyleUnionType;

@@ -4,14 +4,12 @@ import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars8086.war.*;
 import com.google.gwt.animation.client.AnimationScheduler;
-import com.google.gwt.user.client.Window;
 
 import il.co.codeguru.corewars8086.gui.widgets.*;
 //import java.awt.*;
 //import java.awt.event.*;
 import java.io.IOException;
-
-import static il.co.codeguru.corewars8086.gui.CompetitionWindow.call_gwtStart;
+import java.util.Arrays;
 //import javax.swing.*;
 
 /**
@@ -25,23 +23,18 @@ public class CompetitionWindow extends JFrame
     private ColumnGraph columnGraph;
 
     // widgets
-    //private JButton runWarButton;
     private JLabel warCounterDisplay;
-    //private JCheckBox showBattleCheckBox;
     private boolean m_isBattleShown = false;
     private JTextField battlesPerGroupField;
-    //private JTextField warriorsPerGroupField;
     public WarFrame battleFrame;
 
     private int warCounter;
     private int totalWars;
-    //private Thread warThread;
 	private boolean competitionRunning;
 
     private static final String SEED_PREFIX = "SEED!@#=";
 	private JTextField seed;
 
-    //private JCheckBox startPausedCheckBox;
     private boolean m_isStartPaused = false;
 
     public CodeEditor m_codeEditor;
@@ -58,10 +51,12 @@ public class CompetitionWindow extends JFrame
         super("CodeGuru Extreme - Competition Viewer");
         getContentPane().setLayout(new BorderLayout());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         competition = new Competition();
         competition.addCompetitionEventListener(this);
         WarriorRepository warriorRepository = competition.getWarriorRepository();
         warriorRepository.addScoreEventListener(this);
+
         columnGraph = new ColumnGraph(warriorRepository.getGroupNames());
         getContentPane().add(columnGraph, BorderLayout.CENTER);
         // -------------
@@ -69,32 +64,9 @@ public class CompetitionWindow extends JFrame
         controlArea.setLayout(new BoxLayout(controlArea, BoxLayout.Y_AXIS));
         // -------------- Button Panel
         JPanel buttonPanel = new JPanel();
-        //runWarButton = new JButton("runWarButton", "<html><font color=red>Start!</font></html>");
-        //runWarButton.addActionListener(this); // triggers actionPerformed
-        //buttonPanel.add(runWarButton);
         warCounterDisplay = new JLabel("");
         buttonPanel.add(warCounterDisplay);
         buttonPanel.add(Box.createHorizontalStrut(30));
-        /*showBattleCheckBox = new JCheckBox("showBattleCheckBox", "Show session on start");
-		showBattleCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-                m_isBattleShown = showBattleCheckBox.isSelected();
-                Console.log("isBattleShown= " + (m_isBattleShown?"true":"false") );
-            }
-		});*/
-        //buttonPanel.add(showBattleCheckBox);
-        
-        /*startPausedCheckBox = new JCheckBox("startPausedCheckBox", "Start Paused");
-		startPausedCheckBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-                m_isStartPaused = startPausedCheckBox.isSelected();
-				//if(startPausedCheckBox.isSelected())
-				//	showBattleCheckBox.setSelected(true);
-			}
-		});
-		buttonPanel.add(startPausedCheckBox);*/
         
         controlArea.add(buttonPanel);
         // -------------
@@ -103,17 +75,13 @@ public class CompetitionWindow extends JFrame
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new FlowLayout());
         controlPanel.add(new JLabel("Survivor groups per session:"));
-        
+
         // If total number of teams is less then four, make it the defauld number
 		int numberOfGropus = Math.min(4,
             competition.getWarriorRepository().getNumberOfGroups());
-		
-        //warriorsPerGroupField = new JTextField(String.format("%d", numberOfGropus), 3); SHY-CHANGED
-        //warriorsPerGroupField = new JTextField("warriorsPerGroupField", Integer.toString(numberOfGropus), 3);
-		//controlPanel.add(warriorsPerGroupField);
+
 		controlPanel.add(new JLabel("Sessions per groups combination:"));
 		battlesPerGroupField = new JTextField("battlesPerGroupField", "100", 4);
-		//controlPanel.add(battlesPerGroupField);
 		seed = new JTextField("seed", null, 4);
 		seed.setText("guru");
 		controlPanel.add(new JLabel("seed:"));
@@ -137,21 +105,6 @@ public class CompetitionWindow extends JFrame
         competition.memoryEventCaster.doneAdding();
 
         call_gwtStart();
-
-        /*addWindowListener(new WindowListener() {
-            public void windowOpened(WindowEvent e) {}
-            public void windowClosing(WindowEvent e) {
-                if (warThread!= null) {
-                    competition.setAbort();
-                }
-            }
-
-            public void windowClosed(WindowEvent e) {}
-            public void windowIconified(WindowEvent e) {}
-            public void windowDeiconified(WindowEvent e) {}
-            public void windowActivated(WindowEvent e) {}
-            public void windowDeactivated(WindowEvent e) {}
-        });*/
     }
 
     public static native void call_gwtStart() /*-{
@@ -174,9 +127,7 @@ public class CompetitionWindow extends JFrame
     {
         if (!m_playersPanel.checkPlayersReady())
             return false;
-        if (!gui_runWar(true, true))
-            return false;
-        return true;
+        return gui_runWar(true, true);
     }
 
     public void j_stopDebug()
@@ -189,9 +140,7 @@ public class CompetitionWindow extends JFrame
     {
         if (!m_playersPanel.checkPlayersReady())
             return false;
-        if (!gui_runWar(false, false))
-            return false;
-        return true;
+        return gui_runWar(false, false);
     }
     public void j_stopCompete()
     {
@@ -208,15 +157,12 @@ public class CompetitionWindow extends JFrame
         stepnum.innerHTML = (competition.compState == null) ? "[null]":Integer.toString(competition.compState.round);
     }
 
-    public AnimationScheduler.AnimationCallback animCallback = new AnimationScheduler.AnimationCallback() {
-        @Override
-        public void execute(double timestamp) {
-            try {
-                callContinueRun();
-			} catch (Exception e) {
-				Console.log("continueRun EXCEPTION " + e.toString());
-				e.printStackTrace();
-			}
+    private AnimationScheduler.AnimationCallback animCallback = timestamp -> {
+        try {
+            callContinueRun();
+        } catch (Exception e) {
+            Console.log("continueRun EXCEPTION " + e.toString());
+            e.printStackTrace();
         }
     };
 
@@ -251,18 +197,9 @@ public class CompetitionWindow extends JFrame
             competition.setSeed(seedValue);
             battlesPerGroup = 0; // in case parseInt fails
             battlesPerGroup = Integer.parseInt(battlesPerGroupField.getText().trim());
-          /*  final int warriorsPerGroup = Integer.parseInt(
-                warriorsPerGroupField.getText().trim());*/
         } catch (NumberFormatException e2) {
             JOptionPane.showMessageDialog(this, "Error in configuration");
         }
-        /*    if (competition.getWarriorRepository().getNumberOfGroups() < warriorsPerGroup) {
-                JOptionPane.showMessageDialog(this,
-                    "Not enough survivors (got " +
-                    competition.getWarriorRepository().getNumberOfGroups() +
-                    " but " + warriorsPerGroup + " are needed)");
-                return false;
-            }*/
 
         // having numItems and groupSize allows having 4 players and running competitions of just any 3 of them
         // this is hardly useful in reality so I just set it to the same size
@@ -273,7 +210,10 @@ public class CompetitionWindow extends JFrame
         }
 
         WarriorRepository repo = competition.getWarriorRepository();
-        if (!repo.readWarriorFilesFromUI( m_playersPanel.getFiles(), m_playersPanel.getZombies(), isInDebug))
+        PlayersPanel.Code[] playerFiles = Arrays.stream(m_playersPanel.getFiles())
+                .filter(code -> code.player.isEnabled)
+                .toArray(PlayersPanel.Code[]::new);
+        if (!repo.loadWarriors(playerFiles , m_playersPanel.getZombies(), isInDebug))
             return false;
         columnGraph.clear(repo.getGroupNames());
 
@@ -286,7 +226,7 @@ public class CompetitionWindow extends JFrame
         try {
             competition.runCompetition(battlesPerGroup, numOfGroups, m_isStartPaused, isBattleShown());
             callContinueRun(); // when runWar() returns we want the War object to be already constructured and ready
-            if (isBattleShown()) { // add breapointchecked only if we're in debugger
+            if (isBattleShown()) { // add breakpointchecked only if we're in debugger
                 War war = competition.getCurrentWar();
                 war.setBreakpointCheck(m_codeEditor);
                 Warrior inEditorWarrior = war.getWarriorByLabel(m_playersPanel.getCodeInEditor().getLabel());
@@ -307,14 +247,6 @@ public class CompetitionWindow extends JFrame
     public void scoreChanged(String name, float addedValue, int groupIndex, int subIndex) {
         columnGraph.addToValue(groupIndex, subIndex, addedValue);
     }
-
-    /*public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == runWarButton) {
-        	showBattleFrameIfNeeded();
-        	gui_runWar(null, null);
-        }
-    }*/
-
 
     public void setDebugMode(boolean v) {
         m_codeEditor.setDebugMode(v);
@@ -359,13 +291,6 @@ public class CompetitionWindow extends JFrame
         battleFrame.cpuframe.setVisible(true); // do this here since the messages need to scroll to the bottom and it needs to be visible
     }
 
-    private void showBattleFrameIfNeeded() {
-    	//if (showBattleCheckBox.isSelected() && battleFrame == null ) {
-    		//showBattleRoom();
-    		//showBattleCheckBox.setSelected(false);
-    	//}
-    }
-    
     private void showBattleRoom() {
         battleFrame = new WarFrame(competition, this);
 
@@ -402,7 +327,6 @@ public class CompetitionWindow extends JFrame
     public void onCompetitionStart() {
         warCounter = 0;
         totalWars = competition.getTotalNumberOfWars();
-		//this.runWarButton.setEnabled(false);
     }
 
     public static native void jsCompeteFinish() /*-{
@@ -412,9 +336,6 @@ public class CompetitionWindow extends JFrame
 
     public void onCompetitionEnd() {
         warCounterDisplay.setText("The competition is over. " + warCounter + " sessions were run.");
-        //warThread = null;
-		//this.runWarButton.setEnabled(true);
-        //runWarButton.setEnabled(true);
 		competitionRunning = false;
         jsCompeteFinish();
     }
@@ -424,7 +345,7 @@ public class CompetitionWindow extends JFrame
 	}
 
 	// when an edit in the registers has parse error
-	public void errorPreventsStep(boolean v, String reason) {
+	public void errorPreventsStep(boolean v) {
 
         battleFrame.btnPause.setEnabled(!v);
         battleFrame.btnSingleRound.setEnabled(!v);

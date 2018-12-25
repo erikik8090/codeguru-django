@@ -1,21 +1,19 @@
 package il.co.codeguru.corewars8086.gui;
 
 
+import com.google.gwt.typedarrays.client.Int8ArrayNative;
 import com.google.gwt.typedarrays.client.Uint8ArrayNative;
 import elemental2.dom.*;
 import elemental2.dom.EventListener;
-import il.co.codeguru.corewars8086.cpu.CpuState;
-import il.co.codeguru.corewars8086.gui.widgets.ActionEvent;
+import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
+import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
-import il.co.codeguru.corewars8086.gui.widgets.JButton;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Disassembler;
 import il.co.codeguru.corewars8086.war.*;
-import jsinterop.annotations.JsPackage;
-import jsinterop.annotations.JsType;
 
 
 import java.util.*;
@@ -120,12 +118,12 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             setByte(ipInsideArena, value);
         }
         else  {
-            // find where this opcode starts
+            // find where this InstructionInfo starts
             while (m_dbglines[ipInsideArena] == null)
                 --ipInsideArena;
 
             do {
-                // rewriting only a single opcode so its not possible to cross to a new opcode which will need reparsing
+                // rewriting only a single InstructionInfo so its not possible to cross to a new InstructionInfo which will need reparsing
                 setByte(ipInsideArena, m_mem.readByte(ipInsideArena + CODE_ARENA_OFFSET));
                 ++ipInsideArena;
             } while (ipInsideArena < 0x10000 && m_dbglines[ipInsideArena] == null);
@@ -154,7 +152,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         String opcode = "";  // for display
         String fullOpcode = ""; // for knowing the real length
         String code = "";
-        int opcodesCount = 0; // number of bytes in my opcode, without brackets and spaces
+        int opcodesCount = 0; // number of bytes in my InstructionInfo, without brackets and spaces
         PlayersPanel.Breakpoint tmp_br = null; // used when initializing debug view (doesn't hold info when editing)
     }
     enum Field {
@@ -282,7 +280,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     public static final char SPACE_FOR_HEX_CHAR = '\u202f';
     public static final String SPACE_FOR_HEX = "&#x202f;";
 
-    // hex field in the opcode can have all sorts of brackets and -. need to know how many just digits
+    // hex field in the InstructionInfo can have all sorts of brackets and -. need to know how many just digits
     public int countDigits(String s) {
         boolean doingDigits = s.length() > 0 && isHexDigit(s.charAt(0)); // see below 'nesb 4'
         if (!doingDigits)
@@ -313,7 +311,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         for(int i = 0; i <= upto; ++i) {
             char c = s.charAt(i);
             if (digitCount == 7*2) {
-                // don't add more than 7 bytes of opcode to not overflow the field size
+                // don't add more than 7 bytes of InstructionInfo to not overflow the field size
                 bs.append(SPACE_FOR_HEX); // ellipsis
                 break;
             }
@@ -423,8 +421,8 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                             state = Field.WARNING;
                         }
                         else if (!islast && charsBeforeCode < 22)
-                            ++charsBeforeCode; // take anything as long as its in the field size of the opcode. need this sinc resb adds spaces
-                        else if (c == ' ' || islast) { // continueation lines of a string definition end in the middle of the opcode field.
+                            ++charsBeforeCode; // take anything as long as its in the field size of the InstructionInfo. need this sinc resb adds spaces
+                        else if (c == ' ' || islast) { // continueation lines of a string definition end in the middle of the InstructionInfo field.
                             //spacedHex(, l);
                             l.fullOpcode = line.substring(opcodeStart, j);
                             l.opcode = spacedHex(l.fullOpcode);
@@ -470,11 +468,11 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                 }
             }
             else if (prevLine != null && l.lineNum == prevLine.lineNum) {
-                // it's a continuation line of the previous line. we need to concatenate to get the full opcode in order to know its size
+                // it's a continuation line of the previous line. we need to concatenate to get the full InstructionInfo in order to know its size
                 // happens with string definition db "abcdefgh"
                 prevLine.fullOpcode += l.fullOpcode;
                 prevLine.opcodesCount = countDigits(prevLine.fullOpcode) / 2;
-                // no need to update the display opcode because its already too long
+                // no need to update the display InstructionInfo because its already too long
                 continue;
             }
             else if (l.lineNum != lineIndex) {
@@ -984,7 +982,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
         if (retcode != 0) { // error
             // TBD- compile just till the error line? or just the last good result?
-            opcodes_edit.innerHTML = linesAsInput(intext); // this is needed because x-scroll hiding relies on the opcode pane to be full
+            opcodes_edit.innerHTML = linesAsInput(intext); // this is needed because x-scroll hiding relies on the InstructionInfo pane to be full
             Console.error("~Assembler error");
             if (playersPanel != null)
                 playersPanel.updateAsmResult(false, null, null);
@@ -1096,10 +1094,10 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                 msg = Integer.toString(atLstLine+1) + ": not enough bytes to parse"; // can happen if we db 09h for example, or just 'rep'
             }
             catch(Disassembler.DisassemblerException e) {
-                msg = Integer.toString(atLstLine+1) + ": Although this is a legal x86 opcode, codewars8086 does not support it";
+                msg = Integer.toString(atLstLine+1) + ": Although this is a legal x86 InstructionInfo, codewars8086 does not support it";
                 int eptr = dis.getPointer() - 1;
                 if (eptr >= 0 && eptr < binbuf.length)
-                    msg += ", opcode = 0x" + Format.hex2(binbuf[eptr] & 0xff);
+                    msg += ", InstructionInfo = 0x" + Format.hex2(binbuf[eptr] & 0xff);
             }
             catch(RuntimeException e) {
                 Console.error("failed parsing binbuf RuntimeException"); // this should not happen. only happens for missing cases
@@ -1343,9 +1341,9 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         page.isDirty = false;
     }
 
-    public boolean shouldBreak(CpuState state)
+    public boolean shouldBreak(CpuStateRiscV state)
     {
-        int absAddr = RealModeAddress.linearAddress(state.getCS(), state.getIP());
+        int absAddr = RealModeAddress.linearAddress(state.getCS(), (short)state.getPc());
         int arenaAddr = absAddr - CODE_ARENA_OFFSET;
         if (m_dbgBreakpoints[arenaAddr] == null)
             return false;
@@ -1414,7 +1412,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     };
 
     private int m_lastDbgAddr = -1; // for knowing if we need to move it
-    private int m_lastDbgAddrEnd = -1; // end (one after last) of the debugged opcode (for edit handling)
+    private int m_lastDbgAddrEnd = -1; // end (one after last) of the debugged InstructionInfo (for edit handling)
     private HTMLElement m_lastDbgElement;
     private boolean m_lastIsAlive = false;
 
@@ -1428,9 +1426,9 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     private static int getWarrirorIp(Warrior w) {
         if (w == null)
             return -1;
-        CpuState state = w.getCpuState();
+        CpuStateRiscV state = w.getCpuState();
 
-        short ip = state.getIP();
+        short ip = (short) state.getPc();
         short cs = state.getCS();
 
         int ipInsideArena = RealModeAddress.linearAddress(cs, ip) - CODE_ARENA_OFFSET;
@@ -1464,18 +1462,18 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         // in this case we don't want to disassemble since the dbglines have not even been inited yet. sort of a hack.
         if (m_dbglines[ipInsideArena] == null)
         {
-            // got to a null line, means this address is hidden and is part of a preceding opcode, first find that
+            // got to a null line, means this address is hidden and is part of a preceding InstructionInfo, first find that
             int opcodeAddr = ipInsideArena;
             while (m_dbglines[opcodeAddr] == null)
                 --opcodeAddr;
-            // fill the size of this opcode with db lines,
-            // do this before disassembly of the IP line to make sure we've erased the old opcode correctly
+            // fill the size of this InstructionInfo with db lines,
+            // do this before disassembly of the IP line to make sure we've erased the old InstructionInfo correctly
             //byte[] mem = m_competition.getCurrentWar().getMemory().m_data;
             do {
                 setByteFromMem(opcodeAddr);
                 ++opcodeAddr;
             } while (m_dbglines[opcodeAddr] == null);
-            // disassemble may eat at any of the db's after it, and might also each opcode after that
+            // disassemble may eat at any of the db's after it, and might also each InstructionInfo after that
             disassembleAddr(ipInsideArena + CODE_ARENA_OFFSET, ipInsideArena);
         }
         else {
@@ -1503,7 +1501,11 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     private void disassembleAddr(int absaddr, int addrInArea)
     {
-        Disassembler dis = new Disassembler.NArrDisassembler(m_mem.m_data, absaddr, m_mem.length()); // TBDTBD
+        //TODO: Check the performance on this - if it is not bad, don't fix it
+        //TODO: Make version like before, but make it special to gwt version
+        Int8ArrayNative memory = Int8ArrayNative.create(m_mem.length());
+        memory.set(m_mem.getMemory());
+        Disassembler dis = new Disassembler.NArrDisassembler(memory , absaddr, m_mem.length()); // TBDTBD
         String text;
         try {
             text = dis.nextOpcode();
@@ -1532,7 +1534,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
     }
 
-    // erase the opcode in addr, and take care to setByte the bytes after it that are affected
+    // erase the InstructionInfo in addr, and take care to setByte the bytes after it that are affected
     private void eraseOpcode(int addrInArea) {
         m_dbglines[addrInArea] = null;
         renderLineIfInView(addrInArea, null);

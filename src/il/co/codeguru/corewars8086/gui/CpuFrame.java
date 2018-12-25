@@ -2,7 +2,8 @@ package il.co.codeguru.corewars8086.gui;
 
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
-import il.co.codeguru.corewars8086.cpu.CpuState;
+import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
+import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
@@ -14,20 +15,7 @@ import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.gui.widgets.*;
 import il.co.codeguru.corewars8086.war.Warrior;
 
-import java.util.Dictionary;
 import java.util.HashMap;
-//import java.awt.Font;
-//import java.awt.GridLayout;
-//import java.awt.event.ActionEvent;
-//import java.awt.event.ActionListener;
-
-//import javax.swing.JButton;
-//import javax.swing.JComboBox;
-//import javax.swing.JFrame;
-//import javax.swing.JOptionPane;
-//import javax.swing.JPanel;
-//import javax.swing.JTextArea;
-
 
 public class CpuFrame  implements CompetitionEventListener, MemoryEventListener {
 	
@@ -40,7 +28,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 	private int m_base = 16;
 	
 
-	private RegisterField regAX,regBX,regCX,regDX,
+	private RegisterField reg1,reg2,reg3,reg4,
 						regSI,regDI,regBP,regSP,
 						 regIP,regCS,regDS,regSS,
 						 regES,regE, regF;
@@ -72,16 +60,13 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		}
 	}
 
-
-
-
 	public int regChanged_callback(String name, String value)
 	{
 		War currentWar = competition.getCurrentWar();
 		if (currentWar == null)
 			return 1;
 
-		CpuState state = currentWar.getWarriorByLabel(m_currentWarriorLabel).getCpuState();
+		CpuStateRiscV state = currentWar.getWarriorByLabel(m_currentWarriorLabel).getCpuState();
 
 		int v;
 
@@ -96,29 +81,29 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 				v = Integer.parseInt(value, 16);
 		}
 		catch(NumberFormatException e) {
-			m_mainwnd.errorPreventsStep(true, "Register value parse error");
+			m_mainwnd.errorPreventsStep(true);
 			return (m_base == 10) ? -2000000 : -1000000;
 		}
 		if (v < 0 || v > 0xffff) {
-			m_mainwnd.errorPreventsStep(true, "Register value out out range");
+			m_mainwnd.errorPreventsStep(true);
 			return -3000000;
 		}
-		m_mainwnd.errorPreventsStep(false, null);
+		m_mainwnd.errorPreventsStep(false);
 
 		short sv = (short)v;
 
 		switch(name) {
-			case "AX": state.setAX(sv); break;
-			case "BX": state.setBX(sv); break;
-			case "CX": state.setCX(sv); break;
-			case "DX": state.setDX(sv); break;
+			case "1": state.setReg(1, sv); break;
+			case "2": state.setBX(sv); break;
+			case "3": state.setCX(sv); break;
+			case "4": state.setDX(sv); break;
 
 			case "SI": state.setSI(sv); break;
 			case "DI": state.setDI(sv); break;
 			case "BP": state.setBP(sv); break;
 			case "SP": state.setSP(sv); stackView.moveToLine(RealModeAddress.linearAddress(state.getSS(), sv)); break;
 
-			case "IP": state.setIP(sv); changedCSIP(); break;
+			case "IP": state.setPc(sv); changedCSIP(); break;
 			case "CS": state.setCS(sv); changedCSIP(); break;
 			case "DS": state.setDS(sv); break;
 			case "SS": state.setSS(sv); stackView.moveToLine(RealModeAddress.linearAddress(sv, state.getSP())); break;
@@ -197,10 +182,10 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
         cpuPanel = (HTMLElement) DomGlobal.document.getElementById("cpuPanel");
 
 		
-		regAX = new RegisterField("AX", this);
-		regBX = new RegisterField("BX", this);
-		regCX = new RegisterField("CX", this);
-		regDX = new RegisterField("DX", this);
+		reg1 = new RegisterField("1", this);
+		reg2 = new RegisterField("2", this);
+		reg3 = new RegisterField("3", this);
+		reg4 = new RegisterField("4", this);
 
 		regSI = new RegisterField("SI", this);
 		regDI = new RegisterField("DI", this);
@@ -244,10 +229,10 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 	public void j_setRegistersBase(int base) {
 		m_base = base;
-		regAX.setBase(base);
-		regBX.setBase(base);
-		regCX.setBase(base);
-		regDX.setBase(base);
+		reg1.setBase(base);
+		reg2.setBase(base);
+		reg3.setBase(base);
+		reg4.setBase(base);
 		regSI.setBase(base);
 		regDI.setBase(base);
 		regBP.setBase(base);
@@ -278,17 +263,17 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		}
 
 		//CpuState state = currentWar.getWarrior(dropMenu.getSelectedIndex()).getCpuState();
-		CpuState state = currentWar.getWarrior(m_currentWarriorIndex).getCpuState();
+		CpuStateRiscV state = currentWar.getWarrior(m_currentWarriorIndex).getCpuState();
 
-		regAX.setValue( state.getAX());
-		regBX.setValue( state.getBX());
-		regCX.setValue( state.getCX());
-		regDX.setValue( state.getDX());
+		reg1.setValue( (short)state.getReg(1));
+		reg2.setValue( (short)state.getReg(2));
+		reg3.setValue( (short)state.getReg(3));
+		reg4.setValue( (short)state.getReg(4));
 		regSI.setValue( state.getSI());
 		regDI.setValue( state.getDI());
 		regBP.setValue( state.getBP());
 		regSP.setValue( state.getSP());
-		regIP.setValue( state.getIP());
+		regIP.setValue( (short) state.getPc());
 		regCS.setValue( state.getCS());
 		regDS.setValue( state.getDS());
 		regSS.setValue( state.getSS());
@@ -307,11 +292,8 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 	}
 
-
-
-
 	private static class StateAccess implements ExpressionParser.IStateAccess {
-		public CpuState state;
+		public CpuStateRiscV state;
 		public RealModeMemoryImpl memory;
 
 		@Override
@@ -320,19 +302,19 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		        throw new Exception("invalid state");
             }
 			switch (name) {
-				case "AX": return state.getAX();
+				case "1": return (short)state.getReg(1);
 				case "AL": return state.getAL();
 				case "AH": return state.getAH();
 
-				case "BX": return state.getBX();
+				case "2": return(short)state.getReg(2);
 				case "BL": return state.getBL();
 				case "BH": return state.getBH();
 
-				case "CX": return state.getCX();
+				case "3": return (short)state.getReg(3);
 				case "CL": return state.getCL();
 				case "CH": return state.getCH();
 
-				case "DX": return state.getDX();
+				case "4": return (short)state.getReg(4);
 				case "DL": return state.getDL();
 				case "DH": return state.getDH();
 
@@ -340,7 +322,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 				case "DI": return state.getDI();
 				case "BP": return state.getBP();
 				case "SP": return state.getSP();
-				case "IP": return state.getIP();
+				case "IP": return (short)state.getPc();
 				case "CS": return state.getCS();
 				case "DS": return state.getDS();
 				case "SS": return state.getSS();
@@ -366,7 +348,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 			if (size == 1)
 				return memory.readByte(linaddr) & 0xff;
 			else
-				return memory.readWord(new RealModeAddress(linaddr)) & 0xffff;
+				return memory.read16Bit(new RealModeAddress(linaddr)) & 0xffff;
 		}
 
 	}
@@ -404,9 +386,9 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
         }
 	}
 
-	HashMap<Integer, WatchEntry> m_watches = new HashMap<>();
-	StateAccess m_stateAccess = new StateAccess();
-	ExpressionParser m_parser = new ExpressionParser();
+	private HashMap<Integer, WatchEntry> m_watches = new HashMap<>();
+	private StateAccess m_stateAccess = new StateAccess();
+	private ExpressionParser m_parser = new ExpressionParser();
 
 	void j_addWatch(int watchId) {
         WatchEntry entry = new WatchEntry();
@@ -420,7 +402,8 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
         m_watches.remove(watchId);
     }
 
-    boolean onlySpaces(String s) {
+    private boolean onlySpaces(String s) {
+		//return s.chars().anyMatch(c -> c != ' ');
 	    for(int i = 0; i < s.length(); ++i) {
 	        char c = s.charAt(i);
 	        if (c != ' ')

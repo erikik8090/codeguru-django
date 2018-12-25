@@ -75,7 +75,6 @@ public class Competition {
         competitionEventListener.onCompetitionEnd();
         long elapsed = System.currentTimeMillis() - compState.startTime;
         Console.log("Total time=" + Double.toString(elapsed / 1000.0) );
-        warriorRepository.saveScoresToFile(SCORE_FILENAME);
         compState = null;
     }
 

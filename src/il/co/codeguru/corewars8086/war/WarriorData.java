@@ -1,7 +1,5 @@
 package il.co.codeguru.corewars8086.war;
 
-import il.co.codeguru.corewars8086.gui.PlayersPanel;
-
 /**
  * Holds a single warrior's name & code.
  * 

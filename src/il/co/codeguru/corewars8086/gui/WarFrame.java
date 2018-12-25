@@ -2,7 +2,8 @@ package il.co.codeguru.corewars8086.gui;
 
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
-import il.co.codeguru.corewars8086.cpu.CpuState;
+import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
+import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 //import il.co.codeguru.corewars8086.utils.EventMulticaster;
@@ -12,7 +13,6 @@ import il.co.codeguru.corewars8086.war.*;
 //import java.awt.*;
 //import java.awt.event.ActionEvent;
 //import java.awt.event.ActionListener;
-import java.util.Enumeration;
 
 //import javax.swing.*;
 //import javax.swing.event.ChangeEvent;
@@ -451,8 +451,8 @@ public class WarFrame extends JFrame implements MemoryEventListener,  Competitio
 		War currentWar = this.competition.getCurrentWar();
 		for (int i = 0; i < currentWar.getNumWarriors(); i++)
 			if (currentWar.getWarrior(i).isAlive()) {
-		        CpuState state = currentWar.getWarrior(i).getCpuState();
-				short ip = state.getIP();
+		        CpuStateRiscV state = currentWar.getWarrior(i).getCpuState();
+				short ip = (short) state.getPc();
 				short cs = state.getCS();
 				
 				int ipInsideArena = RealModeAddress.linearAddress(cs, ip) - 0x10000;

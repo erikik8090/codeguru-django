@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class EventMulticasterBase<T> {
     
-    protected Set<T> mListeners = new HashSet<T>(); //new LinkedHashSet<>();
+    protected Set<T> mListeners = new HashSet<>(); //new LinkedHashSet<>();
 	protected Object[] mListenersArr = null;
     protected boolean isDoneAdding = false;
 

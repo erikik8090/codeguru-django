@@ -1,5 +1,5 @@
 <module>
     <inherits name='com.google.gwt.user.User' />
 
-    <source path="corewars8086"></source>
+    <source path="corewars8086"/>
 </module>

@@ -1,2 +1,10 @@
-/.idea/workspace.xml
-/gwt-unitCache
+.idea/
+reports/
+lib/
+gwt-unitCache/
+gwt-2.8.2/
+target/
+jacoco.dev.exec
+jacoco.prod.exec
+.sonar/
+war/codewars_js

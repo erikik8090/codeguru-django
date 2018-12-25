@@ -610,6 +610,7 @@ input:disabled + .sc-btn:active,
 }
 #seed {
     margin-left: 3px;
+    width: 160px;
 }
 
 #debug_goto {
@@ -1029,7 +1030,64 @@ input:disabled + .sc-btn:active,
 #uploadBinBut:active {
     background-position: 3px 4px;
     background-image: linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)), url(upload_bin.png);
+    background-repeat: repeat, no-repeat; /* needed to avoid strange shadow when pressed */
+}
+
+#aboutBtn {
+    background-image: url(q_mark.png);
+    background-repeat: no-repeat;
+    background-position: 8px 3px;
+    height: 34px;
+    width: 33px;
+    position: absolute;
+    border-radius: 5px;
+    right: 0;
+}
+#aboutBtn:active {
+    background-position: 9px 4px;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)), url(q_mark.png);
     background-repeat: repeat, no-repeat;
+}
+.popupBack {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(20,20,20, 0.82);
+    top: 0;
+    left: 0;
+    z-index: 1; /* above the export button which is an appended child */
+}
+.popupWin {
+    position: absolute;
+    width: 600px;
+    height: 230px;
+    top: 25%;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    background: #FFF;
+    border-radius: 15px;
+    padding: 20px;
+}
+h1, h2, h3 {
+    margin: 0;
+    font-family: Tahoma;
+}
+h1 {
+    font-size: 30px;
+    margin: 0 0 0 30px;
+    font-family: monospace;
+}
+h2 {
+    font-size: 18px;
+    font-weight: normal;
+}
+h3 {
+    font-size: 16px;
+    margin: 30px 0 0 0;
+    font-weight: normal;
 }
 
 #hoverCellInfo {

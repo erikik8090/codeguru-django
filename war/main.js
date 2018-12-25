@@ -1,6 +1,6 @@
 "use strict";
 
-var run_nasm = null
+var run_assembler = null, run_nasm = null, run_gas = null
 var PAGE_SIZE = 512
 var LAST_PART_INDEX = Math.trunc(65535/PAGE_SIZE)
 
@@ -8,14 +8,39 @@ var did_start = false
 
 var selcount = 1
 
+
+// Java code comes to get and clear this variable to get the stdout of the nasm run
+//var g_outputText = null
+//function printConsole(line) {
+//    //console.log("*** " + line)
+//    g_outputText += line + '\n'
+//}
+// new ver of emscripten moved this to pre-js
+
+// this is some emscripten voodoo that re-initialized the process memory
+// it works in conjunction with the sbrk saving and rewind in run_gas to reset the memory state in
+// each activation of the command line tool.
+// Notice that it undoes some memory allocation made on process initialization
+// building envars seem to be the only thing there and we don't care about that
+
+function reinitMem() {
+    // re-parse the base64 non-zero start value data segment. This assumes we don't have a separate mem file
+    var memoryInitializerBytes = tryParseAsDataURI(memoryInitializer);
+    HEAPU32.fill(0);
+    HEAPU8.set(memoryInitializerBytes, GLOBAL_BASE);
+    HEAP32[DYNAMICTOP_PTR>>2] = DYNAMIC_BASE; // basic memory allocation need this (done in global scope on the startup of the process)
+}
+
+
 function start()
 {
     if (did_start)
         return;
     console.log("start()");
-    run_nasm = Module.cwrap('run_nasm', null, ['string', 'string'])
-    Module['print'] = printConsole
-    Module['printErr'] = printConsole
+    //run_nasm = Module.cwrap('run_nasm', null, ['string', 'string'])
+    run_gas = Module.cwrap('run_gas', null, ['string', 'string'])
+    //Module['print'] = printConsole
+    //Module['printErr'] = printConsole
 
     asm_edit.addEventListener("keydown", fixhscroll)
     asm_edit.addEventListener("keydown", fixTabKey) // want to capture the press since we want to prevent the default action
@@ -413,12 +438,6 @@ function triggerEraseZombie(buttonElem, elem, num) {
 }
 
 
-// Java code comes to get and clear this variable to get the stdout of the nasm run
-var g_outputText = null
-function printConsole(line) {
-    //console.log("*** " + line)
-    g_outputText += line + '\n'
-}
 
 
 // in case there is a long line, when returning to a new line, the text will be still scrolled to the left, fix that
@@ -990,3 +1009,17 @@ function competeFinished()
     competeRunCheckbox.checked = false
 }
 
+function eventStopProp(e) {
+    e.stopPropagation()
+}
+function triggerAbout(v, ev) {
+    aboutBtn.checked = v
+    if (v) {
+        aboutBack.style.display = "inline"
+    }
+    else {
+        aboutBack.style.display = "none"
+    }
+
+    aboutWin.onclick = eventStopProp
+}

@@ -1,154 +1,74 @@
-package il.co.codeguru.corewars8086.utils;
+package il.co.codeguru.corewars8086.utils.disassembler;
 
-import com.google.gwt.typedarrays.client.Int8ArrayNative;
-import il.co.codeguru.corewars8086.gui.widgets.Console;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
-
-import java.util.ArrayList;
+import il.co.codeguru.corewars8086.utils.Unsigned;
 
 /**
  * A fast disassembler, similar to Cpu.java
  */
-public abstract class Disassembler
+public class DisassemblerX86 implements IDisassembler
 {
-
-	public static class DisassemblerException extends Exception {
-		private static final long serialVersionUID = 1L;
-	}
-	public static class DisassemblerLengthException extends DisassemblerException {
-		private static final long serialVersionUID = 1L;
-	}
-
-	// I hate Java.
-	public static class ArrDisassembler extends Disassembler
-	{
-		private byte[] bytes;
-		public ArrDisassembler(byte[] memory, int offset, int endOffset) {
-			super(offset, endOffset);
-			bytes = memory;
-		}
-
-		protected byte getByte() throws DisassemblerException
-		{
-			if (!hasNextByte())
-				throw new DisassemblerLengthException();
-			return bytes[pointer];
-		}
-
-		protected byte nextByte() throws DisassemblerException
-		{
-			if (!hasNextByte())
-				throw new DisassemblerLengthException();
-			pointer++;
-			return bytes[pointer -1];
-		}
-	}
-
-	public static class NArrDisassembler extends Disassembler
-	{
-		private Int8ArrayNative bytes;
-		public NArrDisassembler(Int8ArrayNative memory, int offset, int endOffset) {
-			super(offset, endOffset);
-			bytes = memory;
-		}
-
-		protected byte getByte() throws DisassemblerException
-		{
-			if (!hasNextByte())
-				throw new DisassemblerLengthException();
-			return bytes.get(pointer);
-		}
-
-		protected byte nextByte() throws DisassemblerException
-		{
-			if (!hasNextByte())
-				throw new DisassemblerLengthException();
-			pointer++;
-			return bytes.get(pointer -1);
-		}
-	}
-
-
 
 	/**
 	 * the pointer to the next byte to disassemble.
 	 */
 	protected int pointer;
 
-	protected int startOffset; // start of current InstructionInfo
-	protected int progStartOffset; // offset the program is loaded to
-	protected int endOffset;
+	private int startOffset; // start of current Opcode
+	private int progStartOffset; // offset the program is loaded to
+	private int endOffset;
 	
 	/**
 	 * the current mode or register index or memory index of the indirect address function
 	 */
 	private byte mode, regIndex, memIndex;
 
-	//public Disassembler()
-	//{}
+	private byte[] bytes;
 
-	public Disassembler(int offset, int endOffset) {
-		reset(offset, endOffset);
+	protected byte getByte() throws DisassemblerException
+	{
+		if (!hasNextByte())
+			throw new DisassemblerLengthException();
+		return bytes[pointer];
 	}
 
+	/**
+	 * similar to OpcodeFetcher#nextByte()
+	 * @return the next byte to disassemble
+	 * @throws DisassemblerException
+	 */
+	protected byte nextByte() throws DisassemblerException
+	{
+		if (!hasNextByte())
+			throw new DisassemblerLengthException();
+		pointer++;
+		return bytes[pointer -1];
+	}
+
+	public DisassemblerX86(byte[] memory, int offset, int endOffset) {
+		reset(offset, endOffset);
+		bytes = memory;
+	}
+
+	@Override
 	public void reset(int offset, int endOffset) {
 
-		pointer = offset;
-		startOffset = offset;
-		progStartOffset = offset;
+		this.pointer = offset;
+		this.startOffset = offset;
+		this.progStartOffset = offset;
 		this.endOffset = endOffset;
 	}
 
+	@Override
 	public int lastOpcodeSize() {
 		int ret = pointer - startOffset;
 		startOffset = pointer;
 		return ret;
 	}
 
-	public void skipBytes(int len) {
-	    pointer += len;
-        startOffset = pointer;
-    }
     public void setPointer(int ptr) {
 	    pointer = ptr;
     }
 	public int getPointer() { return pointer; }
-
-	/**
-	 * disassemble the bytes
-	 * @param bytes to disassemble
-	 * @return string array of the disassembled opcodes
-	 */
-/*	public String[] disassemble(byte[] bytes, RealModeAddress address)
-	{
-		this.bytes = bytes;
-		pointer = 0;
-		
-		ArrayList<String> res = new ArrayList<String>();
-		while (hasNextByte())
-		{
-			int lastPointer = pointer;
-			try
-			{
-				String InstructionInfo = nextOpcode();
-				String assembledBytes = "0x";
-				for (int i = lastPointer; i < pointer; i++)
-					assembledBytes += Integer.toHexString(bytes[i] & 0xFF).toUpperCase();
-				res.add(toString(address.getSegment(), (short)((address.getOffset() + lastPointer) & 0xFFFF)) + "\t"
-					+ assembledBytes + "\t" + InstructionInfo);
-			}
-			catch (DisassemblerException e)
-			{
-				for (int i = lastPointer; i < pointer; i++)
-					res.add(toString(address.getSegment(), (short)((address.getOffset() + lastPointer) & 0xFFFF)) + "\t"
-							+ toString(bytes[i]) + "\t DB " + toString(bytes[i]));
-			}
-		}
-		
-		String[] results = new String[res.size()];
-		return res.toArray(results);
-	}
-	*/
 	
 	/**
 	 * 
@@ -158,15 +78,6 @@ public abstract class Disassembler
 	{
 		return pointer < endOffset; //bytes.length;
 	}
-	
-	protected abstract byte getByte() throws DisassemblerException;
-
-	/**
-	 * similar to OpcodeFetcher#nextByte()
-	 * @return the next byte to disassemble
-	 * @throws DisassemblerException 
-	 */
-	protected abstract byte nextByte() throws DisassemblerException;
 
 	/**
 	 * similar to OpcodeFetcher#nextWord()
@@ -213,7 +124,7 @@ public abstract class Disassembler
 	private String getMem8() throws DisassemblerException
 	{
 		String extraInfo = null;
-		// decode the InstructionInfo according to the indirect-addressing mode, and
+		// decode the Opcode according to the indirect-addressing mode, and
         // retrieve the address operand
         switch (mode) {
             case 0:
@@ -400,7 +311,8 @@ public abstract class Disassembler
 			offsetS = "0x0" + offsetS.substring(2);
 		return segmentS + ":" + offsetS;
 	}
-	
+
+	@Override
 	public String nextOpcode() throws DisassemblerException {
         byte opcode = nextByte();
         switch(opcode & 0xF0) {
@@ -481,7 +393,7 @@ public abstract class Disassembler
             	return "OR AX, " + toString(nextWord());			
             case (byte)0x0E: // PUSH CS
                 return "PUSH CS";
-            case (byte)0x0F: // invalid InstructionInfo
+            case (byte)0x0F: // invalid Opcode
             	throw new DisassemblerException();
             default:
                 throw new RuntimeException();
@@ -739,7 +651,7 @@ public abstract class Disassembler
     private String opcode8X(byte opcode) throws DisassemblerException {
         switch (opcode) {
             case (byte)0x80: // <?> byte ptr [X], imm8
-            case (byte)0x82: // TODO: InstructionInfo 0x82 is identical to InstructionInfo 0x80 ?
+            case (byte)0x82: // TODO: Opcode 0x82 is identical to Opcode 0x80 ?
                 resetIndirect();
                 switch (regIndex)
                 {
@@ -837,7 +749,7 @@ public abstract class Disassembler
                 return "MOV " + getMem16() + ", " + getSeg();
             case (byte)0x8D: // LEA reg16, [X]
                 resetIndirect();
-                if (mode == 3) // "LEA reg16, reg16" is an invalid InstructionInfo
+                if (mode == 3) // "LEA reg16, reg16" is an invalid Opcode
                     return "DW " + toString(toWord(opcode, getIndirect()));
                 else
                 	return "LEA " + getReg16() + ", " + getMem16();
@@ -846,7 +758,7 @@ public abstract class Disassembler
                 return "MOV " + getSeg() + ", " + getMem16();
             case (byte)0x8F: // POP [X]
                 // Note: since Reg index bits are ignored, there are 8 different
-                // machine-code representations for this InstructionInfo :-)
+                // machine-code representations for this Opcode :-)
                 resetIndirect();
                 return "POP " + getMem16();
             default:
@@ -873,8 +785,8 @@ public abstract class Disassembler
                 return "CWD";				
             case (byte)0x9A: // CALL far imm16:imm16
                 return "CALL FAR " + toString(nextWord()) + ":" + toString(nextWord());
-            case (byte)0x9B: // original: WAIT, modified: virtual InstructionInfo NRG
-                // The virtual NRG InstructionInfo is made up of 4 consecutive WAIT opcodes
+            case (byte)0x9B: // original: WAIT, modified: virtual Opcode NRG
+                // The virtual NRG Opcode is made up of 4 consecutive WAIT opcodes
                 for (int i = 0; i < 3; ++i)
                 {
                     if (getByte() != (byte)0x9B)
@@ -975,25 +887,25 @@ public abstract class Disassembler
             case (byte)0xC4: // LES reg16, [X]
                 resetIndirect();
                 if (mode == 3)
-                    // "LES reg16, reg16" is an invalid InstructionInfo
+                    // "LES reg16, reg16" is an invalid Opcode
                     throw new DisassemblerException();					
                 else
                 	return "LES " + getReg16() + ", " + getMem8();		
             case (byte)0xC5: // LDS reg16, [X]
                 resetIndirect();
                 if (mode == 3)
-                    // "LDS reg16, reg16" is an invalid InstructionInfo
+                    // "LDS reg16, reg16" is an invalid Opcode
                     throw new DisassemblerException();					
                 else
                 	return "LDS " + getReg16() + ", " + getMem8();		
             case (byte)0xC6: // MOV [X], imm8
                 // Note: since Reg index bits are ignored, there are 8 different
-                // machine-code representations for this InstructionInfo :-)
+                // machine-code representations for this Opcode :-)
                 resetIndirect();
             	return "MOV " + getMem8() + ", " + toString(nextByte());
             case (byte)0xC7: // MOV [X], imm16
                 // Note: since Reg index bits are ignored, there are 8 different
-                // machine-code representations for this InstructionInfo :-)
+                // machine-code representations for this Opcode :-)
                 resetIndirect();
                 return "MOV " + getMem16() + ", " + toString(nextWord());
             case (byte)0xC8:
@@ -1041,7 +953,7 @@ public abstract class Disassembler
                     	return "SHL " + getMem8() + ", 1";
                     case (byte)0x05: // SHR
                     	return "SHR " + getMem8() + ", 1";
-                    case (byte)0x06: // invalid InstructionInfo
+                    case (byte)0x06: // invalid Opcode
                         throw new DisassemblerException();
                     case (byte)0x07: // SAR
                     	return "SAR " + getMem8() + ", 1";
@@ -1064,7 +976,7 @@ public abstract class Disassembler
 	                	return "SHL " + getMem16() + ", 1";
 	                case (byte)0x05: // SHR
 	                	return "SHR " + getMem16() + ", 1";
-	                case (byte)0x06: // invalid InstructionInfo
+	                case (byte)0x06: // invalid Opcode
 	                    throw new DisassemblerException();
 	                case (byte)0x07: // SAR
 	                	return "SAR " + getMem16() + ", 1";
@@ -1087,7 +999,7 @@ public abstract class Disassembler
 	                	return "SHL " + getMem8() + ", CL";
 	                case (byte)0x05: // SHR
 	                	return "SHR " + getMem8() + ", CL";
-	                case (byte)0x06: // invalid InstructionInfo
+	                case (byte)0x06: // invalid Opcode
 	                    throw new DisassemblerException();
 	                case (byte)0x07: // SAR
 	                	return "SAR " + getMem8() + ", CL";
@@ -1110,7 +1022,7 @@ public abstract class Disassembler
 	                	return "SHL " + getMem16() + ", CL";
 	                case (byte)0x05: // SHR
 	                	return "SHR " + getMem16() + ", CL";
-	                case (byte)0x06: // invalid InstructionInfo
+	                case (byte)0x06: // invalid Opcode
 	                    throw new DisassemblerException();
 	                case (byte)0x07: // SAR
 	                	return "SAR " + getMem16() + ", CL";
@@ -1122,7 +1034,7 @@ public abstract class Disassembler
                 return "XLATB";
             case (byte)0xD4: // TODO: AAM
             case (byte)0xD5: // TODO: AAD
-            case (byte)0xD6: // 0xD6 - invalid InstructionInfo
+            case (byte)0xD6: // 0xD6 - invalid Opcode
             case (byte)0xD8: // FADD dword
             case (byte)0xD9: // FLD dword
             case (byte)0xDA: // FIADD dword
@@ -1323,13 +1235,13 @@ public abstract class Disassembler
                         	return "JMP FAR " + getMem16();
                     case 6: // PUSH
                         return "PUSH " + getMem16();
-                    case 7: // invalid InstructionInfo
+                    case 7: // invalid Opcode
                         throw new DisassemblerException();
                     default:
                         throw new RuntimeException();
                 }
             case (byte)0xF0: // LOCK
-            case (byte)0xF1: // 0xF1 - invalid InstructionInfo
+            case (byte)0xF1: // 0xF1 - invalid Opcode
             case (byte)0xF4: // HLT
                 throw new DisassemblerException();
             default:

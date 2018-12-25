@@ -52,7 +52,7 @@ public class Competition {
     }
     public CompState compState;
 
-    public Competition() throws IOException {
+    public Competition() {
         warriorRepository = new WarriorRepository();
 
         competitionEventCaster = new EventMulticasterCompetition();

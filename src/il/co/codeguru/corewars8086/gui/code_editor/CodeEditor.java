@@ -5,6 +5,9 @@ import elemental2.dom.*;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars8086.gui.IBreakpointCheck;
 import il.co.codeguru.corewars8086.gui.PlayersPanel;
+import il.co.codeguru.corewars8086.gui.asm_parsers.GasListParser;
+import il.co.codeguru.corewars8086.gui.asm_parsers.IListParser;
+import il.co.codeguru.corewars8086.gui.asm_parsers.NasmListParser;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
@@ -77,14 +80,14 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     }
 
     public static class LstLine {
-        int lineNum = -1;
-        int address = -1;
-        String addressStr = "";
-        String opcode = "";  // for display
-        String fullOpcode = ""; // for knowing the real length
-        String code = "";
-        int opcodesCount = 0; // number of bytes in my Opcode, without brackets and spaces
-        PlayersPanel.Breakpoint tmp_br = null; // used when initializing debug view (doesn't hold info when editing)
+        public int lineNum = -1;
+        public int address = -1;
+        public String addressStr = "";
+        public String opcode = "";  // for display
+        public String fullOpcode = ""; // for knowing the real length
+        public String code = "";
+        public int opcodesCount = 0; // number of bytes in my Opcode, without brackets and spaces
+        public PlayersPanel.Breakpoint tmp_br = null; // used when initializing debug view (doesn't hold info when editing)
     }
 
     public static class PageInfo {
@@ -123,6 +126,8 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     public PlayersPanel m_playersPanel = null;
     private Competition m_competition;
     final int PAGE_SIZE = _PAGE_SIZE();
+    private IListParser m_listParser;
+
 
     private static native int _PAGE_SIZE() /*-{
         return (typeof $wnd.PAGE_SIZE === "undefined" ? 512 : $wnd.PAGE_SIZE)
@@ -165,10 +170,11 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         $wnd.j_asm_edit_changed = $entry(function() { that.@il.co.codeguru.corewars8086.gui.code_editor.CodeEditor::assemblyEditorChanged()() });
     }-*/;
 
-    private static native int run_nasm(String asmname, String text, String lstname)     /*-{
+    private static native int run_assembler(String asmname, String text, String lstname)     /*-{
         $wnd.FS.writeFile(asmname, text, { encoding:'utf8' })
         $wnd.g_outputText = ''
-        var ret_code = $wnd.run_nasm(asmname, lstname)
+        $wnd.reinitMem()
+        var ret_code = $wnd.run_assembler(asmname, lstname)
         return ret_code
     }-*/;
     private static native String read_file(String name) /*-{
@@ -191,6 +197,26 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         return $wnd.g_outputText
     }-*/;
 
+
+    private static native String js_setPlatform(String plat) /*-{
+        if (plat == "8086") {
+            $wnd.run_assembler = $wnd.run_nasm
+        }
+        else if (plat == "riscv") {
+            $wnd.run_assembler = $wnd.run_gas
+        }
+    }-*/;
+
+    public void setPlatform(String plat) {
+        if (plat == "8086") {
+            m_listParser = new NasmListParser();
+        }
+        else if (plat == "riscv") {
+            m_listParser = new GasListParser();
+        }
+        js_setPlatform(plat);
+
+    }
 
     public static final char SPACE_FOR_HEX_CHAR = '\u202f';
     static final String SPACE_FOR_HEX = "&#x202f;";
@@ -530,7 +556,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         // we want the marks to appear in the html for debugging but not in the nasm input
         String nasm_intext = intext;
         // assemble
-        int retcode = run_nasm("player.asm", nasm_intext, "player.lst");
+        int retcode = run_assembler("player.asm", nasm_intext, "player.lst");
         String stdout = get_stdout();
 
         // this updates m_lineOffsets and m_lineCount
@@ -541,14 +567,17 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
         DocumentFragment df = null;
         if (!stdout.isEmpty())
-        {   // add coloring to the text
+        {
+            StringBuilder stdoutShorten = new StringBuilder(); // removes the file name from the start of the lines
+
+            // add coloring to the text
             df = htmlizeText(intext);
-            String errorString = parseStdout(stdout, df);
+            m_errLines = m_listParser.parseStdout(stdout, df, stdoutShorten, m_lineOffsets);
 
             asm_show.innerHTML = "";
             asm_show.appendChild(df);
 
-            asm_output.innerHTML = errorString;
+            asm_output.innerHTML = stdoutShorten.toString();
         }
         else {
             asm_show.innerHTML = intext; // clear all line marking
@@ -578,7 +607,9 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
 
         StringBuilder opcodesText = new StringBuilder();
-        boolean ok = lstParser.parseLst(output, opcodesText);
+        m_currentListing = new ArrayList<CodeEditor.LstLine>();
+
+        boolean ok = m_listParser.parseLst(output, opcodesText, m_currentListing);
         if (!ok) {
             opcodes_edit.innerHTML = "[listing parsing error]";
             Console.error("listing parsing error"); // should not happen

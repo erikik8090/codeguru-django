@@ -1,7 +1,5 @@
 package il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats;
 
-import il.co.codeguru.corewars8086.utils.Logger;
-
 public class CInstructionFormatCB extends CInstructionFormatBase {
 
     public CInstructionFormatCB(short raw) {

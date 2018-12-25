@@ -1,6 +1,5 @@
 package il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats;
 
-import il.co.codeguru.corewars8086.utils.Logger;
 
 public class CInstructionFormatCJ extends CInstructionFormatBase {
 
@@ -34,7 +33,6 @@ public class CInstructionFormatCJ extends CInstructionFormatBase {
         int bit98= (raw >> 9) & mask(2);
         int bit4 = (raw >> 11) & 1;
         int bit11= (raw >> 12) & 1;
-        Logger.log("" + bit31);
         int imm = ((
                  bit31 |
                 (bit4 << 3) |

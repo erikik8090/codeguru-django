@@ -21,10 +21,8 @@ public class PlayersPanel
     public static class Breakpoint {
         public Breakpoint(int _lineNum) {
             lineNum = _lineNum;
-            //arenaAddr = _arenaAddr;
         }
         public int lineNum; // 1 based line number, -1 means there's no line number (debug only breakpoint)
-        //public int arenaAddr; // breakpoints addd
     }
 
     public static class Code {
@@ -32,7 +30,7 @@ public class PlayersPanel
             player = p;
             index = idx;
             label = p.label + Integer.toString(idx); // p.label is a single letter, index is 0 or 1
-            breakpoints = new ArrayList<Breakpoint>();
+            breakpoints = new ArrayList<>();
         }
         public String getName() {
             return name;
@@ -89,11 +87,7 @@ public class PlayersPanel
 
     public PlayersPanel(CompetitionWindow mainWnd) {
         m_mainWnd = mainWnd;
-
-        //addPlayerBtn = (HTMLElement)DomGlobal.document.getElementById("addPlayerBtn");
-
         exportMethods();
-        //Console.log( findPlayer("bla") == null ? "null":"not-null");
     }
 
     // http://www.gwtproject.org/doc/latest/DevGuideCodingBasicsJSNI.html
@@ -109,7 +103,6 @@ public class PlayersPanel
     }-*/;
 
     public PlayerInfo findPlayer(String label) {
-        //Console.log("###" + Integer.toString(m_players.size()));
         for(PlayerInfo p : m_players) {
             if (p.label.equals(label))
                 return p;
@@ -178,55 +171,40 @@ public class PlayersPanel
 
     public static String still =
             "# Technieque - Stand Still\n" +
-            "j x1";
+            "j x1\n";
 
 
     public InitPlayers m_initPlayers = m_initPlayers_riscv;
 
     public void setPlatform(String plat) {
-        if (plat == "8086")
+        if (plat.equals("8086"))
             m_initPlayers = m_initPlayers_x86;
-        else if (plat == "riscv")
+        else if (plat.equals("riscv"))
             m_initPlayers = m_initPlayers_riscv;
     }
 
     private void demo_like_original() {
         addPlayerPanel(); // this demo has 4 players. initialization of the page adds 2 panels
-        addPlayerPanel();
-
-        String shooterCode = m_initPlayers.shooterCode;
 
         m_inEditor = m_players.get(1).code[0];
-        m_inEditor.asmText = shooterCode;
+        m_inEditor.asmText = still;
+        m_inEditor.player.wtype = EWarriorType.SINGLE;
+        updateTitle("Still");
         m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
-        m_inEditor = m_players.get(1).code[1];
-        m_inEditor.asmText = shooterCode;
-        m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
-        m_inEditor.player.wtype = EWarriorType.TWO_DIFFERENT;
-        updateTitle("shooter");
-        changedWType(m_inEditor.player.label, "TWO_DIFFERENT");
 
         m_inEditor = m_players.get(2).code[0];
-        m_inEditor.asmText = shooterCode;
+        m_inEditor.asmText = blindWarrior;
         m_inEditor.player.wtype = EWarriorType.SINGLE;
-        updateTitle("shooterB");
+        updateTitle("Warrior");
         m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
-
-        m_inEditor = m_players.get(3).code[0];
-        m_inEditor.asmText = shooterCode;
-        m_inEditor.player.wtype = EWarriorType.SINGLE;
-        updateTitle("shooterC");
-        m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
-
 
         // the one that is selected at the end
-        String bimpCode = m_initPlayers.bimpCode;
         m_inEditor = m_players.get(0).code[0];
-        updateTitle("bimp");
-        m_inEditor.asmText = bimpCode;
+        updateTitle("Ranger");
+        m_inEditor.asmText = blindRanger;
         m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
         m_inEditor = m_players.get(0).code[1];
-        m_inEditor.asmText = bimpCode;
+        m_inEditor.asmText = blindRanger;
         m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
         m_inEditor.player.wtype = EWarriorType.TWO_DIFFERENT;
         changedWType(m_inEditor.player.label, "TWO_DIFFERENT");

@@ -5,7 +5,6 @@ import il.co.codeguru.corewars8086.cpu.riscv.InstructionRunner;
 import il.co.codeguru.corewars8086.cpu.riscv.RV32I;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.*;
-import il.co.codeguru.corewars8086.utils.Logger;
 
 public class InstructionDecoderRv32c {
     public Instruction decode(CInstructionFormatBase i) {

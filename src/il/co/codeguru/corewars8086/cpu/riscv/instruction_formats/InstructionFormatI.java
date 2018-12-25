@@ -27,7 +27,7 @@ public class InstructionFormatI extends InstructionFormatBase {
     @Override
     public String format(Instruction.InstructionInfo info)
     {
-        return info.getName().toUpperCase() + " #" + getRd() + ", #" + getRs1() + ", " + getImmediate();
+        return info.getName().toLowerCase() + " x" + getRd() + ", x" + getRs1() + ", " + getImmediate();
     }
 
     public byte getRd()

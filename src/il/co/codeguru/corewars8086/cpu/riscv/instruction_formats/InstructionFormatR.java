@@ -29,7 +29,7 @@ public class InstructionFormatR extends InstructionFormatBase
     @Override
     public String format(Instruction.InstructionInfo info)
     {
-        return info.getName().toUpperCase() + " #" + getRd() + ", #" + getRs1() + ", #" + getRs2();
+        return info.getName().toLowerCase() + " x" + getRd() + ", x" + getRs1() + ", x" + getRs2();
     }
 
     public byte getRd()

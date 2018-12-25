@@ -62,7 +62,7 @@ public class DisassemblerRiscVTest {
         disassembler = new DisassemblerRiscV(testData,0,4);
         String opcode = disassembler.nextOpcode();
 
-        assertEquals("ADD #3, #1, #2", opcode);
+        assertEquals("add x3, x1, x2", opcode);
         assertEquals(4, disassembler.lastOpcodeSize());
     }
 
@@ -78,21 +78,21 @@ public class DisassemblerRiscVTest {
         disassembler = new DisassemblerRiscV(testData, 4, 12);
 
         String opcode = disassembler.nextOpcode();
-        assertEquals("SW #2, 0 (#1)", opcode);
+        assertEquals("sw x2, 0 (x1)", opcode);
         assertEquals(4, disassembler.lastOpcodeSize());
 
         opcode = disassembler.nextOpcode();
-        assertEquals("JAL #0, 8", opcode);
+        assertEquals("jal x0, 8", opcode);
         assertEquals(4, disassembler.lastOpcodeSize());
 
         disassembler.reset(4, 12);
 
         opcode = disassembler.nextOpcode();
-        assertEquals("SW #2, 0 (#1)", opcode);
+        assertEquals("sw x2, 0 (x1)", opcode);
         assertEquals(4, disassembler.lastOpcodeSize());
 
         opcode = disassembler.nextOpcode();
-        assertEquals("JAL #0, 8", opcode);
+        assertEquals("jal x0, 8", opcode);
         assertEquals(4, disassembler.lastOpcodeSize());
     }
 
@@ -106,7 +106,7 @@ public class DisassemblerRiscVTest {
         disassembler = new DisassemblerRiscV(testData,0,4);
         String opcode = disassembler.nextOpcode();
 
-        assertEquals("C.ADDI #5, #5, 13", opcode);
+        assertEquals("c.addi x5, x5, 13", opcode);
         assertEquals(2, disassembler.lastOpcodeSize());
     }
 

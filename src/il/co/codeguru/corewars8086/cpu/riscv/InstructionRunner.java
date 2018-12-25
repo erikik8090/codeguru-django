@@ -5,6 +5,7 @@ import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
+import il.co.codeguru.corewars8086.utils.Logger;
 
 import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
@@ -201,7 +202,6 @@ public class InstructionRunner {
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
     public void lw(InstructionFormatI i) throws MemoryException {
-
         state.setReg(i.getRd(), memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImmediate()))));
     }
 
@@ -249,6 +249,11 @@ public class InstructionRunner {
         jump(state, i.getImmediate());
     }
 
+    public void jal(InstructionFormatUJ i, int instructionSize) throws MisalignedMemoryLoadException {
+        state.setReg(i.getRd(), state.getPc() + instructionSize);
+        jump(state, i.getImmediate(), instructionSize);
+    }
+
     /**
      * The indirect jump instruction JALR (jump and link register) uses the I-type encoding.
      * The target address is obtained by adding the 12-bit signed I-immediate to the register rs1, then setting the least-significant bit of the result to zero.
@@ -260,18 +265,31 @@ public class InstructionRunner {
         jump(state, state.getReg(i.getRs1()) + i.getImmediate());
     }
 
+    public void jalr(InstructionFormatI i, int instructionSize) throws MisalignedMemoryLoadException {
+        state.setReg(i.getRd(), state.getPc() + instructionSize);
+        jump(state, state.getReg(i.getRs1()) + i.getImmediate(), instructionSize);
+    }
+
     /**
      * BEQ (Branch if Equal) takes the branch if registers rs1 and rs2 are equal
      */
     public void beq(InstructionFormatSB i) throws MisalignedMemoryLoadException {
-        if (state.getReg(i.getRs1()) == state.getReg(i.getRs2())) jump(state, i.getImm());
+        beq(i,4);
+    }
+
+    public void beq(InstructionFormatSB i, int instructionSize) throws MisalignedMemoryLoadException {
+        if (state.getReg(i.getRs1()) == state.getReg(i.getRs2())) jump(state, i.getImm(), instructionSize);
     }
 
     /**
      * BNE (Branch if Not Equal) takes the branch if registers rs1 and rs2 are not equal
      */
     public void bne(InstructionFormatSB i) throws MisalignedMemoryLoadException {
-        if (state.getReg(i.getRs1()) != state.getReg(i.getRs2())) jump(state, i.getImm());
+        bne(i, 4);
+    }
+
+    public void bne(InstructionFormatSB i, int instructionSize) throws MisalignedMemoryLoadException {
+        if (state.getReg(i.getRs1()) != state.getReg(i.getRs2())) jump(state, i.getImm(), instructionSize);
     }
 
     /**
@@ -303,10 +321,11 @@ public class InstructionRunner {
     }
 
 
-
-    private void jump(CpuStateRiscV state, int immediate) throws MisalignedMemoryLoadException {
-        if (immediate % 4 != 0) throw new MisalignedMemoryLoadException();
-        state.setPc(state.getPc() + immediate - 4);
+    private void jump(CpuStateRiscV state, int immediate, int instructionSize) throws MisalignedMemoryLoadException {
+        state.setPc(state.getPc() + immediate - instructionSize);
     }
 
+    private void jump(CpuStateRiscV state, int immediate) throws MisalignedMemoryLoadException {
+        jump(state, immediate, 4);
+    }
 }

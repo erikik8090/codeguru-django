@@ -1,5 +1,6 @@
 package il.co.codeguru.corewars8086.cpu.riscv.instruction_tests;
 
+import com.google.gwt.editor.client.Editor;
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.exceptions.MisalignedMemoryLoadException;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuRiscV;
@@ -14,6 +15,7 @@ import il.co.codeguru.corewars8086.utils.Logger;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -60,6 +62,11 @@ public class JumpTest {
         assertEquals(16, state.getReg(RD_INDEX));
     }
 
+    /*
+     * As of RV32C, jumps no longer throw a misaligned memory load exception when reaching an address that
+     * is not divisible by 4, and that is why this kind of tests are now disabled.
+     */
+    @Ignore
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testJalMisalignedAddress() throws MemoryException, CpuException {
         state.setPc(24);
@@ -82,6 +89,11 @@ public class JumpTest {
         assertEquals(expectedReg, state.getReg(RD_INDEX));
     }
 
+    /*
+     * As of RV32C, jumps no longer throw a misaligned memory load exception when reaching an address that
+     * is not divisible by 4, and that is why this kind of tests are now disabled.
+     */
+    @Ignore
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testJalrMisalignedAddress() throws MemoryException, CpuException {
         state.setReg(RS1_INDEX, 14);
@@ -114,6 +126,11 @@ public class JumpTest {
 
     }
 
+    /*
+     * As of RV32C, jumps no longer throw a misaligned memory load exception when reaching an address that
+     * is not divisible by 4, and that is why this kind of tests are now disabled.
+     */
+    @Ignore
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBeqMisalignedAddressTakenBranch() throws MemoryException, CpuException {
         state.setPc(24);
@@ -136,6 +153,11 @@ public class JumpTest {
         assertEquals(expected, state.getPc());
     }
 
+    /*
+     * As of RV32C, jumps no longer throw a misaligned memory load exception when reaching an address that
+     * is not divisible by 4, and that is why this kind of tests are now disabled.
+     */
+    @Ignore
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBneMisalignedAddressBranchTaken() throws MemoryException, CpuException {
         state.setPc(24);
@@ -161,6 +183,11 @@ public class JumpTest {
         assertEquals(expected, state.getPc());
     }
 
+    /*
+     * As of RV32C, jumps no longer throw a misaligned memory load exception when reaching an address that
+     * is not divisible by 4, and that is why this kind of tests are now disabled.
+     */
+    @Ignore
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBltMisalignedAddress() throws MemoryException, CpuException {
         state.setReg(RS1_INDEX, 5);
@@ -187,6 +214,11 @@ public class JumpTest {
         assertEquals(expected, state.getPc());
     }
 
+    /*
+     * As of RV32C, jumps no longer throw a misaligned memory load exception when reaching an address that
+     * is not divisible by 4, and that is why this kind of tests are now disabled.
+     */
+    @Ignore
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBltuMisalignedAddressBranchTaken() throws MemoryException, CpuException {
         state.setPc(24);
@@ -213,6 +245,11 @@ public class JumpTest {
         assertEquals(expected, state.getPc());
     }
 
+    /*
+     * As of RV32C, jumps no longer throw a misaligned memory load exception when reaching an address that
+     * is not divisible by 4, and that is why this kind of tests are now disabled.
+     */
+    @Ignore
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBgeMisalignedAddressBranchTaken() throws MemoryException, CpuException {
         state.setReg(RS1_INDEX, 5);
@@ -238,6 +275,11 @@ public class JumpTest {
         assertEquals(expected, state.getPc());
     }
 
+    /*
+     * As of RV32C, jumps no longer throw a misaligned memory load exception when reaching an address that
+     * is not divisible by 4, and that is why this kind of tests are now disabled.
+     */
+    @Ignore
     @Test(expected = MisalignedMemoryLoadException.class)
     public void testBgeuMisalignedAddress() throws MemoryException, CpuException {
         state.setReg(RS1_INDEX, 5);

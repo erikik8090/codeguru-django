@@ -2,8 +2,11 @@ package il.co.codeguru.corewars8086.utils;
 
 import il.co.codeguru.corewars8086.cpu.riscv.RV32I;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatBase;
+import il.co.codeguru.corewars8086.cpu.riscv.rv32c.RV32C;
+import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
 import il.co.codeguru.corewars8086.utils.disassembler.DisassemblerRiscV;
 import il.co.codeguru.corewars8086.utils.disassembler.IDisassembler;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -11,12 +14,12 @@ import static org.junit.Assert.assertTrue;
 
 public class DisassemblerRiscVTest {
 
-    IDisassembler disassembler;
+    private IDisassembler disassembler;
 
-    @Test
-    public void pass()
+    @Before
+    public void setUp()
     {
-        assertTrue(true);
+        Logger.setTestingMode();
     }
 
     private byte[] loadInstructions(InstructionFormatBase[] instructions)
@@ -31,6 +34,20 @@ public class DisassemblerRiscVTest {
             result[index+2]= (byte)((raw >> 16)& 0xFF);
             result[index+3]= (byte)((raw >> 24)& 0xFF);
             index += 4;
+        }
+        return result;
+    }
+
+    private byte[] loadCInstructions(CInstructionFormatBase[] instructions)
+    {
+        byte[] result = new byte[instructions.length * 4];
+        int index = 0;
+        for(CInstructionFormatBase instruction : instructions)
+        {
+            short raw = instruction.getRaw();
+            result[index]  = (byte)(raw & 0xFF);
+            result[index+1]= (byte)((raw >> 8) & 0xFF);
+            index += 2;
         }
         return result;
     }
@@ -77,6 +94,20 @@ public class DisassemblerRiscVTest {
         opcode = disassembler.nextOpcode();
         assertEquals("JAL #0, 8", opcode);
         assertEquals(4, disassembler.lastOpcodeSize());
+    }
+
+    @Test
+    public void testCInstruction() throws  IDisassembler.DisassemblerException
+    {
+        byte[] testData = loadCInstructions(new CInstructionFormatBase[]{
+                RV32C.cInstructionFormatCI(RV32C.Opcodes.CADDI, 5, 13)
+        });
+
+        disassembler = new DisassemblerRiscV(testData,0,4);
+        String opcode = disassembler.nextOpcode();
+
+        assertEquals("C.ADDI #5, #5, 13", opcode);
+        assertEquals(2, disassembler.lastOpcodeSize());
     }
 
     @Test(expected = IDisassembler.DisassemblerException.class)

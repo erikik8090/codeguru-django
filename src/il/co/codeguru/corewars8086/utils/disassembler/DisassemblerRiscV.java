@@ -5,14 +5,19 @@ import il.co.codeguru.corewars8086.cpu.riscv.Instruction;
 import il.co.codeguru.corewars8086.cpu.riscv.InstructionDecoder;
 import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatBase;
+import il.co.codeguru.corewars8086.cpu.riscv.rv32c.InstructionDecoderRv32c;
+import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
+import il.co.codeguru.corewars8086.utils.Logger;
 
 public class DisassemblerRiscV implements IDisassembler {
 
     private InstructionDecoder decoder;
+    private InstructionDecoderRv32c cDecoder;
 
     private Memory memory;
     private int index;
     private int endIndex;
+    private int lastOpcdodeSize = 0;
 
     public DisassemblerRiscV(byte[] memory, int index, int endIndex) {
         this.memory = new Memory(memory);
@@ -20,6 +25,7 @@ public class DisassemblerRiscV implements IDisassembler {
         this.endIndex = endIndex;
 
         this.decoder = new InstructionDecoder();
+        this.cDecoder= new InstructionDecoderRv32c();
     }
 
     @Override
@@ -28,24 +34,35 @@ public class DisassemblerRiscV implements IDisassembler {
         this.endIndex = endOffset;
     }
 
+    private Instruction getCInstruction() {
+        short rawInstruction = memory.loadHalfWord(this.index);
+        CInstructionFormatBase instructionFormat = new CInstructionFormatBase(rawInstruction);
+        return cDecoder.decode(instructionFormat);
+    }
+
     @Override
     public int lastOpcodeSize() {
-        return 4;
+        return lastOpcdodeSize;
     }
 
     @Override
     public String nextOpcode() throws DisassemblerException {
         int rawInstruction = memory.loadWord(this.index);
         InstructionFormatBase instructionFormat = new InstructionFormatBase(rawInstruction);
-        Instruction instruction;
-        try {
-            instruction = decoder.decode(instructionFormat);
-            index += 4;
+        Instruction instruction= getCInstruction();
+
+        if(instruction != null){
+            lastOpcdodeSize = 2;
         }
-        catch (InvalidOpcodeException iv)
-        {
-            throw new DisassemblerException();
+        else {
+            try {
+                instruction = decoder.decode(instructionFormat);
+                lastOpcdodeSize = 4;
+            } catch (InvalidOpcodeException iv) {
+                throw new DisassemblerException();
+            }
         }
+        index += lastOpcdodeSize;
         return instruction.getFormat().format(instruction.getInfo());
     }
 }

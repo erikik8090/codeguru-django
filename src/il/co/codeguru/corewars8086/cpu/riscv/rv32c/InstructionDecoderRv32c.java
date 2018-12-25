@@ -26,6 +26,10 @@ public class InstructionDecoderRv32c {
                          * to generate pointers to stack-allocated variables, and expands to
                          * "addi rd, x2, nzuimm[9:2]".
                          */
+                        if(ciw.getImmediate() == 0)
+                        {
+                            return null;
+                        }
                         int bit3 = ciw.getImmediate() & 1;
                         int bit2 = (ciw.getImmediate() >> 1) & 1;
                         int bit96= (ciw.getImmediate() >> 2) & 15;

@@ -12,7 +12,7 @@ import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.utils.disassembler.DisassemblerX86;
+import il.co.codeguru.corewars8086.utils.disassembler.DisassemblerRiscV;
 import il.co.codeguru.corewars8086.utils.disassembler.IDisassembler;
 import il.co.codeguru.corewars8086.war.*;
 
@@ -432,7 +432,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         breakpointManager.removeCurrentBreakpoints();
 
         StringBuilder sb = new StringBuilder();
-        IDisassembler dis = new DisassemblerX86(incode.bin, 0, incode.bin.length);
+        IDisassembler dis = new DisassemblerRiscV(incode.bin, 0, incode.bin.length);
         int offset = 0;
         try {
             while (offset < incode.bin.length) {
@@ -669,7 +669,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     // check opcodes that are emitten are supported by codewars8086 and issue warnings if not
     private void checkDisasmLines(byte[] binbuf, ArrayList<LstLine> listing, DocumentFragment asmElem, String intext)
     {
-        IDisassembler dis = new DisassemblerX86(binbuf, 0, binbuf.length);
+        IDisassembler dis = new DisassemblerRiscV(binbuf, 0, binbuf.length);
 
         // process each line independently
         for(int lineNum = 0; lineNum < listing.size(); ++lineNum)
@@ -720,11 +720,11 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             dis.nextOpcode();
             dis.lastOpcodeSize();
         }
-        catch(DisassemblerX86.DisassemblerLengthException e) {
+        catch(IDisassembler.DisassemblerLengthException e) {
             msg = Integer.toString(lineNum+1) + ": not enough bytes to parse"; // can happen if we db 09h for example, or just 'rep'
         }
-        //TODO: Change this to it's own exception type
-        catch(DisassemblerX86.DisassemblerException e) {
+        //TODO: Change this to its own exception type
+        catch(IDisassembler.DisassemblerException e) {
             msg = Integer.toString(lineNum+1) + ": Although this is a legal x86 Opcode, codewars8086 does not support it";
             //int eptr = dis.getPointer() - 1;
             //if (eptr >= 0 && eptr < binbuf.length)

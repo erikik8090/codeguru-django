@@ -11,7 +11,7 @@ import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
-import il.co.codeguru.corewars8086.utils.disassembler.DisassemblerX86;
+import il.co.codeguru.corewars8086.utils.disassembler.DisassemblerRiscV;
 import il.co.codeguru.corewars8086.utils.disassembler.IDisassembler;
 import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.war.Warrior;
@@ -145,7 +145,7 @@ public class Debugger {
 
     private void disassembleAddress(int absaddr, int addrInArea) {
         byte[] memory_bytes = m_mem.getMemory();
-        IDisassembler dis = new DisassemblerX86(memory_bytes, absaddr, m_mem.length());
+        IDisassembler dis = new DisassemblerRiscV(memory_bytes, absaddr, m_mem.length());
         String text;
         try {
             text = dis.nextOpcode();

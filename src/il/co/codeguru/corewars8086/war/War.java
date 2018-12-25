@@ -31,7 +31,7 @@ public class War {
     /** Group-shared private memory size */
     private final static short GROUP_SHARED_MEMORY_SIZE = 1024;
     /** Arena is filled with this byte */
-    public final static byte ARENA_BYTE = (byte)0xCC;
+    public final static byte ARENA_BYTE = (byte)0x00;
     /** Maximum number of warriors in a fight */
     private final static int MAX_WARRIORS = 20;
     /** Maximum attempts to load a warrior to the Arena */

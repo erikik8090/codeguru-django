@@ -18,7 +18,7 @@ public class RegisterField /*extends JPanel*/ {
 	private int m_base = 16;
 	private CpuFrame m_frame;
 	private boolean m_lastInputOk = true;
-	private short m_lastValue;
+	private int m_lastValue;
 	private String m_name;
 
 	public RegisterField(String name, CpuFrame frame) {
@@ -63,10 +63,10 @@ public class RegisterField /*extends JPanel*/ {
 		}
 	}
 
-	public void setValue(short value) {
+	public void setValue(int value) {
 		m_lastValue = value;
 		if (m_base == 16)
-			textField.value = Format.hex4((int)value & 0xffff);
+			textField.value = Format.hex(value,8);
 		else
 			textField.value = Integer.toString((int)value & 0xffff);
 	}

@@ -146,9 +146,40 @@ public class PlayersPanel
             "PUSH DS\nPOP ES\nXCHG DI, AX\nADD WORD DI, 0xC\nMOV SI, DI\nADD WORD SI, 0xA\nSTD\nDEC DI\nDEC DI\nMOVSW\nMOVSW\nMOVSW\nMOVSW\nMOVSW\nMOVSW\nINC DI\nINC DI\nJMP DI\n"
     );
     public static InitPlayers m_initPlayers_riscv = new InitPlayers(
-            "lui   a0,0x32\naddi  a0,a0,-1029\nslli  a0,a0,0xe\naddi  a0,a0,-1346\n",
-            "lui   a0,0x32\naddi  a0,a0,-1029\nslli  a0,a0,0xe\naddi  a0,a0,-1346\n"
+            "# Technique - Blind Knight\n" +
+                    "add x2, x2, 4\n" +
+                    "add x1, x1, x2\n" +
+                    "sw x2, 16(x1)\n" +
+                    "sub x1, x1, x2\n" +
+                    "j x1",
+            "# Technique - Blind Ranger\n" +
+                    "add x2, x2, 750\n" +
+                    "add x1, x1, x2\n" +
+                    "sw x2, 32(x1)\n" +
+                    "sub x1, x1, x2\n" +
+                    "j x1\n"
     );
+
+    public static String blindRanger =
+            "# Technique - Blind Ranger\n" +
+            "add x2, x2, 750\n" +
+            "add x1, x1, x2\n" +
+            "sw x2, 32(x1)\n" +
+            "sub x1, x1, x2\n" +
+            "j x1\n";
+
+    public static String blindWarrior =
+            "# Technique - Blind Knight\n" +
+            "add x2, x2, 4\n" +
+            "add x1, x1, x2\n" +
+            "sw x2, 16(x1)\n" +
+            "sub x1, x1, x2\n" +
+            "j x1\n";
+
+    public static String still =
+            "# Technieque - Stand Still\n" +
+            "j x1";
+
 
     public InitPlayers m_initPlayers = m_initPlayers_riscv;
 
@@ -158,18 +189,6 @@ public class PlayersPanel
         else if (plat == "riscv")
             m_initPlayers = m_initPlayers_riscv;
     }
-
-    private void demo_simple() {
-        m_inEditor = m_players.get(1).code[0];
-        m_inEditor.asmText = "start:\ninc cx\njmp start";
-        m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
-
-        m_inEditor = m_players.get(0).code[0];
-        //m_inEditor.asmText = "start:\ninc ax    ;hello\n          ;world\nadd WORD[bx],1234h\nmov ax,5678h\njmp start";
-        m_inEditor.asmText = "start:\nmov bx, ax\nadd bx, 12\nloop:\nmov byte[bx],0x11\ninc bx\njmp loop";
-        m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
-    }
-
 
     private void demo_like_original() {
         addPlayerPanel(); // this demo has 4 players. initialization of the page adds 2 panels
@@ -184,7 +203,7 @@ public class PlayersPanel
         m_inEditor.asmText = shooterCode;
         m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
         m_inEditor.player.wtype = EWarriorType.TWO_DIFFERENT;
-        updateTitle("shooterA");
+        updateTitle("shooter");
         changedWType(m_inEditor.player.label, "TWO_DIFFERENT");
 
         m_inEditor = m_players.get(2).code[0];

@@ -8,10 +8,10 @@ public class Format {
     }
 
     public static String hex(int num, int pad) {
-        String s = Integer.toHexString(num).toUpperCase();
+        StringBuilder s = new StringBuilder(Integer.toHexString(num).toUpperCase());
         for(int i = s.length(); i < pad; ++i)
-            s = "0" + s;
-        return s;
+            s.insert(0, "0");
+        return s.toString();
     }
     public static String hex2(int num) {
         String s = Integer.toHexString(num).toUpperCase();

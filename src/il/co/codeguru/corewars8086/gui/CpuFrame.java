@@ -26,12 +26,10 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 	
 	private Competition competition;
 	private int m_base = 16;
-	
 
-	private RegisterField reg1,reg2,reg3,reg4,
-						regSI,regDI,regBP,regSP,
-						 regIP,regCS,regDS,regSS,
-						 regES,regE, regF;
+
+	private RegisterField[] registers;
+	private RegisterField regF, regPc;
 	
 	private FlagFields flagOF,flagDF,flagIF,flagTF,
 						flagSF,flagZF,flagAF,flagPF,
@@ -90,27 +88,14 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		}
 		m_mainwnd.errorPreventsStep(false);
 
-		short sv = (short)v;
 
 		switch(name) {
-			case "1": state.setReg(1, sv); break;
-			case "2": state.setBX(sv); break;
-			case "3": state.setCX(sv); break;
-			case "4": state.setDX(sv); break;
+			case "PC": state.setPc(v); changedCSIP(); break;
+			case "Energy": state.setEnergy((short)v); break;
+			case "Flags": state.setFlags((short)v); updateFlagBoxes(state); break;
 
-			case "SI": state.setSI(sv); break;
-			case "DI": state.setDI(sv); break;
-			case "BP": state.setBP(sv); break;
-			case "SP": state.setSP(sv); stackView.moveToLine(RealModeAddress.linearAddress(state.getSS(), sv)); break;
-
-			case "IP": state.setPc(sv); changedCSIP(); break;
-			case "CS": state.setCS(sv); changedCSIP(); break;
-			case "DS": state.setDS(sv); break;
-			case "SS": state.setSS(sv); stackView.moveToLine(RealModeAddress.linearAddress(sv, state.getSP())); break;
-			case "ES": state.setES(sv); break;
-
-			case "Energy": state.setEnergy(sv); break;
-			case "Flags": state.setFlags(sv); updateFlagBoxes(state); break;
+			default:
+				state.setReg(Integer.valueOf(name), v);
 		}
 
 		// reeval watch - might change depending on the register that just changed
@@ -181,23 +166,12 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
         cpuPanel = (HTMLElement) DomGlobal.document.getElementById("cpuPanel");
 
-		
-		reg1 = new RegisterField("1", this);
-		reg2 = new RegisterField("2", this);
-		reg3 = new RegisterField("3", this);
-		reg4 = new RegisterField("4", this);
-
-		regSI = new RegisterField("SI", this);
-		regDI = new RegisterField("DI", this);
-		regBP = new RegisterField("BP", this);
-		regSP = new RegisterField("SP", this);
-
-		regIP = new RegisterField("IP", this);
-		regCS = new RegisterField("CS", this);
-		regDS = new RegisterField("DS", this);
-		regSS = new RegisterField("SS", this);
-		regES = new RegisterField("ES", this);
-		regE = new RegisterField("Energy", this);
+        registers = new RegisterField[32];
+		for(int i=0; i<32;i++)
+		{
+			registers[i] = new RegisterField(Integer.toString(i), this);
+		}
+		regPc = new RegisterField("PC", this);
 		regF = new RegisterField("Flags", this);
 		
 		//Flags
@@ -229,20 +203,10 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 	public void j_setRegistersBase(int base) {
 		m_base = base;
-		reg1.setBase(base);
-		reg2.setBase(base);
-		reg3.setBase(base);
-		reg4.setBase(base);
-		regSI.setBase(base);
-		regDI.setBase(base);
-		regBP.setBase(base);
-		regSP.setBase(base);
-		regIP.setBase(base);
-		regCS.setBase(base);
-		regDS.setBase(base);
-		regSS.setBase(base);
-		regES.setBase(base);
-		regE.setBase(base);
+		for(RegisterField reg : registers)
+		{
+			reg.setBase(base);
+		}
 		regF.setBase(base);
 		// setBase already updates the value if that's ok
 
@@ -265,21 +229,12 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		//CpuState state = currentWar.getWarrior(dropMenu.getSelectedIndex()).getCpuState();
 		CpuStateRiscV state = currentWar.getWarrior(m_currentWarriorIndex).getCpuState();
 
-		reg1.setValue( (short)state.getReg(1));
-		reg2.setValue( (short)state.getReg(2));
-		reg3.setValue( (short)state.getReg(3));
-		reg4.setValue( (short)state.getReg(4));
-		regSI.setValue( state.getSI());
-		regDI.setValue( state.getDI());
-		regBP.setValue( state.getBP());
-		regSP.setValue( state.getSP());
-		regIP.setValue( (short) state.getPc());
-		regCS.setValue( state.getCS());
-		regDS.setValue( state.getDS());
-		regSS.setValue( state.getSS());
-		regES.setValue( state.getES());
-		regE.setValue( state.getEnergy());
-		regF.setValue( state.getFlags());
+		for(int i=0;i<32;i++)
+		{
+			registers[i].setValue(state.getReg(i));
+		}
+		regPc.setValue(state.getPc());
+		regF.setValue(state.getFlags());
 		
 		updateFlagBoxes(state);
 		stackView.moveToLine(RealModeAddress.linearAddress(state.getSS(), state.getSP()));
@@ -301,37 +256,19 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		    if (state == null) {
 		        throw new Exception("invalid state");
             }
-			switch (name) {
-				case "1": return (short)state.getReg(1);
-				case "AL": return state.getAL();
-				case "AH": return state.getAH();
-
-				case "2": return(short)state.getReg(2);
-				case "BL": return state.getBL();
-				case "BH": return state.getBH();
-
-				case "3": return (short)state.getReg(3);
-				case "CL": return state.getCL();
-				case "CH": return state.getCH();
-
-				case "4": return (short)state.getReg(4);
-				case "DL": return state.getDL();
-				case "DH": return state.getDH();
-
-				case "SI": return state.getSI();
-				case "DI": return state.getDI();
-				case "BP": return state.getBP();
-				case "SP": return state.getSP();
-				case "IP": return (short)state.getPc();
-				case "CS": return state.getCS();
-				case "DS": return state.getDS();
-				case "SS": return state.getSS();
-				case "ES": return state.getES();
-
-				case "ENERGY": return state.getEnergy();
-				case "FLAGS": return state.getFlags();
+            try {
+				switch (name) {
+					case "ENERGY":
+						return state.getEnergy();
+					case "FLAGS":
+						return state.getFlags();
+					default:
+						return (short) state.getReg(Integer.valueOf(name));
+				}
 			}
-			throw new Exception("unknown register name " + name); // should not happen since we check before
+			catch(IndexOutOfBoundsException e) {
+				throw new RuntimeException("unknown register name " + name); // should not happen since we check before
+			}
 		}
 
 		@Override

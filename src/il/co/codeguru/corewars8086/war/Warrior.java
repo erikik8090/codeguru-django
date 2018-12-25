@@ -155,7 +155,7 @@ public class Warrior
         RealModeAddress groupSharedMemory) {
 
         // initialize registers
-        m_state.setReg(1, loadAddress.getOffset());
+        m_state.setReg(1, loadAddress.getOffset() & 0xFFFF);
         m_state.setReg(2,0);
         m_state.setReg(3,(short)0);
         m_state.setReg(4,(short)0);

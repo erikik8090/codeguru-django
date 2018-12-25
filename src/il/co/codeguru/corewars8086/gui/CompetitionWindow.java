@@ -33,7 +33,7 @@ public class CompetitionWindow extends JFrame
     private int totalWars;
 	private boolean competitionRunning;
 
-    private static final String SEED_PREFIX = "SEED!@#=";
+    private static final String SEED_PREFIX = "SEED#";
 	private JTextField seed;
 
     private boolean m_isStartPaused = false;
@@ -98,6 +98,9 @@ public class CompetitionWindow extends JFrame
         m_codeEditor = new CodeEditor(competition);
         m_playersPanel = new PlayersPanel(this);
         m_codeEditor.m_playersPanel = m_playersPanel;
+
+        setPlatform("riscv");
+
         stepnum = (HTMLElement) DomGlobal.document.getElementById("stepnum");
 
         exportMethods();
@@ -106,6 +109,11 @@ public class CompetitionWindow extends JFrame
         competition.memoryEventCaster.doneAdding();
 
         call_gwtStart();
+    }
+
+    public void setPlatform(String plat) {
+        m_codeEditor.setPlatform(plat);
+        m_playersPanel.setPlatform(plat);
     }
 
     public static native void call_gwtStart() /*-{
@@ -306,6 +314,8 @@ public class CompetitionWindow extends JFrame
 
     public void onWarEnd(int reason, String winners, boolean inDebug) {
         warCounter++;
+        // this is needed so that we'll be able to recreate the war we just ran in the debugger
+        // and for the seed counter to advance beteen competitions
         seed.setText(SEED_PREFIX + competition.getSeed());
         warCounterDisplay.setText("Sessions so far:" + warCounter + " (out of " + totalWars + ")");
         setBattlesRan(Integer.toString(warCounter) + "/" + Integer.toString(totalWars));

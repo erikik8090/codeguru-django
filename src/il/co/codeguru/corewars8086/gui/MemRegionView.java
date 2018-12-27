@@ -5,6 +5,7 @@ import elemental2.dom.DocumentFragment;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLElement;
+import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.gui.asm_parsers.TextUtils;
 import il.co.codeguru.corewars8086.gui.code_editor.CodeEditor;
 import il.co.codeguru.corewars8086.jsadd.Format;
@@ -27,7 +28,7 @@ public class MemRegionView implements MemoryEventListener
     }
 
 
-    public void initMemRegion(RealModeMemoryRegion region, RealModeMemoryImpl memory, boolean force) {
+    public void initMemRegion(RealModeMemoryRegion region, Memory memory, boolean force) {
         if (!force && m_currentRegion.equals(region))
             return; // can happen in shared mem if we move between the two codes of a single player
 

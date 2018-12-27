@@ -2,13 +2,13 @@ package il.co.codeguru.corewars8086.gui;
 
 import elemental2.dom.*;
 import elemental2.dom.CanvasRenderingContext2D.FillStyleUnionType;
+import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.gui.widgets.Color;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.gui.widgets.Dimension;
 import il.co.codeguru.corewars8086.gui.widgets.JComponent;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.war.War;
 
 import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
@@ -39,7 +39,7 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
 
     private HTMLInputElement m_dummyInput; // used to have something that could get input focus
     private HTMLElement m_hoverCellInfo;
-    private RealModeMemoryImpl m_mem = null;
+    private Memory m_mem = null;
     private boolean m_indebug = false;
     private War m_currentWar = null;
 

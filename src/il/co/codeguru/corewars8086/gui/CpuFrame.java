@@ -3,15 +3,14 @@ package il.co.codeguru.corewars8086.gui;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
-import il.co.codeguru.corewars8086.memory.MemoryEventListener;
+import il.co.codeguru.corewars8086.cpu.riscv.Memory;
+import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
+import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.war.Competition;
 import il.co.codeguru.corewars8086.war.CompetitionEventListener;
 import il.co.codeguru.corewars8086.war.War;
-
-import il.co.codeguru.corewars8086.gui.widgets.*;
 import il.co.codeguru.corewars8086.war.Warrior;
 
 import java.util.HashMap;
@@ -120,9 +119,6 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 	public void flagChanged_callback(String name, boolean v)
 	{
-		War currentWar = competition.getCurrentWar();
-		if (currentWar == null)
-			return;
 	}
 
 	public CpuFrame(Competition c, CompetitionWindow mainwnd)
@@ -201,7 +197,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 	private static class StateAccess implements ExpressionParser.IStateAccess {
 		public CpuStateRiscV state;
-		public RealModeMemoryImpl memory;
+		public Memory memory;
 
 		@Override
 		public short getRegisterValue(String name) throws Exception{
@@ -227,7 +223,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 			if (seg == -1) sseg = ARENA_SEGMENT;
 			int linaddr = RealModeAddress.linearAddress(sseg, (short)addr);
 			if (size == 1)
-				return memory.readByte(linaddr) & 0xff;
+				return memory.loadByte(linaddr) & 0xff;
 			else
 				return memory.read16Bit(new RealModeAddress(linaddr)) & 0xffff;
 		}

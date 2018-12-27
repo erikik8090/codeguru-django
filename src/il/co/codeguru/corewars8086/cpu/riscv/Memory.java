@@ -1,22 +1,28 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
-public class Memory {
+import il.co.codeguru.corewars8086.memory.RealModeAddress;
+import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 
-    private final byte[] memory;
+import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
+public class Memory extends RealModeMemoryImpl {
+
+    //private byte[] data;
+/*
     public Memory(int size)
     {
-        memory = new byte[size];
+        data = new byte[size];
     }
 
-    public Memory(byte[] memory)
+    public Memory(byte[] data)
     {
-        this.memory = memory;
+        this.data = data;
     }
-
+*/
     public void storeByte(int index, byte value)
     {
-        memory[index] = value;
+        //data[index] = value;
+        writeByte(new RealModeAddress(ARENA_SEGMENT, (short)index), value);
     }
     public void storeHalfWord(int index, short value)
     {
@@ -32,7 +38,8 @@ public class Memory {
 
     public byte loadByte(int index)
     {
-        return memory[index];
+        //return data[index];
+        return readByte(new RealModeAddress(ARENA_SEGMENT, (short)index));
     }
     public short loadHalfWord(int index)
     {

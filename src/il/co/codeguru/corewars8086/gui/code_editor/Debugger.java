@@ -5,12 +5,12 @@ import elemental2.dom.Element;
 import elemental2.dom.EventListener;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
+import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.gui.PlayersPanel;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.disassembler.DisassemblerRiscV;
 import il.co.codeguru.corewars8086.utils.disassembler.IDisassembler;
 import il.co.codeguru.corewars8086.war.War;
@@ -25,7 +25,7 @@ public class Debugger {
 
     private HTMLElement m_lastDbgElement;
     private boolean m_lastIsAlive = false;
-    private RealModeMemoryImpl m_mem = null;
+    private Memory m_mem = null;
     private DebuggerMemoryListener memoryListener = new DebuggerMemoryListener();
 
     private DbgLine[] m_singleByte = new DbgLine[256]; // hold lines with db XXh for memory write events
@@ -61,13 +61,13 @@ public class Debugger {
         m_dbglines = new DbgLine[War.ARENA_SIZE];
     }
 
-    public RealModeMemoryImpl getMemory() {
+    public Memory getMemory() {
         return m_mem;
     }
     
     public MemoryEventListener getMemoryListener() { return memoryListener;}
 
-    public void setMemory(RealModeMemoryImpl memory) {
+    public void setMemory(Memory memory) {
         m_mem = memory;
     }
 

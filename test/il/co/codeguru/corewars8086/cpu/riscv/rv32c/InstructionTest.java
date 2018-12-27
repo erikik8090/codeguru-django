@@ -3,11 +3,9 @@ package il.co.codeguru.corewars8086.cpu.riscv.rv32c;
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
+import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
 import il.co.codeguru.corewars8086.memory.MemoryException;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.memory.RealModeMemory;
-import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Logger;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -15,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -30,19 +27,19 @@ public class InstructionTest {
 
     private CpuStateRiscV state;
     private CpuRiscV cpu;
-    private RealModeMemory memory;
+    private Memory memory;
 
     @Before
     public void setUp() {
         state = new CpuStateRiscV();
-        memory = new RealModeMemoryImpl();
+        memory = new Memory();
         cpu = new CpuRiscV(state, memory);
         Logger.setTestingMode();
     }
 
-    private void loadInstruction(CInstructionFormatBase i) throws MemoryException {
+    private void loadInstruction(CInstructionFormatBase i) {
         state.setPc(0);
-        cpu.getMemory().write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) state.getPc()), i.getRaw());
+        cpu.getMemory().storeWord(state.getPc(), i.getRaw());
     }
 
     @Test
@@ -167,19 +164,19 @@ public class InstructionTest {
     @Test
     public void testLwsp() throws MemoryException, CpuException {
         state.setReg(2, 15);
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 15), VAL);
+        memory.storeWord(15, VAL);
         loadInstruction(RV32C.cInstructionFormatCI(RV32C.Opcodes.CLWSP, RS1, 0));
         cpu.nextOpcode();
         assertEquals(VAL, state.getReg(RS1));
 
         state.setReg(2, 15);
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 35), VAL);
+        memory.storeWord(35, VAL);
         loadInstruction(RV32C.cInstructionFormatCI(RV32C.Opcodes.CLWSP, RS1, 20));
         cpu.nextOpcode();
         assertEquals(VAL, state.getReg(RS1));
 
         state.setReg(2, 0);
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) -15), VAL);
+        memory.storeWord( (-15) & 0xFFFF, VAL);
         loadInstruction(RV32C.cInstructionFormatCI(RV32C.Opcodes.CLWSP, RS1, -15));
         cpu.nextOpcode();
         assertNotEquals(VAL, state.getReg(RS1));
@@ -191,19 +188,19 @@ public class InstructionTest {
         state.setReg(2, 15);
         loadInstruction(RV32C.cInstructionFormatCSS(RV32C.Opcodes.CSWSP, RS1, 0));
         cpu.nextOpcode();
-        assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)15)));
+        assertEquals(VAL, memory.loadWord(15));
 
         state.setReg(RS1, VAL);
         state.setReg(2, 15);
         loadInstruction(RV32C.cInstructionFormatCSS(RV32C.Opcodes.CSWSP, RS1, 20));
         cpu.nextOpcode();
-        assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)35)));
+        assertEquals(VAL, memory.loadWord(35));
 
         state.setReg(RS1, VAL);
         state.setReg(2, 0);
         loadInstruction(RV32C.cInstructionFormatCSS(RV32C.Opcodes.CSWSP, RS1, -15));
         cpu.nextOpcode();
-        assertNotEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)-15)));
+        assertNotEquals(VAL, memory.loadWord((-15) & 0xFFFF));
     }
 
     @Test
@@ -218,19 +215,19 @@ public class InstructionTest {
     @Test
     public void testLw() throws MemoryException, CpuException {
         state.setReg(RS1, 15);
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 15), VAL);
+        memory.storeWord( 15, VAL);
         loadInstruction(RV32C.cInstructionFormatCL(RV32C.Opcodes.CLW, RD, RS1, 0));
         cpu.nextOpcode();
         assertEquals(VAL, state.getReg(RD));
 
         state.setReg(RS1, 15);
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) 35), VAL);
+        memory.storeWord(35, VAL);
         loadInstruction(RV32C.cInstructionFormatCL(RV32C.Opcodes.CLW, RD, RS1, 20));
         cpu.nextOpcode();
         assertEquals(VAL, state.getReg(RD ));
 
         state.setReg(RS1, 0);
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) -15), VAL);
+        memory.storeWord((-15) & 0xFFFF, VAL);
         loadInstruction(RV32C.cInstructionFormatCL(RV32C.Opcodes.CLW, RD, RS1, -15));
         cpu.nextOpcode();
         assertNotEquals(VAL, state.getReg(RD));
@@ -242,19 +239,19 @@ public class InstructionTest {
         state.setReg(RS1, 15);
         loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CSW, RS1, RS2, 0));
         cpu.nextOpcode();
-        assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)15)));
+        assertEquals(VAL, memory.loadWord(15));
 
         state.setReg(RS2, VAL);
         state.setReg(RS1, 15);
         loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CSW, RS1, RS2,20));
         cpu.nextOpcode();
-        assertEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)35)));
+        assertEquals(VAL, memory.loadWord(35));
 
         state.setReg(RS2, VAL);
         state.setReg(RS1, 0);
         loadInstruction(RV32C.cInstructionFormatCS(RV32C.Opcodes.CSW, RS1, RS2,-15));
         cpu.nextOpcode();
-        assertNotEquals(VAL, memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)-15)));
+        assertNotEquals(VAL, memory.loadWord((-15) & 0xFFFF));
     }
 
     @Test

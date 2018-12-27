@@ -1,22 +1,13 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
-import il.co.codeguru.corewars8086.cpu.exceptions.MisalignedMemoryLoadException;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.*;
-import il.co.codeguru.corewars8086.memory.MemoryException;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.memory.RealModeMemory;
-import il.co.codeguru.corewars8086.utils.Logger;
-
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 public class InstructionRunner {
 
     private CpuStateRiscV state;
-    private RealModeMemory memory;
-    private CpuRiscV cpu;
+    private Memory memory;
 
     public InstructionRunner(CpuRiscV cpu) {
-        this.cpu = cpu;
         this.state = cpu.getState();
         this.memory = cpu.getMemory();
     }
@@ -51,7 +42,7 @@ public class InstructionRunner {
      * AUIPC forms a 32-bit offset from the 20-bit U-immediate, filling in the lowest 12 bits with zeros, adds this offset to the pc, then places the result in register rd
      */
     public void auipc(InstructionFormatU i) {
-        state.setReg(i.getRd(), state.getPc() + (i.getImmediate() << 12)); // TODO:Set this in the U type instruciton
+        state.setReg(i.getRd(), state.getPc() + (i.getImmediate() << 12)); // TODO:Set this in the U type instruction
     }
 
     /**
@@ -67,24 +58,24 @@ public class InstructionRunner {
      * The SW (Store word) instruction stores 32-bit value from register rs2 to memory
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void sw(InstructionFormatS i) throws MemoryException {
-        memory.write32Bit(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImm())), state.getReg(i.getRs2()));
+    public void sw(InstructionFormatS i) {
+        memory.storeWord(state.getReg(i.getRs1()) + i.getImm(), state.getReg(i.getRs2()));
     }
 
     /**
      * The SH (Store Halfword) instruction stores 16-bit value from the low bits of register rs2 to memory
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void sh(InstructionFormatS i) throws MemoryException {
-        memory.write16Bit(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImm())), (short) state.getReg(i.getRs2()));
+    public void sh(InstructionFormatS i) {
+        memory.storeHalfWord(state.getReg(i.getRs1()) + i.getImm(), (short) state.getReg(i.getRs2()));
     }
 
     /**
      * The SB (Store Byte) instruction stores 8-bit value from the low bits of register rs2 to memory
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void sb(InstructionFormatS i) throws MemoryException {
-        memory.writeByte(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImm())), (byte) state.getReg(i.getRs2()));
+    public void sb(InstructionFormatS i) {
+        memory.storeByte(state.getReg(i.getRs1()) + i.getImm(), (byte) state.getReg(i.getRs2()));
     }
 
     /**
@@ -201,24 +192,24 @@ public class InstructionRunner {
      * The LW instruction loads a 32-bit value from memory into rd
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void lw(InstructionFormatI i) throws MemoryException {
-        state.setReg(i.getRd(), memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImmediate()))));
+    public void lw(InstructionFormatI i) {
+        state.setReg(i.getRd(), memory.loadWord(state.getReg(i.getRs1()) + i.getImmediate()));
     }
 
     /**
      * LH loads a 16-bit value from memory,then sign-extends to 32-bits before storing in rd
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void lh(InstructionFormatI i) throws MemoryException {
-        state.setReg(i.getRd(), memory.read16Bit(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImmediate()))));
+    public void lh(InstructionFormatI i) {
+        state.setReg(i.getRd(), memory.loadHalfWord(state.getReg(i.getRs1()) + i.getImmediate()));
     }
 
     /**
      * LHU loads a 16-bit value from memory,then zero-extends to 32-bits before storing in rd
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void lhu(InstructionFormatI i) throws MemoryException {
-        int val = memory.read16Bit(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImmediate())));
+    public void lhu(InstructionFormatI i) {
+        int val = memory.loadHalfWord(state.getReg(i.getRs1()) + i.getImmediate());
         state.setReg(i.getRd(), val & 0xFFFF);
     }
 
@@ -226,16 +217,16 @@ public class InstructionRunner {
      * LB loads a 8-bit value from memory,then sign-extends to 32-bits before storing in rd
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void lb(InstructionFormatI i) throws MemoryException {
-        state.setReg(i.getRd(), memory.readByte(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImmediate()))));
+    public void lb(InstructionFormatI i) {
+        state.setReg(i.getRd(), memory.loadByte(state.getReg(i.getRs1()) + i.getImmediate()));
     }
 
     /**
      * LBU loads a 8-bit value from memory,then zero-extends to 32-bits before storing in rd
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void lbu(InstructionFormatI i) throws MemoryException {
-        int val = memory.readByte(new RealModeAddress(ARENA_SEGMENT, (short) (state.getReg(i.getRs1()) + i.getImmediate())));
+    public void lbu(InstructionFormatI i) {
+        int val = memory.loadByte(state.getReg(i.getRs1()) + i.getImmediate());
         state.setReg(i.getRd(), val & 0xFF);
     }
 
@@ -244,12 +235,12 @@ public class InstructionRunner {
      * The offset is sign-extended and added to the pc to form the jump target address.  Jumps can therefore target a +-1 MiB range.
      * JAL stores the address of the instruction following the jump (pc+4) into register rd.
      */
-    public void jal(InstructionFormatUJ i) throws MisalignedMemoryLoadException {
+    public void jal(InstructionFormatUJ i) {
         state.setReg(i.getRd(), state.getPc() + 4);
         jump(state, i.getImmediate());
     }
 
-    public void jal(InstructionFormatUJ i, int instructionSize) throws MisalignedMemoryLoadException {
+    public void jal(InstructionFormatUJ i, int instructionSize) {
         state.setReg(i.getRd(), state.getPc() + instructionSize);
         jump(state, i.getImmediate(), instructionSize);
     }
@@ -260,12 +251,12 @@ public class InstructionRunner {
      * The address of the instruction following the jump (pc+4)is written to register rd.
      * Register x0 can be used as the destination if the result is not required
      */
-    public void jalr(InstructionFormatI i) throws MisalignedMemoryLoadException {
+    public void jalr(InstructionFormatI i) {
         state.setReg(i.getRd(), state.getPc() + 4);
         jump(state, state.getReg(i.getRs1()) + i.getImmediate());
     }
 
-    public void jalr(InstructionFormatI i, int instructionSize) throws MisalignedMemoryLoadException {
+    public void jalr(InstructionFormatI i, int instructionSize) {
         state.setReg(i.getRd(), state.getPc() + instructionSize);
         jump(state, state.getReg(i.getRs1()) + i.getImmediate(), instructionSize);
     }
@@ -273,59 +264,59 @@ public class InstructionRunner {
     /**
      * BEQ (Branch if Equal) takes the branch if registers rs1 and rs2 are equal
      */
-    public void beq(InstructionFormatSB i) throws MisalignedMemoryLoadException {
+    public void beq(InstructionFormatSB i) {
         beq(i,4);
     }
 
-    public void beq(InstructionFormatSB i, int instructionSize) throws MisalignedMemoryLoadException {
+    public void beq(InstructionFormatSB i, int instructionSize) {
         if (state.getReg(i.getRs1()) == state.getReg(i.getRs2())) jump(state, i.getImm(), instructionSize);
     }
 
     /**
      * BNE (Branch if Not Equal) takes the branch if registers rs1 and rs2 are not equal
      */
-    public void bne(InstructionFormatSB i) throws MisalignedMemoryLoadException {
+    public void bne(InstructionFormatSB i) {
         bne(i, 4);
     }
 
-    public void bne(InstructionFormatSB i, int instructionSize) throws MisalignedMemoryLoadException {
+    public void bne(InstructionFormatSB i, int instructionSize) {
         if (state.getReg(i.getRs1()) != state.getReg(i.getRs2())) jump(state, i.getImm(), instructionSize);
     }
 
     /**
      * BLT (Branch Less than) takes the branch if register rs1 is less than rs2 using signed comparision
      */
-    public void blt(InstructionFormatSB i) throws MisalignedMemoryLoadException {
+    public void blt(InstructionFormatSB i) {
         if (state.getReg(i.getRs1()) < state.getReg(i.getRs2())) jump(state, i.getImm());
     }
 
     /**
      * BLTU (Branch Less than Unsigned) takes the branch if register rs1 is less than rs2 using unsigned comparision
      */
-    public void bltu(InstructionFormatSB i) throws MisalignedMemoryLoadException {
+    public void bltu(InstructionFormatSB i) {
         if (state.getReg(i.getRs1()) + 0x80000000 < state.getReg(i.getRs2()) + 0x80000000) jump(state, i.getImm());
     }
 
     /**
      * BGE (Branch Greater or Equal) takes the branch if register rs1 is greater than rs2 or equal using signed comparision
      */
-    public void bge(InstructionFormatSB i) throws MisalignedMemoryLoadException {
+    public void bge(InstructionFormatSB i) {
         if (state.getReg(i.getRs1()) >= state.getReg(i.getRs2())) jump(state, i.getImm());
     }
 
     /**
      * BGE (Branch Greater or Equal Unsigned) takes the branch if register rs1 is greater than rs2 or equal using unsigned comparision
      */
-    public void bgeu(InstructionFormatSB i) throws MisalignedMemoryLoadException {
+    public void bgeu(InstructionFormatSB i) {
         if (state.getReg(i.getRs1()) + 0x80000000 >= state.getReg(i.getRs2()) + 0x80000000) jump(state, i.getImm());
     }
 
 
-    private void jump(CpuStateRiscV state, int immediate, int instructionSize) throws MisalignedMemoryLoadException {
+    private void jump(CpuStateRiscV state, int immediate, int instructionSize) {
         state.setPc(state.getPc() + immediate - instructionSize);
     }
 
-    private void jump(CpuStateRiscV state, int immediate) throws MisalignedMemoryLoadException {
+    private void jump(CpuStateRiscV state, int immediate) {
         jump(state, immediate, 4);
     }
 }

@@ -1,11 +1,11 @@
 package il.co.codeguru.corewars8086.war;
 
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
+import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.gui.IBreakpointCheck;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.utils.Logger;
 import il.co.codeguru.corewars8086.utils.Unsigned;
 
@@ -51,7 +51,7 @@ public class War {
      */
     private int m_nextFreeAddress;
     /** The 'physical' memory core */
-    private RealModeMemoryImpl m_core;
+    private Memory m_core;
 
     /** The number of the current warrior */
     private int m_currentWarrior;
@@ -93,7 +93,9 @@ public class War {
         m_warriors = new Warrior[MAX_WARRIORS];
         m_numWarriors = 0;
         m_numWarriorsAlive = 0;
-        m_core = new RealModeMemoryImpl();
+        Logger.log("here, hello");
+        m_core = new Memory();
+        Logger.log("here, hell2");
         m_nextFreeAddress = RealModeAddress.PARAGRAPH_SIZE * (ARENA_SEGMENT + RealModeAddress.PARAGRAPHS_IN_SEGMENT);
 
         // initialize arena
@@ -473,7 +475,7 @@ public class War {
     	return this.isSingleRound;
     }
     
-    public RealModeMemoryImpl getMemory(){
+    public Memory getMemory(){
     	return m_core;
     }
     

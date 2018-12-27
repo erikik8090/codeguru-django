@@ -258,7 +258,6 @@ public class Competition {
     // return true if needs another round
     public void startWar(WarriorGroup[] warriorGroups) throws Exception
     {
-        //Console.log("runWar");
         currentWar = new War(memoryEventListener, competitionEventListener, compState.startPaused);
         currentWar.setSeed(this.seed);
         competitionEventListener.onWarPreStartClear();

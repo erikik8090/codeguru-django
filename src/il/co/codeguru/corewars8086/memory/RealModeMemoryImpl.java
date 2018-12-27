@@ -1,8 +1,5 @@
 package il.co.codeguru.corewars8086.memory;
 
-import com.google.gwt.typedarrays.client.Int8ArrayNative;
-import il.co.codeguru.corewars8086.utils.Logger;
-
 /**
  * Implements the RealModeMemory interface using a buffer.
  *
@@ -14,7 +11,7 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
     public MemoryEventListener listener;
 
     /** Actual memory data */
-    public byte[] m_data;
+    public byte[] data;
     //TODO: Remove this and return to byte[] - separate the gwt framework from the core if it doesn't mean too much overhead
     //public Int8ArrayNative m_data;
 
@@ -23,7 +20,7 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
      */
     public RealModeMemoryImpl() {
         //m_data = Int8ArrayNative.create(RealModeAddress.MEMORY_SIZE);
-        m_data = new byte[RealModeAddress.MEMORY_SIZE];
+        data = new byte[RealModeAddress.MEMORY_SIZE];
     }
 
     /**
@@ -35,16 +32,16 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
      * @throws MemoryException  on any error. 
      */
     public byte readByte(RealModeAddress address) {
-        return m_data[address.getLinearAddress()];
+        return data[address.getLinearAddress()];
     }
     public byte readByte(int linearAddress) {
-        return m_data[linearAddress % RealModeAddress.MEMORY_SIZE];
+        return data[linearAddress % RealModeAddress.MEMORY_SIZE];
     }
 
     public int length() {
-        return m_data.length;
+        return data.length;
     }
-    public byte[] getMemory() {return m_data;}
+    public byte[] getMemory() {return data;}
     /**
      * Writes a single byte to the specified address.
      *
@@ -54,7 +51,7 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
      * @throws MemoryException  on any error. 
      */
     public void writeByte(RealModeAddress address, byte value) {
-        m_data[address.getLinearAddress()] = value;
+        data[address.getLinearAddress()] = value;
         if (listener != null) {
             listener.onMemoryWrite(address, value);
         }
@@ -71,10 +68,10 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
      * @throws MemoryException  on any error. 
      */
     public byte readExecuteByte(RealModeAddress address) {
-        return m_data[address.getLinearAddress()];
+        return data[address.getLinearAddress()];
     }
     public byte readExecuteByte(int linearAddress) {
-        return m_data[linearAddress];
+        return data[linearAddress];
     }
 
 

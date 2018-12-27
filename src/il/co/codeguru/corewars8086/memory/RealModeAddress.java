@@ -2,8 +2,6 @@ package il.co.codeguru.corewars8086.memory;
 
 import il.co.codeguru.corewars8086.utils.Unsigned;
 
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
-
 /**
  * Wrapper class for a Real-Mode segment:offset address.
  * 

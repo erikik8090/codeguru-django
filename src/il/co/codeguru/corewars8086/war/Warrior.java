@@ -3,6 +3,7 @@ package il.co.codeguru.corewars8086.war;
 import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
+import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
@@ -35,7 +36,7 @@ public class Warrior
         String name,
         String label,
         int codeSize,
-        RealModeMemory core,
+        Memory core,
         RealModeAddress loadAddress,
         RealModeAddress initialStack,
         RealModeAddress groupSharedMemory,

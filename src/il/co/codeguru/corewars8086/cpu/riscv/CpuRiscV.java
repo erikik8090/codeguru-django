@@ -6,7 +6,6 @@ import il.co.codeguru.corewars8086.cpu.riscv.rv32c.InstructionDecoderRv32c;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.utils.Logger;
 
 import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
@@ -14,7 +13,7 @@ import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 public class CpuRiscV {
 
     private CpuStateRiscV state;
-    private RealModeMemory memory;
+    private Memory memory;
     private InstructionDecoder decoder;
     private InstructionDecoderRv32c cDecoder;
     private InstructionRunner runner;
@@ -23,11 +22,11 @@ public class CpuRiscV {
         return state;
     }
 
-    public RealModeMemory getMemory() {
+    public Memory getMemory() {
         return memory;
     }
 
-    public CpuRiscV(CpuStateRiscV state, RealModeMemory memory)
+    public CpuRiscV(CpuStateRiscV state, Memory memory)
     {
         this.state = state;
         this.memory = memory;
@@ -41,7 +40,7 @@ public class CpuRiscV {
         if(tryRv32cSet())
             return;
 
-        int rawCode = memory.read32Bit(new RealModeAddress(ARENA_SEGMENT, (short)state.getPc()));
+        int rawCode = memory.loadWord(state.getPc());
         InstructionFormatBase instructionRaw = new InstructionFormatBase(rawCode);
 
         Instruction instruction = decoder.decode(instructionRaw);
@@ -53,7 +52,7 @@ public class CpuRiscV {
 
     private boolean tryRv32cSet() throws CpuException, MemoryException
     {
-        short rawComppressedCode = memory.read16Bit(new RealModeAddress(ARENA_SEGMENT, (short)state.getPc()));
+        short rawComppressedCode = memory.loadHalfWord(state.getPc());
         CInstructionFormatBase commpressedInstruction = new CInstructionFormatBase(rawComppressedCode);
         Instruction i = cDecoder.decode(commpressedInstruction);
         if(i!=null)

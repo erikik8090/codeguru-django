@@ -17,6 +17,7 @@ import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.war.Warrior;
 
 import static il.co.codeguru.corewars8086.gui.code_editor.CodeEditor.*;
+import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
 import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 public class Debugger {
@@ -139,7 +140,7 @@ public class Debugger {
         this.m_lastDbgAddr = ipInsideArena;
         this.m_lastDbgAddrEnd = m_lastDbgAddr + 1;
         m_lastIsAlive = isAlive;
-        while (m_lastDbgAddrEnd < 0x10000 && m_dbglines[m_lastDbgAddrEnd] == null)
+        while (m_lastDbgAddrEnd < (ARENA_SEGMENT * PARAGRAPH_SIZE) && m_dbglines[m_lastDbgAddrEnd] == null)
             this.m_lastDbgAddrEnd = m_lastDbgAddrEnd + 1;
 
     }
@@ -449,9 +450,9 @@ public class Debugger {
             if (m_memWriteState != EWriteState.RUN)
                 return;
             int absAddr = address.getLinearAddress();
-            if (absAddr < ARENA_SEGMENT*RealModeAddress.PARAGRAPH_SIZE || absAddr >= ARENA_SEGMENT*RealModeAddress.PARAGRAPH_SIZE + War.ARENA_SIZE)
+            if (absAddr < ARENA_SEGMENT * PARAGRAPH_SIZE || absAddr >= ARENA_SEGMENT * PARAGRAPH_SIZE + War.ARENA_SIZE)
                 return;
-            int ipInsideArena = absAddr - 0x1000 *0x10; // arena * paragraph
+            int ipInsideArena = absAddr - (ARENA_SEGMENT * PARAGRAPH_SIZE); // arena * paragraph
             final int cIpInsideArea = ipInsideArena;
 
             int page = ipInsideArena / codeEditor.PAGE_SIZE;
@@ -474,7 +475,7 @@ public class Debugger {
                     // rewriting only a single Opcode so its not possible to cross to a new Opcode which will need reparsing
                     setByte(ipInsideArena, getMemory().readByte(ipInsideArena + CODE_ARENA_OFFSET));
                     ++ipInsideArena;
-                } while (ipInsideArena < 0x10000 && getDbgLine(ipInsideArena) == null);
+                } while (ipInsideArena < (ARENA_SEGMENT * PARAGRAPH_SIZE)&& getDbgLine(ipInsideArena) == null);
             }
 
             // if we just edited the byte under the debugger, need to reparse it

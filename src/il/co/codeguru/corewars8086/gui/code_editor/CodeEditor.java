@@ -19,6 +19,7 @@ import il.co.codeguru.corewars8086.war.*;
 import java.util.ArrayList;
 
 import static elemental2.dom.DomGlobal.document;
+import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
 import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 public class CodeEditor implements CompetitionEventListener, MemoryEventListener, IBreakpointCheck
@@ -37,7 +38,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
     private boolean m_isDebugMode = false;
 
 
-    static final int CODE_ARENA_OFFSET = 0x10000;
+    static final int CODE_ARENA_OFFSET = ARENA_SEGMENT * PARAGRAPH_SIZE;
 
     @Override
     public void onWarPreStartClear() {}

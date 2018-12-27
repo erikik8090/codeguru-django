@@ -22,7 +22,7 @@ import java.util.Random;
  */
 public class War {
     /** Arena's code segment */
-    public final static short ARENA_SEGMENT = 0x1000;	
+    public final static short ARENA_SEGMENT = 0x100;
     /** Arena's size in bytes (= size of a single segment) */
     public final static int ARENA_SIZE =
         RealModeAddress.PARAGRAPHS_IN_SEGMENT * RealModeAddress.PARAGRAPH_SIZE;
@@ -31,7 +31,7 @@ public class War {
     /** Group-shared private memory size */
     private final static short GROUP_SHARED_MEMORY_SIZE = 1024;
     /** Arena is filled with this byte */
-    public final static byte ARENA_BYTE = (byte)0x00;
+    private final static byte ARENA_BYTE = (byte)0x00;
     /** Maximum number of warriors in a fight */
     private final static int MAX_WARRIORS = 20;
     /** Maximum attempts to load a warrior to the Arena */

@@ -13,7 +13,9 @@ import il.co.codeguru.corewars8086.war.CompetitionEventListener;
 import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.war.Warrior;
 
+import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
 import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
+import static il.co.codeguru.corewars8086.war.War.ARENA_SIZE;
 
 /**
  * The main GUI class for core-wars.
@@ -34,11 +36,11 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
     /**
      * the canvas which show the core war memory area
      */
-    public Canvas warCanvas;
+    Canvas warCanvas;
     public CpuFrame cpuframe;
-    public JButton btnPause;
-    public JButton btnSingleRound;
-    public JSlider speedSlider;
+    JButton btnPause;
+    JButton btnSingleRound;
+    JSlider speedSlider;
     /**
      * the message area show misc. information about the current fight
      */
@@ -225,10 +227,10 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
         if (!mainWnd.isBattleShown())
             return; // canvas not shown, no reason to update it
 
-        int ipInsideArena = address.getLinearAddress() - 0x1000 * 0x10; // arena * paragraph
+        int absAddress = address.getLinearAddress() - (ARENA_SEGMENT * PARAGRAPH_SIZE); // arena * paragraph
 
-        if (address.getLinearAddress() >= ARENA_SEGMENT * 0x10 && address.getLinearAddress() < 2 * ARENA_SEGMENT * 0x10) {
-            warCanvas.paintPixel(Unsigned.unsignedShort(ipInsideArena), (byte) competition.getCurrentWarrior(), value);
+        if (absAddress >= 0 && absAddress < ARENA_SIZE) {
+            warCanvas.paintPixel(Unsigned.unsignedShort(absAddress), (byte) competition.getCurrentWarrior(), value);
         }
     }
 
@@ -330,7 +332,7 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
                 CpuStateRiscV state = currentWar.getWarrior(i).getCpuState();
                 short ip = (short) state.getPc();
 
-                int ipInsideArena = RealModeAddress.linearAddress(ARENA_SEGMENT, ip) - 0x10000;
+                int ipInsideArena = RealModeAddress.linearAddress(ARENA_SEGMENT, ip) - (ARENA_SEGMENT * PARAGRAPH_SIZE);
 
                 this.warCanvas.paintPointer((char) ipInsideArena, (byte) i);
             }
@@ -357,11 +359,10 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
         /**
          * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
          */
-        public Object getListCellRendererComponent(JList list, Object value,
-                                                   int index, boolean isSelected, boolean cellHasFocus) {
+        public Object getListCellRendererComponent(Object value, int index) {
             WarriorInfo info = (WarriorInfo) value;
 
-            String text = info.name;// + " (" + warriorScore + ")";
+            String text = info.name;
             if (!info.alive) {
                 // strike out dead warriors
                 text = "<html><S>" + text + "</S></html>";

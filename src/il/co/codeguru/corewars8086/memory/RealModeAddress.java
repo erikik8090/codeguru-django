@@ -2,6 +2,8 @@ package il.co.codeguru.corewars8086.memory;
 
 import il.co.codeguru.corewars8086.utils.Unsigned;
 
+import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
+
 /**
  * Wrapper class for a Real-Mode segment:offset address.
  * 
@@ -79,7 +81,7 @@ public class RealModeAddress {
     /** Various real-mode memory constants. */	
     public static final int NUM_PARAGRAPHS = 64 * 1024;	
     public static final int PARAGRAPH_SIZE = 0x10;	
-    public static final int PARAGRAPHS_IN_SEGMENT = 0x1000;	
+    public static final int PARAGRAPHS_IN_SEGMENT = 0x1000;
     public static final int MEMORY_SIZE = NUM_PARAGRAPHS * PARAGRAPH_SIZE;
 
     /** 16bit Real-Mode segment. */	

@@ -1,24 +1,24 @@
 package il.co.codeguru.corewars8086.gui;
 
 import elemental2.dom.*;
-import elemental2.dom.CanvasRenderingContext2D.StrokeStyleUnionType;
 import elemental2.dom.CanvasRenderingContext2D.FillStyleUnionType;
-
-
-import il.co.codeguru.corewars8086.gui.widgets.*;
+import il.co.codeguru.corewars8086.gui.widgets.Color;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
-import il.co.codeguru.corewars8086.gui.widgets.MouseEvent;
+import il.co.codeguru.corewars8086.gui.widgets.Dimension;
+import il.co.codeguru.corewars8086.gui.widgets.JComponent;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
 import il.co.codeguru.corewars8086.war.War;
+
+import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
+import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 
 public class Canvas extends JComponent<HTMLCanvasElement> {
 
 	public static final int BOARD_SIZE = 256;
 	public static final int DOT_SIZE = 3;
-	//public static final int MARGIN_SIZE = 45; // in pixels
     public static final int MARGIN_TOP = 20, MARGIN_RIGHT = 20, MARGIN_BOTTOM = 45, MARGIN_LEFT = 45;
     public static final int BOARD_SIZE_PX = BOARD_SIZE * DOT_SIZE;
 
@@ -33,20 +33,15 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
 	private byte[][] pointer;
 	private byte[][] values;
 
-	//private EventMulticasterMouse eventCaster;
-	//private MouseAddressRequest eventHandler;
-
-	//private int MouseX, MouseY;
-
 	private float m_zrHscale, m_zrVscale, m_zrX, m_zrY; // zoom rect
     private boolean m_showContent = false;
     private Path2D m_memclip, m_coordXclip, m_coordYclip;
 
-    HTMLInputElement m_dummyInput; // used to have something that could get input focus
-    HTMLElement m_hoverCellInfo;
-    RealModeMemoryImpl m_mem = null;
-    boolean m_indebug = false;
-    War m_currentWar = null;
+    private HTMLInputElement m_dummyInput; // used to have something that could get input focus
+    private HTMLElement m_hoverCellInfo;
+    private RealModeMemoryImpl m_mem = null;
+    private boolean m_indebug = false;
+    private War m_currentWar = null;
 
     class Turtle {
         float x, y;
@@ -192,7 +187,7 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
         m_mem = war.getMemory();
         m_currentWar = war;
         m_indebug = true;
-        int addr = 0x10000;
+        int addr = ARENA_SEGMENT * PARAGRAPH_SIZE;
         for (int y = 0; y < BOARD_SIZE; y++)
         {
             for (int x = 0; x < BOARD_SIZE; x++)
@@ -484,8 +479,8 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
         int mx = (int)( (x - m_zrX)/ DOT_SIZE/m_zrHscale );
         int my = (int)( (y - m_zrY)/ DOT_SIZE/m_zrVscale );
 
-        int addr = (int)(mx+my*256) & 0xffff;
-        int v = m_mem.readByte(addr + 0x10000) & 0xff;
+        int addr = (mx+my*256) & 0xffff;
+        int v = m_mem.readByte(addr + (ARENA_SEGMENT * PARAGRAPH_SIZE)) & 0xff;
 
         StringBuilder sb = new StringBuilder();
         sb.append("0x");
@@ -583,7 +578,7 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
                     else
                         ev = ev & 0xf0 | v;
                     values[ix][iy] = (byte)ev;
-                    m_mem.writeByte(new RealModeAddress((short)0x1000, (short)(ix+iy*256)), (byte)ev);
+                    m_mem.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)(ix+iy*256)), (byte)ev);
                     moveCursor(0.5, 0);
 
                 }

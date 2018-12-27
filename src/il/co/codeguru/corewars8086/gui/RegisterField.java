@@ -1,12 +1,5 @@
 package il.co.codeguru.corewars8086.gui;
 
-//import java.awt.BorderLayout;
-//import java.awt.GridLayout;
-
-//import javax.swing.JLabel;
-//import javax.swing.JPanel;
-//import javax.swing.JTextField;
-
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLInputElement;
 import il.co.codeguru.corewars8086.gui.widgets.*;
@@ -68,10 +61,10 @@ public class RegisterField /*extends JPanel*/ {
 		if (m_base == 16)
 			textField.value = Format.hex(value,8);
 		else
-			textField.value = Integer.toString((int)value & 0xffff);
+			textField.value = Integer.toString(value & 0xffff);
 	}
 
-	public short getValue() throws Exception {
+	public short getValue() {
 		return (short) Integer.parseInt(textField.value, 16);
 	}
 

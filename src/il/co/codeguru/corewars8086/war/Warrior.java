@@ -1,16 +1,12 @@
 package il.co.codeguru.corewars8086.war;
 
+import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
-import il.co.codeguru.corewars8086.cpu.x86.Cpu;
-import il.co.codeguru.corewars8086.cpu.exceptions.CpuException;
-import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.memory.MemoryException;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryRegion;
-import il.co.codeguru.corewars8086.memory.RestrictedAccessRealModeMemory;
-import il.co.codeguru.corewars8086.utils.Logger;
 
 
 /**
@@ -121,10 +117,10 @@ public class Warrior
      * the warrior's speed).
      */
     public short getEnergy() {
-        return m_state.getEnergy();
+        return 0;
     }
     public void setEnergy(short value) {
-        m_state.setEnergy(value);
+
     }
 
     /**
@@ -156,29 +152,7 @@ public class Warrior
 
         // initialize registers
         m_state.setReg(1, loadAddress.getOffset() & 0xFFFF);
-        m_state.setReg(2,0);
-        m_state.setReg(3,(short)0);
-        m_state.setReg(4,(short)0);
-
-        m_state.setDS(loadAddress.getSegment());
-        m_state.setES(groupSharedMemory.getSegment());
-        m_state.setSI((short)0);
-        m_state.setDI((short)0);
-
-        m_state.setSS(initialStack.getSegment());
-        m_state.setBP((short)0);
-        m_state.setSP(initialStack.getOffset());
-
-        m_state.setCS(loadAddress.getSegment());
         m_state.setPc(loadAddress.getOffset() & 0xFFFF);
-        m_state.setFlags((short)0);
-
-        // initialize Energy
-        m_state.setEnergy((short)0);
-
-        // initialize bombs
-        m_state.setBomb1Count((byte)2);
-        m_state.setBomb2Count((byte)1);
     }
     
     public CpuStateRiscV getCpuState(){

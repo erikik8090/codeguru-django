@@ -3,7 +3,6 @@ package il.co.codeguru.corewars8086.gui;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
-import il.co.codeguru.corewars8086.cpu.x86.CpuState;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.RealModeAddress;
@@ -17,6 +16,8 @@ import il.co.codeguru.corewars8086.war.Warrior;
 
 import java.util.HashMap;
 
+import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
+
 public class CpuFrame  implements CompetitionEventListener, MemoryEventListener {
 	
 	//private War currentWar;
@@ -29,16 +30,13 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 
 	private RegisterField[] registers;
-	private RegisterField regF, regPc;
-	
-	private FlagFields flagOF,flagDF,flagIF,flagTF,
-						flagSF,flagZF,flagAF,flagPF,
-						flagCF;
+	private RegisterField regPc;
+
 
     private HTMLElement cpuPanel;
 
-    public MemRegionView stackView;
-	public MemRegionView sharedMemView;
+    MemRegionView stackView;
+	MemRegionView sharedMemView;
 
     public void setVisible(boolean v) {
         if (v)
@@ -91,9 +89,6 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 		switch(name) {
 			case "PC": state.setPc(v); changedCSIP(); break;
-			case "Energy": state.setEnergy((short)v); break;
-			case "Flags": state.setFlags((short)v); updateFlagBoxes(state); break;
-
 			default:
 				state.setReg(Integer.valueOf(name), v);
 		}
@@ -123,38 +118,11 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 	public void onWriteState(MemoryEventListener.EWriteState state)
 	{}
 
-	public void updateFlagBoxes(CpuState state) {
-		flagOF.setValue( state.getOverflowFlag());
-		flagDF.setValue( state.getDirectionFlag() );
-		flagIF.setValue( state.getInterruptFlag() );
-		flagTF.setValue( state.getTrapFlag() );
-		flagSF.setValue( state.getSignFlag() );
-		flagZF.setValue( state.getZeroFlag() );
-		flagAF.setValue( state.getAuxFlag() );
-		flagPF.setValue( state.getParityFlag() );
-		flagCF.setValue( state.getCarryFlag() );
-	}
-
 	public void flagChanged_callback(String name, boolean v)
 	{
 		War currentWar = competition.getCurrentWar();
 		if (currentWar == null)
 			return;
-
-		CpuState state = currentWar.getWarriorByLabel(m_currentWarriorLabel).getCpuState();
-
-		switch(name) {
-		case "OF": state.setOverflowFlag(v); break;
-		case "DF": state.setDirectionFlag(v); break;
-		case "IF": state.setInterruptFlag(v); break;
-		case "TF": state.setTrapFlag(v); break;
-		case "SF": state.setSignFlag(v); break;
-		case "ZF": state.setZeroFlag(v); break;
-		case "AF": state.setAuxFlag(v); break;
-		case "PF": state.setParityFlag(v); break;
-		case "CF": state.setCarryFlag(v); break;
-		}
-		regF.setValue( state.getFlags());
 	}
 
 	public CpuFrame(Competition c, CompetitionWindow mainwnd)
@@ -172,19 +140,6 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 			registers[i] = new RegisterField(Integer.toString(i), this);
 		}
 		regPc = new RegisterField("PC", this);
-		regF = new RegisterField("Flags", this);
-		
-		//Flags
-		
-		flagOF = new FlagFields("OF", this);
-		flagDF = new FlagFields("DF", this);
-		flagIF = new FlagFields("IF", this);
-		flagTF = new FlagFields("TF", this);
-		flagSF = new FlagFields("SF", this);
-		flagZF = new FlagFields("ZF", this);
-		flagAF = new FlagFields("AF", this);
-		flagPF = new FlagFields("PF", this);
-		flagCF = new FlagFields("CF", this);
 
 		stackView = new MemRegionView("stackList", "mk");
 		sharedMemView = new MemRegionView("sharedMemList", "mh");
@@ -207,8 +162,6 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		{
 			reg.setBase(base);
 		}
-		regF.setBase(base);
-		// setBase already updates the value if that's ok
 
         for (WatchEntry entry : m_watches.values()) {
             entry.base = base;
@@ -234,10 +187,9 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 			registers[i].setValue(state.getReg(i));
 		}
 		regPc.setValue(state.getPc());
-		regF.setValue(state.getFlags());
-		
-		updateFlagBoxes(state);
-		stackView.moveToLine(RealModeAddress.linearAddress(state.getSS(), state.getSP()));
+
+		//TODO: do this when re-implementing the stack
+		//stackView.moveToLine(RealModeAddress.linearAddress(state.getSS(), state.getSP()));
 
 		// update watches;
 		m_stateAccess.state = state;
@@ -257,17 +209,10 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		        throw new Exception("invalid state");
             }
             try {
-				switch (name) {
-					case "ENERGY":
-						return state.getEnergy();
-					case "FLAGS":
-						return state.getFlags();
-					default:
-						return (short) state.getReg(Integer.valueOf(name));
-				}
+				return (short) state.getReg(Integer.valueOf(name));
 			}
 			catch(IndexOutOfBoundsException e) {
-				throw new RuntimeException("unknown register name " + name); // should not happen since we check before
+				throw new RuntimeException("Unknown register name: " + name); // should not happen since we check before
 			}
 		}
 
@@ -279,8 +224,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		@Override
 		public int getMemory(int addr, int seg, int size) throws Exception {
 			short sseg = (short)seg;
-			if (seg == -1)
-				sseg = state.getDS();
+			if (seg == -1) sseg = ARENA_SEGMENT;
 			int linaddr = RealModeAddress.linearAddress(sseg, (short)addr);
 			if (size == 1)
 				return memory.readByte(linaddr) & 0xff;
@@ -332,7 +276,6 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
         m_watches.put(watchId, entry);
         entry.resultElem = (HTMLElement)DomGlobal.document.getElementById("watch" + Integer.toString(watchId) + "_val" );
         assert entry.resultElem != null : "did not find watch result element";
-        Console.debug("Watchs: " + Integer.toString(m_watches.size()));
     }
 
     void j_delWatch(int watchId) {
@@ -374,10 +317,9 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		return true;
 	}
 
-
 	// set the mem regions with the correct address region and values
 	// force if we must reread the memory in a new battle (don't keep the old one but it may have the same regions)
-	void initMemRegions(boolean force)
+	private void initMemRegions(boolean force)
 	{
 		War currentWar = competition.getCurrentWar();
 		if (currentWar == null)
@@ -398,14 +340,11 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 	@Override
 	public void onWarStart() {
 		m_currentWarriorIndex = -1; // invalidate
-
 		initMemRegions(true);
-
 	}
 
 	@Override
 	public void onWarEnd(int reason, String winners, boolean inDebug) {
-		//m_currentWarriorIndex = -1;
 	}
 
 	@Override

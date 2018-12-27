@@ -19,6 +19,7 @@ import il.co.codeguru.corewars8086.war.*;
 import java.util.ArrayList;
 
 import static elemental2.dom.DomGlobal.document;
+import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 public class CodeEditor implements CompetitionEventListener, MemoryEventListener, IBreakpointCheck
 {
@@ -681,7 +682,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                 continue;
             }
 
-            String msg = getDisassemblerErrorMessage(binbuf, dis, lineNum, line);
+            String msg = getDisassemblerErrorMessage(dis, lineNum, line);
 
             if (msg != null)
             {
@@ -713,7 +714,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
     }
 
-    private String getDisassemblerErrorMessage(byte[] binbuf, IDisassembler dis, int lineNum, LstLine line) {
+    private String getDisassemblerErrorMessage(IDisassembler dis, int lineNum, LstLine line) {
         String msg = null;
         try {
             dis.reset(line.address, line.address + line.opcodesCount);
@@ -725,10 +726,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
         //TODO: Change this to its own exception type
         catch(IDisassembler.DisassemblerException e) {
-            msg = Integer.toString(lineNum+1) + ": Although this is a legal x86 Opcode, codewars8086 does not support it";
-            //int eptr = dis.getPointer() - 1;
-            //if (eptr >= 0 && eptr < binbuf.length)
-            //   msg += ", Opcode = 0x" + Format.hex2(binbuf[eptr] & 0xff);
+            msg = Integer.toString(lineNum+1) + ": Although this is a legal RISC-V Opcode, codewars-risc-v does not support it";
         }
         catch(RuntimeException e) {
             Console.error("failed parsing binbuf RuntimeException"); // this should not happen. only happens for missing cases
@@ -752,7 +750,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     public boolean shouldBreak(CpuStateRiscV state)
     {
-        int absAddr = RealModeAddress.linearAddress(state.getCS(), (short)state.getPc());
+        int absAddr = RealModeAddress.linearAddress(ARENA_SEGMENT, (short)state.getPc());
         int arenaAddr = absAddr - CODE_ARENA_OFFSET;
         return debugger.getDbgBreakpoint(arenaAddr) != null;
     }

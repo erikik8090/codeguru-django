@@ -17,6 +17,7 @@ import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.war.Warrior;
 
 import static il.co.codeguru.corewars8086.gui.code_editor.CodeEditor.*;
+import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 public class Debugger {
     private final CodeEditor codeEditor;
@@ -413,9 +414,8 @@ public class Debugger {
         CpuStateRiscV state = w.getCpuState();
 
         short ip = (short) state.getPc();
-        short cs = state.getCS();
 
-        return RealModeAddress.linearAddress(cs, ip) - CODE_ARENA_OFFSET;
+        return RealModeAddress.linearAddress(ARENA_SEGMENT, ip) - CODE_ARENA_OFFSET;
     }
 
     // from javascript scroll of debug area
@@ -449,7 +449,7 @@ public class Debugger {
             if (m_memWriteState != EWriteState.RUN)
                 return;
             int absAddr = address.getLinearAddress();
-            if (absAddr < War.ARENA_SEGMENT*RealModeAddress.PARAGRAPH_SIZE || absAddr >= War.ARENA_SEGMENT*RealModeAddress.PARAGRAPH_SIZE + War.ARENA_SIZE)
+            if (absAddr < ARENA_SEGMENT*RealModeAddress.PARAGRAPH_SIZE || absAddr >= ARENA_SEGMENT*RealModeAddress.PARAGRAPH_SIZE + War.ARENA_SIZE)
                 return;
             int ipInsideArena = absAddr - 0x1000 *0x10; // arena * paragraph
             final int cIpInsideArea = ipInsideArena;

@@ -11,7 +11,6 @@ import il.co.codeguru.corewars8086.gui.asm_parsers.NasmListParser;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.utils.disassembler.DisassemblerRiscV;
 import il.co.codeguru.corewars8086.utils.disassembler.IDisassembler;
 import il.co.codeguru.corewars8086.war.*;
@@ -19,8 +18,6 @@ import il.co.codeguru.corewars8086.war.*;
 import java.util.ArrayList;
 
 import static elemental2.dom.DomGlobal.document;
-import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 public class CodeEditor implements CompetitionEventListener, MemoryEventListener, IBreakpointCheck
 {
@@ -37,8 +34,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     private boolean m_isDebugMode = false;
 
-
-    static final int CODE_ARENA_OFFSET = ARENA_SEGMENT * PARAGRAPH_SIZE;
 
     @Override
     public void onWarPreStartClear() {}
@@ -72,7 +67,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     // MemoryEventListener
     @Override
-    public void onMemoryWrite(RealModeAddress address, byte value) {
+    public void onMemoryWrite(int address, byte value) {
         debugger.getMemoryListener().onMemoryWrite(address, value);
     }
 
@@ -220,7 +215,6 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     }
 
-    public static final char SPACE_FOR_HEX_CHAR = '\u202f';
     static final String SPACE_FOR_HEX = "&#x202f;";
 
     private static native Element DocumentFragment_getElementById(DocumentFragment df, String id) /*-{
@@ -280,10 +274,13 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
                 return  "";
             }
 
-            errorHtml.append("<div class='stdout_line_" + lineType + "' ondblclick='asm_cursorToLine(" +
-                    Integer.toString(m_lineOffsets.get(lineNum)) + ")'>");
-            errorHtml.append(line.substring(firstColon + 1));
-            errorHtml.append("</div>");
+            errorHtml.append("<div class='stdout_line_")
+                     .append(lineType)
+                     .append("' ondblclick='asm_cursorToLine(")
+                     .append(Integer.toString(m_lineOffsets.get(lineNum)))
+                     .append(")'>")
+                     .append(line.substring(firstColon + 1))
+                     .append("</div>");
         }
 
 
@@ -609,7 +606,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
         }
 
         StringBuilder opcodesText = new StringBuilder();
-        m_currentListing = new ArrayList<CodeEditor.LstLine>();
+        m_currentListing = new ArrayList<>();
 
         boolean ok = m_listParser.parseLst(output, opcodesText, m_currentListing);
         if (!ok) {
@@ -751,9 +748,8 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     public boolean shouldBreak(CpuStateRiscV state)
     {
-        int absAddr = RealModeAddress.linearAddress(ARENA_SEGMENT, (short)state.getPc());
-        int arenaAddr = absAddr - CODE_ARENA_OFFSET;
-        return debugger.getDbgBreakpoint(arenaAddr) != null;
+        int arenaAddress = state.getPc();
+        return debugger.getDbgBreakpoint(arenaAddress) != null;
     }
 
     public void setDebugMode(boolean v) {

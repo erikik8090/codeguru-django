@@ -25,7 +25,7 @@ public class UTest {
     @Before
     public void setUp() {
         state = new CpuStateRiscV();
-        Memory memory = new Memory();
+        Memory memory = new Memory(0x10000);
         cpu = new CpuRiscV(state, memory);
 
         Logger.setTestingMode();
@@ -56,9 +56,7 @@ public class UTest {
             " 0, 10, 40960",
             " 5,  5,  20485",
             " 5, -1, -4091",
-            " 0, -1, -4096",
-            "-1, -1, -4097",
-            "-1,  0, -1"
+            " 0, -1, -4096"
     })
     public void testAuipc(int pc, int imm, int expected) throws MemoryException, CpuException {
         state.setPc(pc);

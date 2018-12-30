@@ -155,19 +155,23 @@ public class PlayersPanel
 
     public static String blindRanger =
             "# Technique - Blind Ranger\n" +
+            "li x4, 0xFFFF\n" +
+            "loop:\n" +
             "add x2, x2, 750\n" +
-            "add x1, x1, x2\n" +
-            "sw x2, 32(x1)\n" +
-            "sub x1, x1, x2\n" +
-            "j x1\n";
+            "add x3, x1, x2\n" +
+            "and x3, x3, x4\n" +
+            "sw x2, 32(x3)\n" +
+            "j loop\n";
 
     public static String blindWarrior =
             "# Technique - Blind Knight\n" +
+            "li x4, 0xFFFF\n" +
+            "loop:\n" +
             "add x2, x2, 4\n" +
-            "add x1, x1, x2\n" +
-            "sw x2, 16(x1)\n" +
-            "sub x1, x1, x2\n" +
-            "j x1\n";
+            "add x3, x1, x2\n" +
+            "and x3, x3, x4\n" +
+            "sw x2, 32(x3)\n" +
+            "j loop\n";
 
     public static String still =
             "# Technieque - Stand Still\n" +

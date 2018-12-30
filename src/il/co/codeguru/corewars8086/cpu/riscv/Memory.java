@@ -1,28 +1,38 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.memory.RealModeMemoryImpl;
+import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
+public class Memory {
 
-public class Memory extends RealModeMemoryImpl {
+    public MemoryEventListener listener;
 
-    //private byte[] data;
-/*
+    //private RealModeMemoryImpl data = new RealModeMemoryImpl();
+
+    public byte[] getByteArray()
+    {
+        return data;
+    }
+
+    private byte[] data;
+
     public Memory(int size)
     {
-        data = new byte[size];
+        data= new byte[size];
     }
 
     public Memory(byte[] data)
     {
         this.data = data;
     }
-*/
+
     public void storeByte(int index, byte value)
     {
         //data[index] = value;
-        writeByte(new RealModeAddress(ARENA_SEGMENT, (short)index), value);
+        //data.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)index), value);
+        data[index] = value;
+        if (listener != null) {
+            listener.onMemoryWrite(index , value);
+        }
     }
     public void storeHalfWord(int index, short value)
     {
@@ -39,7 +49,7 @@ public class Memory extends RealModeMemoryImpl {
     public byte loadByte(int index)
     {
         //return data[index];
-        return readByte(new RealModeAddress(ARENA_SEGMENT, (short)index));
+        return data[index];
     }
     public short loadHalfWord(int index)
     {
@@ -51,4 +61,23 @@ public class Memory extends RealModeMemoryImpl {
         return  (loadHalfWord(index) & 0xFFFF |
                 (loadHalfWord(index+2) << 16));
     }
+
+    /**
+     * @return Returns the listener.
+     */
+    public MemoryEventListener getListener() {
+        return listener;
+    }
+    /**
+     * @param listener The listener to set.
+     */
+    public void setListener(MemoryEventListener listener) {
+        this.listener = listener;
+    }
+
+    public static final int NUM_PARAGRAPHS = 64 * 1024;
+    public static final int PARAGRAPH_SIZE = 0x10;
+    public static final int PARAGRAPHS_IN_SEGMENT = 0x1000;
+    public static final int MEMORY_SIZE = NUM_PARAGRAPHS * PARAGRAPH_SIZE;
+
 }

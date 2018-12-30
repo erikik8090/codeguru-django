@@ -29,7 +29,7 @@ public class LoadTest {
     @Before
     public void setUp() {
         state = new CpuStateRiscV();
-        memory = new Memory();
+        memory = new Memory(0x10000);
         cpu = new CpuRiscV(state, memory);
         //To not interrupt the 0 memory location
         state.setPc(0x100);

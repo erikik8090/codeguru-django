@@ -12,7 +12,7 @@ public interface MemoryEventListener {
      * Called when a byte is written to memory
      * @param address
      */
-    void onMemoryWrite(RealModeAddress address, byte value);
+    void onMemoryWrite(int address, byte value);
 
     enum EWriteState {
         INIT,

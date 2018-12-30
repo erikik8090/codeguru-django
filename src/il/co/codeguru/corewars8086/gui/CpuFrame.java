@@ -7,15 +7,12 @@ import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.war.Competition;
 import il.co.codeguru.corewars8086.war.CompetitionEventListener;
 import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.war.Warrior;
 
 import java.util.HashMap;
-
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 public class CpuFrame  implements CompetitionEventListener, MemoryEventListener {
 	
@@ -108,7 +105,7 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 
 	}
 
-	public void onMemoryWrite(RealModeAddress address, byte value){
+	public void onMemoryWrite(int address, byte value){
 		for (WatchEntry entry : m_watches.values()) {
 			entry.evalAndDisplay();
 		}
@@ -218,14 +215,11 @@ public class CpuFrame  implements CompetitionEventListener, MemoryEventListener 
 		}
 
 		@Override
-		public int getMemory(int addr, int seg, int size) throws Exception {
-			short sseg = (short)seg;
-			if (seg == -1) sseg = ARENA_SEGMENT;
-			int linaddr = RealModeAddress.linearAddress(sseg, (short)addr);
+		public int getMemory(int addr, int seg, int size) {
 			if (size == 1)
-				return memory.loadByte(linaddr) & 0xff;
+				return memory.loadByte(addr) & 0xff;
 			else
-				return memory.read16Bit(new RealModeAddress(linaddr)) & 0xffff;
+				return memory.loadHalfWord(addr) & 0xffff;
 		}
 
 	}

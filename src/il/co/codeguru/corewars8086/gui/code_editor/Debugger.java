@@ -4,21 +4,20 @@ import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import elemental2.dom.EventListener;
 import elemental2.dom.HTMLElement;
-import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.gui.PlayersPanel;
 import il.co.codeguru.corewars8086.gui.widgets.Console;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
+import il.co.codeguru.corewars8086.utils.Logger;
 import il.co.codeguru.corewars8086.utils.disassembler.DisassemblerRiscV;
 import il.co.codeguru.corewars8086.utils.disassembler.IDisassembler;
 import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.war.Warrior;
 
-import static il.co.codeguru.corewars8086.gui.code_editor.CodeEditor.*;
-import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
+import static il.co.codeguru.corewars8086.gui.code_editor.CodeEditor.PageInfo;
+import static il.co.codeguru.corewars8086.gui.code_editor.CodeEditor.SPACE_FOR_HEX;
+import static il.co.codeguru.corewars8086.war.War.ARENA_SIZE;
 
 public class Debugger {
     private final CodeEditor codeEditor;
@@ -58,7 +57,7 @@ public class Debugger {
 
     public Debugger(CodeEditor codeEditor) {
         this.codeEditor = codeEditor;
-        m_dbglines = new DbgLine[War.ARENA_SIZE];
+        m_dbglines = new DbgLine[ARENA_SIZE];
     }
 
     public Memory getMemory() {
@@ -99,7 +98,9 @@ public class Debugger {
         if (currentWarrior == null)
             return;
         final int ipInsideArena = getWarrirorIp(currentWarrior);
+        assert ipInsideArena < ARENA_SIZE : "IP outside of arena";
         final boolean isAlive = currentWarrior.isAlive();
+
 
         CodeEditor.scrollToAddr(ipInsideArena, false); // make sure to scroll to it even the current line marker is on it
         if (ipInsideArena == m_lastDbgAddr && isAlive == m_lastIsAlive) {
@@ -122,17 +123,19 @@ public class Debugger {
                 ++opcodeAddr;
             } while (m_dbglines[opcodeAddr] == null);
             // disassemble may eat at any of the db's after it, and might also each Opcode after that
-            disassembleAddress(ipInsideArena + CODE_ARENA_OFFSET, ipInsideArena);
+            disassembleAddress(ipInsideArena, ipInsideArena);
         } else {
             int flags = m_dbglines[ipInsideArena].flags;
             if ((flags & DbgLine.FLAG_UNPARSED) != 0 || (flags & DbgLine.FLAG_DEFINE_CODE) != 0) {
-                disassembleAddress(ipInsideArena + CODE_ARENA_OFFSET, ipInsideArena);
+                disassembleAddress(ipInsideArena, ipInsideArena);
             }
         }
+
 
         String ider = "d";
         if ((m_dbglines[ipInsideArena].flags & DbgLine.FLAG_HAS_COMMENT) != 0)
             ider = "df"; // a line with a comment after, don't highlight the entire line, just the first line. df is assured to exist if we have this flag
+
 
         HTMLElement dline = (HTMLElement) DomGlobal.document.getElementById(ider + Integer.toString(ipInsideArena));
         dline.classList.add(isAlive ? "current_dbg" : "current_dbg_dead");
@@ -140,14 +143,14 @@ public class Debugger {
         this.m_lastDbgAddr = ipInsideArena;
         this.m_lastDbgAddrEnd = m_lastDbgAddr + 1;
         m_lastIsAlive = isAlive;
-        while (m_lastDbgAddrEnd < (ARENA_SEGMENT * PARAGRAPH_SIZE) && m_dbglines[m_lastDbgAddrEnd] == null)
+        while (m_lastDbgAddrEnd < (0) && m_dbglines[m_lastDbgAddrEnd] == null)
             this.m_lastDbgAddrEnd = m_lastDbgAddrEnd + 1;
 
     }
 
     private void disassembleAddress(int absaddr, int addrInArea) {
-        byte[] memory_bytes = m_mem.getMemory();
-        IDisassembler dis = new DisassemblerRiscV(memory_bytes, absaddr, m_mem.length());
+        byte[] memory_bytes = m_mem.getByteArray();
+        IDisassembler dis = new DisassemblerRiscV(memory_bytes, absaddr, memory_bytes.length);
         String text;
         try {
             text = dis.nextOpcode();
@@ -160,7 +163,7 @@ public class Debugger {
         DbgLine opline = new DbgLine();
         StringBuilder bs = new StringBuilder();
         for (int i = 0; i < len; ++i) {
-            bs.append(Format.hex2(m_mem.loadByte(absaddr + i - (ARENA_SEGMENT * PARAGRAPH_SIZE)) & 0xff));
+            bs.append(Format.hex2(m_mem.loadByte(absaddr + i) & 0xff));
             bs.append(SPACE_FOR_HEX);
         }
 
@@ -225,13 +228,13 @@ public class Debugger {
             m_fillCmd.text = "<span class='dbg_backfill'><span class='dbg_opcodes'>CC</span>int 3</span>";
         }
 
-        for (int addr = 0; addr < War.ARENA_SIZE; ++addr) {
+        for (int addr = 0; addr < ARENA_SIZE; ++addr) {
             m_dbglines[addr] = m_fillCmd;
         }
         for (CodeEditor.PageInfo p : codeEditor.getPages())
             p.isDirty = true;
 
-        m_dbgBreakpoints = new PlayersPanel.Breakpoint[War.ARENA_SIZE];
+        m_dbgBreakpoints = new PlayersPanel.Breakpoint[ARENA_SIZE];
 
         for (int i = 0; i < war.getNumWarriors(); ++i) {
             Warrior w = war.getWarrior(i);
@@ -310,7 +313,7 @@ public class Debugger {
     // breakpoints in the debug view that are in addresses that don't correspond to code lines are transient.
     // they disappear once the debug session is over. They are not saved in the players m_breakpoints since it's unknown what players are they of
     public void toggleBreakpointDbg(int addr) {
-        PlayersPanel.Breakpoint br = null;
+        PlayersPanel.Breakpoint br;
         boolean wasAdded = false;
 
         if (m_dbgBreakpoints[addr] == null) {
@@ -320,7 +323,6 @@ public class Debugger {
         } else {
             br = m_dbgBreakpoints[addr];
             m_dbgBreakpoints[addr] = null;
-            wasAdded = false;
         }
 
         War war = codeEditor.getCurrentCompetition().getCurrentWar();
@@ -412,11 +414,7 @@ public class Debugger {
     public static int getWarrirorIp(Warrior w) {
         if (w == null)
             return -1;
-        CpuStateRiscV state = w.getCpuState();
-
-        short ip = (short) state.getPc();
-
-        return RealModeAddress.linearAddress(ARENA_SEGMENT, ip) - CODE_ARENA_OFFSET;
+        return w.getCpuState().getPc();
     }
 
     // from javascript scroll of debug area
@@ -445,14 +443,13 @@ public class Debugger {
     {
         private EWriteState m_memWriteState = MemoryEventListener.EWriteState.INIT;
         @Override
-        public void onMemoryWrite(RealModeAddress address, byte value) {
+        public void onMemoryWrite(int address, byte value) {
             // don't rewrite lines if we're in the stage of putting warriors in memory
             if (m_memWriteState != EWriteState.RUN)
                 return;
-            int absAddr = address.getLinearAddress();
-            if (absAddr < ARENA_SEGMENT * PARAGRAPH_SIZE || absAddr >= ARENA_SEGMENT * PARAGRAPH_SIZE + War.ARENA_SIZE)
+            if (address >= ARENA_SIZE)
                 return;
-            int ipInsideArena = absAddr - (ARENA_SEGMENT * PARAGRAPH_SIZE); // arena * paragraph
+            int ipInsideArena = address; // arena * paragraph
             final int cIpInsideArea = ipInsideArena;
 
             int page = ipInsideArena / codeEditor.PAGE_SIZE;
@@ -471,11 +468,9 @@ public class Debugger {
                 while (getDbgLine(ipInsideArena) == null)
                     --ipInsideArena;
 
-                do {
-                    // rewriting only a single Opcode so its not possible to cross to a new Opcode which will need reparsing
-                    setByte(ipInsideArena, getMemory().loadByte(ipInsideArena));
-                    ++ipInsideArena;
-                } while (ipInsideArena < (ARENA_SEGMENT * PARAGRAPH_SIZE)&& getDbgLine(ipInsideArena) == null);
+                // rewriting only a single Opcode so its not possible to cross to a new Opcode which will need reparsing
+                setByte(ipInsideArena, getMemory().loadByte(ipInsideArena));
+                ++ipInsideArena;
             }
 
             // if we just edited the byte under the debugger, need to reparse it

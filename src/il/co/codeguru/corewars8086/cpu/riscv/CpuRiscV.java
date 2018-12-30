@@ -5,10 +5,6 @@ import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionForm
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.InstructionDecoderRv32c;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
 import il.co.codeguru.corewars8086.memory.MemoryException;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.utils.Logger;
-
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 public class CpuRiscV {
 

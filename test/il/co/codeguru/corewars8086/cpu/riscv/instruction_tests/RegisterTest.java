@@ -28,7 +28,7 @@ public class RegisterTest {
     @Before
     public void setUp() {
         state = new CpuStateRiscV();
-        Memory memory = new Memory();
+        Memory memory = new Memory(0x10000);
         cpu = new CpuRiscV(state, memory);
         Logger.setTestingMode();
     }
@@ -64,7 +64,6 @@ public class RegisterTest {
             "" + Integer.MIN_VALUE + ", 1, " + Integer.MAX_VALUE
     })
     public void testSub(int reg1, int reg2, int expected) throws MemoryException, CpuException {
-        Logger.log("here");
         state.setReg(RS1_INDEX, reg1);
         state.setReg(RS2_INDEX, reg2);
         loadInstruction(RV32I.instructionR(RV32I.Opcodes.Sub, RD_INDEX, RS1_INDEX, RS2_INDEX));

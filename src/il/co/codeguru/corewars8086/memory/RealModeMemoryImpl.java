@@ -1,5 +1,7 @@
 package il.co.codeguru.corewars8086.memory;
 
+import static il.co.codeguru.corewars8086.cpu.riscv.Memory.MEMORY_SIZE;
+
 /**
  * Implements the RealModeMemory interface using a buffer.
  *
@@ -20,7 +22,7 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
      */
     public RealModeMemoryImpl() {
         //m_data = Int8ArrayNative.create(RealModeAddress.MEMORY_SIZE);
-        data = new byte[RealModeAddress.MEMORY_SIZE];
+        data = new byte[MEMORY_SIZE];
     }
 
     /**
@@ -35,7 +37,7 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
         return data[address.getLinearAddress()];
     }
     public byte readByte(int linearAddress) {
-        return data[linearAddress % RealModeAddress.MEMORY_SIZE];
+        return data[linearAddress % MEMORY_SIZE];
     }
 
     public int length() {
@@ -53,7 +55,7 @@ public class RealModeMemoryImpl extends AbstractRealModeMemory {
     public void writeByte(RealModeAddress address, byte value) {
         data[address.getLinearAddress()] = value;
         if (listener != null) {
-            listener.onMemoryWrite(address, value);
+            listener.onMemoryWrite(address.getLinearAddress(), value);
         }
     }
 

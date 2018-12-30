@@ -5,12 +5,9 @@ import il.co.codeguru.corewars8086.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.memory.MemoryException;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryRegion;
 
-import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
+import static il.co.codeguru.corewars8086.war.War.*;
 
 
 /**
@@ -22,7 +19,6 @@ public class Warrior
 {
     public RealModeMemoryRegion m_stackWritableRegion;
     public RealModeMemoryRegion m_sharedWritableRegion;
-    public RealModeMemoryRegion m_codeRegion;
 
     /**
      * Constructor.
@@ -33,18 +29,16 @@ public class Warrior
      * @param loadAddress       Warrior's load address in the core (initial CS:IP).
      * @param initialStack      Warrior's private stack in the core (initial SS:SP).
      * @param groupSharedMemory Warrior group's shared memroy address (initial ES).
-     * @param groupSharedMemorySize Warrior group's shared memory size. 
      */
     public Warrior(
-        String name,
-        String label,
-        int codeSize,
-        Memory core,
-        int loadAddress,
-        RealModeAddress initialStack,
-        RealModeAddress groupSharedMemory,
-        short groupSharedMemorySize,
-        int myIndex)
+            String name,
+            String label,
+            int codeSize,
+            Memory core,
+            int loadAddress,
+            int initialStack,
+            int groupSharedMemory,
+            int myIndex)
     {
         m_label = label;  // this comes from Code label
         m_name = name;
@@ -55,20 +49,8 @@ public class Warrior
         m_state = new CpuStateRiscV();
         initializeCpuState(loadAddress, initialStack, groupSharedMemory);
 
-        // initialize read-access regions
-        RealModeAddress lowestStackAddress =
-            new RealModeAddress(initialStack.getSegment(), (short)0); 
-        RealModeAddress lowestCoreAddress =
-            new RealModeAddress(ARENA_SEGMENT, (short)0);
-        RealModeAddress highestCoreAddress =
-            new RealModeAddress(ARENA_SEGMENT, (short)-1);
-        RealModeAddress highestGroupSharedMemoryAddress =
-            new RealModeAddress(groupSharedMemory.getSegment(),
-            (short)(groupSharedMemorySize-1));
-
-        m_stackWritableRegion = new RealModeMemoryRegion(lowestStackAddress, initialStack);
-        m_sharedWritableRegion = new RealModeMemoryRegion(groupSharedMemory, highestGroupSharedMemoryAddress);
-        m_codeRegion = new RealModeMemoryRegion(lowestCoreAddress, highestCoreAddress);
+        m_stackWritableRegion = new RealModeMemoryRegion(initialStack, initialStack + STACK_SIZE - 1);
+        m_sharedWritableRegion = new RealModeMemoryRegion(groupSharedMemory, groupSharedMemory + GROUP_SHARED_MEMORY_SIZE - 1);
 
         m_cpu = new CpuRiscV(m_state, core);
 
@@ -103,10 +85,10 @@ public class Warrior
      * @return the warrior's load offset.
      */
     public short getLoadOffset() {
-        return (short)(m_loadAddress - ARENA_SEGMENT * PARAGRAPH_SIZE);
+        return (short)(m_loadAddress);
     }
     public int getLoadOffsetInt() {
-        return m_loadAddress - ARENA_SEGMENT*0x10;
+        return m_loadAddress;
     }
 
     /**
@@ -134,6 +116,11 @@ public class Warrior
      */
     public void nextOpcode() throws CpuException, MemoryException {
         m_cpu.nextOpcode();
+        if(m_cpu.getState().getPc() >= ARENA_SIZE || m_cpu.getState().getPc() < 0)
+        {
+            throw new MemoryException();
+        }
+
     }
 
     /**
@@ -151,14 +138,15 @@ public class Warrior
      */
     private void initializeCpuState(
         int loadAddress,
-        RealModeAddress initialStack,
-        RealModeAddress groupSharedMemory) {
+        int initialStack,
+        int groupSharedMemory) {
 
-        int loadIndex = (loadAddress - ARENA_SEGMENT * PARAGRAPH_SIZE) & 0xFFFF;
+        int loadIndex = (loadAddress) & 0xFFFF;
 
         // initialize registers
         m_state.setReg(1, loadIndex);
         m_state.setPc(loadIndex);
+
     }
     
     public CpuStateRiscV getCpuState(){

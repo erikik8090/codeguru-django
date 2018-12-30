@@ -29,7 +29,7 @@ public class StoreTest {
     @Before
     public void setUp() {
         state = new CpuStateRiscV();
-        memory = new Memory();
+        memory = new Memory(0x10000);
         cpu = new CpuRiscV(state, memory);
         state.setPc(0x100);
         Logger.setTestingMode();

@@ -5,7 +5,6 @@ import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.gui.IBreakpointCheck;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
 import il.co.codeguru.corewars8086.memory.MemoryException;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.utils.Logger;
 import il.co.codeguru.corewars8086.utils.Unsigned;
 
@@ -13,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import static il.co.codeguru.corewars8086.cpu.riscv.Memory.*;
 
 
 /**
@@ -22,14 +23,15 @@ import java.util.Random;
  */
 public class War {
     /** Arena's code segment */
-    public final static short ARENA_SEGMENT = 0x1000;
+    public final static short ARENA_SEGMENT = 0;
+
     /** Arena's size in bytes (= size of a single segment) */
     public final static int ARENA_SIZE =
-        RealModeAddress.PARAGRAPHS_IN_SEGMENT * RealModeAddress.PARAGRAPH_SIZE;
+        PARAGRAPHS_IN_SEGMENT * PARAGRAPH_SIZE;
     /** Warrior's private stack size */
-    private final static short STACK_SIZE = 2*1024;
+    public final static short STACK_SIZE = 2*1024;
     /** Group-shared private memory size */
-    private final static short GROUP_SHARED_MEMORY_SIZE = 1024;
+    public final static short GROUP_SHARED_MEMORY_SIZE = 1024;
     /** Arena is filled with this byte */
     private final static byte ARENA_BYTE = (byte)0x00;
     /** Maximum number of warriors in a fight */
@@ -93,10 +95,8 @@ public class War {
         m_warriors = new Warrior[MAX_WARRIORS];
         m_numWarriors = 0;
         m_numWarriorsAlive = 0;
-        Logger.log("here, hello");
-        m_core = new Memory();
-        Logger.log("here, hell2");
-        m_nextFreeAddress = RealModeAddress.PARAGRAPH_SIZE * (ARENA_SEGMENT + RealModeAddress.PARAGRAPHS_IN_SEGMENT);
+        m_core = new Memory(MEMORY_SIZE);
+        m_nextFreeAddress = ARENA_SIZE;
 
         // initialize arena
         for (int offset = 0; offset < ARENA_SIZE; ++offset) {
@@ -121,7 +121,7 @@ public class War {
             Warrior warrior = m_warriors[i];
             m_currentWarrior = i;
             if (warrior.isAlive()) {
-                short savedIp = (short) warrior.getCpuState().getPc();
+                int savedIp = warrior.getCpuState().getPc();
                 try {
 
                     // run first InstructionInfo
@@ -144,7 +144,7 @@ public class War {
                 }
                 catch (MemoryException e) {
                     if(m_warListener != null)
-                        m_warListener.onWarriorDeath(warrior, "memory exception: " + e.getMessage());
+                        m_warListener.onWarriorDeath(warrior, "Memory exception: " + e.getMessage());
                     warrior.kill();
                     warrior.getCpuState().setPc(savedIp);
                     --m_numWarriorsAlive;
@@ -252,33 +252,28 @@ public class War {
     private void loadWarriorGroup(WarriorGroup warriorGroup) throws Exception {
         List<WarriorData> warriors = warriorGroup.getWarriors();
 
-        RealModeAddress groupSharedMemory = allocateCoreMemory(GROUP_SHARED_MEMORY_SIZE);
+        int groupSharedMemory = allocateCoreMemory(GROUP_SHARED_MEMORY_SIZE);
 
         for (WarriorData warrior : warriors) {
             String warriorName = warrior.getName();
             byte[] warriorData = warrior.getCode();
 
-            short loadOffset;
+            int loadOffset;
             if (warrior.m_debugFixedLoadAddress < 0)
                 loadOffset = getLoadOffset(warriorData.length);
             else
                 loadOffset = (short) warrior.m_debugFixedLoadAddress;
 
-            int loadAddress =
-                    new RealModeAddress(ARENA_SEGMENT, loadOffset).getLinearAddress();
-            RealModeAddress stackMemory = allocateCoreMemory(STACK_SIZE);
-            RealModeAddress initialStack =
-                    new RealModeAddress(stackMemory.getSegment(), STACK_SIZE);
+            int stackMemory = allocateCoreMemory(STACK_SIZE);
 
             Warrior w = new Warrior(
                     warriorName,
                     warrior.getLabel(),
                     warriorData.length,
                     m_core,
-                    loadAddress,
-                    initialStack,
+                    loadOffset,
+                    stackMemory,
                     groupSharedMemory,
-                    GROUP_SHARED_MEMORY_SIZE,
                     m_numWarriors);
             m_warriors[m_numWarriors++] = w;
 
@@ -286,7 +281,7 @@ public class War {
             if (m_core.getListener() != null)
                 m_core.getListener().onWriteState(MemoryEventListener.EWriteState.ADD_WARRIORS);
             for (int offset = 0; offset < warriorData.length; ++offset) {
-                m_core.storeByte((loadOffset + offset), warriorData[offset]);
+                m_core.storeByte((loadOffset + offset) & 0xFFFF, warriorData[offset]);
             }
             if (m_core.getListener() != null)
                 m_core.getListener().onWriteState(MemoryEventListener.EWriteState.RUN);
@@ -308,13 +303,11 @@ public class War {
      *               RealModeAddress.PARAGRAPH_SIZE 
      * @return Pointer to the beginning of the allocated memory block.
      */
-    private RealModeAddress allocateCoreMemory(short size) throws Exception {
-        if ((size % RealModeAddress.PARAGRAPH_SIZE) != 0) {
-            throw new Exception();
+    private int allocateCoreMemory(short size) {
+        if ((size % PARAGRAPH_SIZE) != 0) {
+            throw new IllegalArgumentException();
         }
-
-        RealModeAddress allocatedMemory =
-            new RealModeAddress(m_nextFreeAddress);
+        int allocatedMemory = m_nextFreeAddress;
 
         m_nextFreeAddress += size;
 
@@ -403,7 +396,7 @@ public class War {
         return null;
     }
 
-    /** @return the numebr of warriors fighting in this match. */
+    /** @return the number of warriors fighting in this match. */
     public int getNumWarriors() {
         return m_numWarriors;
     }
@@ -413,20 +406,16 @@ public class War {
     	return m_numWarriorsAlive;
     }
     
-    /** @return a comma-seperated list of all warriors still alive. */
+    /** @return a comma-separated list of all warriors still alive. */
     public String getRemainingWarriorNames() {
-        String names = "";
+        StringBuilder names = new StringBuilder();
     	for (int i = 0; i < m_numWarriors; ++i) {
             Warrior warrior = m_warriors[i];
             if (warrior.isAlive()) {
-                if (names.equals("")) {
-                    names = warrior.getName();
-                } else {
-                    names = names + ", " + warrior.getName();
-                }
+                names.append(", ").append(warrior.getName());
             }
     	}
-    	return names;
+    	return names.toString();
     }    
  
     /**

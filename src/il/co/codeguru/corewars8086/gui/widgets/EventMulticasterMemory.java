@@ -1,8 +1,6 @@
 package il.co.codeguru.corewars8086.gui.widgets;
 
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
-import java.util.*;
 
 /**
  * An event multicaster which broadcasts Events to a number of listeners.
@@ -19,7 +17,7 @@ public class EventMulticasterMemory extends EventMulticasterBase<MemoryEventList
 
     private class CompeteHandler implements MemoryEventListener {
         @Override
-        public void onMemoryWrite(RealModeAddress address, byte value) {
+        public void onMemoryWrite(int address, byte value) {
         }
 
         @Override
@@ -30,7 +28,7 @@ public class EventMulticasterMemory extends EventMulticasterBase<MemoryEventList
 
     private class DebugHandler implements MemoryEventListener {
 		@Override
-		public void onMemoryWrite(RealModeAddress address, byte value) {
+		public void onMemoryWrite(int address, byte value) {
 			for (Object mListener : mListenersArr) {
                 ((MemoryEventListener)mListener).onMemoryWrite(address, value);
 			}

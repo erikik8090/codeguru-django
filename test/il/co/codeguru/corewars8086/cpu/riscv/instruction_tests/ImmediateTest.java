@@ -27,7 +27,7 @@ public class ImmediateTest {
     @Before
     public void setUp() {
         state = new CpuStateRiscV();
-        Memory memory = new Memory();
+        Memory memory = new Memory(0x10000);
         cpu = new CpuRiscV(state, memory);
         Logger.setTestingMode();
     }

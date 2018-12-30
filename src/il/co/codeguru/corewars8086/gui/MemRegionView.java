@@ -7,22 +7,21 @@ import elemental2.dom.Element;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.gui.asm_parsers.TextUtils;
-import il.co.codeguru.corewars8086.gui.code_editor.CodeEditor;
 import il.co.codeguru.corewars8086.jsadd.Format;
-import il.co.codeguru.corewars8086.memory.*;
+import il.co.codeguru.corewars8086.memory.MemoryEventListener;
+import il.co.codeguru.corewars8086.memory.RealModeMemoryRegion;
 import il.co.codeguru.corewars8086.utils.Unsigned;
-
-import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 
 public class MemRegionView implements MemoryEventListener
 {
-    HTMLElement m_htmlList;
-    RealModeMemoryRegion m_currentRegion = new RealModeMemoryRegion();
-    final String m_innerPrefix;
-    int m_step; // how many bytes in each line (only 2 supported now)
-    int m_lastMovedToLine = -1;
-    HTMLElement m_lastMovedToElem = null;
+    private HTMLElement m_htmlList;
+    private RealModeMemoryRegion m_currentRegion = new RealModeMemoryRegion();
+    private final String m_innerPrefix;
+    private int m_step; // how many bytes in each line (only 2 supported now)
+    private int m_lastMovedToLine = -1;
+    private HTMLElement m_lastMovedToElem = null;
+
+
 
     public MemRegionView(String id, String innerPrefix) {
         m_htmlList = (HTMLElement)DomGlobal.document.getElementById(id);
@@ -41,14 +40,14 @@ public class MemRegionView implements MemoryEventListener
             Element e = DomGlobal.document.createElement("div");
             e.setAttribute("id", m_innerPrefix + Integer.toString(addr));
             // 5 spaces since this is an absolute linear address
-            StringBuilder sb = new StringBuilder();
-            sb.append(Format.hex5(addr));
-            sb.append("   ");
-            sb.append(Format.hex2(Unsigned.unsignedByte(memory.loadByte(addr - (ARENA_SEGMENT * PARAGRAPH_SIZE)))));
-            sb.append(TextUtils.SPACE_FOR_HEX_CHAR);
-            sb.append(Format.hex2(Unsigned.unsignedByte(memory.loadByte(addr + 1 - (ARENA_SEGMENT * PARAGRAPH_SIZE))))); // memory size is always even so no need to check
 
-            e.appendChild(DomGlobal.document.createTextNode(sb.toString()));
+            String sb = Format.hex5(addr) +
+                    "   " +
+                    Format.hex2(Unsigned.unsignedByte(memory.loadByte(addr))) +
+                    TextUtils.SPACE_FOR_HEX_CHAR +
+                    Format.hex2(Unsigned.unsignedByte(memory.loadByte(addr + 1)));
+            e.appendChild(DomGlobal.document.createTextNode(sb // memory size is always even so no need to check
+            ));
             df.appendChild(e);
         }
         m_htmlList.innerHTML = "";
@@ -63,14 +62,13 @@ public class MemRegionView implements MemoryEventListener
         m_lastMovedToElem = null;
     }
 
-    public void onMemoryWrite(RealModeAddress address, byte value)
+    public void onMemoryWrite(int address, byte value)
     {
-        int addr = address.getLinearAddress();
-        if (addr < m_currentRegion.m_start || addr > m_currentRegion.m_end)
+        if (address < m_currentRegion.m_start || address > m_currentRegion.m_end)
             return;
 
-        int lineaddr = (addr / m_step) * m_step;
-        int offsetInLine = addr % m_step;
+        int lineaddr = (address / m_step) * m_step;
+        int offsetInLine = address % m_step;
         HTMLElement elem = (HTMLElement)DomGlobal.document.getElementById(m_innerPrefix + Integer.toString(lineaddr) );
         assert elem != null : "unexpected: did not find element";
 

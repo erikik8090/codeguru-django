@@ -7,11 +7,10 @@ public class RealModeMemoryRegion {
         m_end = -1;
     }
 
-    public RealModeMemoryRegion(RealModeAddress start, RealModeAddress end) {
-        m_start = start.getLinearAddress();
-        m_end = end.getLinearAddress();
+    public RealModeMemoryRegion(int start, int end) {
+        m_start = start;
+        m_end = end;
     }
-
 
     public boolean isInRegion(int asked) {
         return ((asked >= m_start) && (asked <= m_end));

@@ -6,15 +6,12 @@ import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars8086.gui.widgets.*;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
-import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.utils.Unsigned;
 import il.co.codeguru.corewars8086.war.Competition;
 import il.co.codeguru.corewars8086.war.CompetitionEventListener;
 import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.war.Warrior;
 
-import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
-import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
 import static il.co.codeguru.corewars8086.war.War.ARENA_SIZE;
 
 /**
@@ -96,25 +93,18 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
 
         HTMLElement speedSliderVal = (HTMLElement) DomGlobal.document.getElementById("speedSliderVal");
         speedSlider = new JSlider("speedSlider", "speedSliderVal");
-        speedSlider.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int s = speedSlider.getValue();
-                if (s > 100)
-                    s = (int) Math.pow((double) (s - 80.0), 1.5);
-                speedSliderVal.innerHTML = Integer.toString(s);
-                WarFrame.this.competition.setSpeed(s); //exponential speed slider
-            }
+        speedSlider.addActionListener(e -> {
+            int s = speedSlider.getValue();
+            if (s > 100)
+                s = (int) Math.pow((s - 80.0), 1.5);
+            speedSliderVal.innerHTML = Integer.toString(s);
+            this.competition.setSpeed(s); //exponential speed slider
         });
         buttonPanel.add(speedSlider);
         nRoundNumber = 0;
         infoZone.add(buttonPanel, BorderLayout.SOUTH);
         infoZone.setBackground(Color.black);
 
-        // Debugger
-        /**
-         * A text field showing the current round number
-         */
-        //private JLabel roundNumber;
         // Debugger
         JLabel addressFiled = new JLabel("Click on the arena to see the memory");
         cpuframe = new CpuFrame(competition, this.mainWnd);
@@ -124,7 +114,7 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
 
         btnPause = new JButton("btnPause", "XXPause");
         btnPause.setEnabled(false);
-        btnPause.addActionListener(arg0 -> {
+        btnPause.addActionListener(arg -> {
             if (competition.getCurrentWar() == null) // pauses between wars
             {
                 if (competition.globalPause) { // do resume
@@ -155,20 +145,15 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
 
         btnSingleRound = new JButton("btnSingleRound", "Single Round");
         btnSingleRound.setEnabled(false);
-        btnSingleRound.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                if (competition.getCurrentWar() == null) {
-                    Console.log("no war");
-                    return;
-                }
-                competition.getCurrentWar().runSingleRound();
-                mainWnd.requestFrame(); // request frame but still paused so it'll be just one frame
+        btnSingleRound.addActionListener(arg0 -> {
+            if (competition.getCurrentWar() == null) {
+                Console.log("no war");
+                return;
             }
+            competition.getCurrentWar().runSingleRound();
+            mainWnd.requestFrame(); // request frame but still paused so it'll be just one frame
         });
 
-        //buttonPanel.add(btnCpuState);
         buttonPanel.add(btnPause);
         buttonPanel.add(btnSingleRound);
         buttonPanel.add(addressFiled);
@@ -177,7 +162,7 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
         JPanel warriorZone = new JPanel(new BorderLayout());
         warriorZone.setBackground(Color.BLACK);
         nameListModel = new DefaultListModel();
-        /**
+        /*
          * list of warrior names
          */
         JList nameList = new JList(nameListModel);
@@ -189,14 +174,12 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
                 BorderFactory.createEmptyBorder(10, 10, 20, 10)));
         nameList.repaint();
         warriorZone.add(nameList, BorderLayout.CENTER);
-        //warriorZone.add(new JLabel(new ImageIcon("images/warriors.jpg")), BorderLayout.NORTH);
         warriorZone.add(Box.createHorizontalStrut(20), BorderLayout.WEST);
         mainPanel.add(warriorZone, BorderLayout.EAST);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().setBackground(Color.BLACK);
         getContentPane().add(mainPanel, BorderLayout.CENTER);
-        //getContentPane().add(new JLabel(new ImageIcon("images/title2.png")), BorderLayout.EAST);
         getContentPane().add(infoZone, BorderLayout.SOUTH);
     }
 
@@ -223,14 +206,13 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
     }
 
     @Override
-    public void onMemoryWrite(RealModeAddress address, byte value) {
+    public void onMemoryWrite(int address, byte value) {
         if (!mainWnd.isBattleShown())
             return; // canvas not shown, no reason to update it
 
-        int absAddress = address.getLinearAddress() - (ARENA_SEGMENT * PARAGRAPH_SIZE); // arena * paragraph
 
-        if (absAddress >= 0 && absAddress < ARENA_SIZE) {
-            warCanvas.paintPixel(Unsigned.unsignedShort(absAddress), (byte) competition.getCurrentWarrior(), value);
+        if (address >= 0 && address < ARENA_SIZE) {
+            warCanvas.paintPixel(Unsigned.unsignedShort(address), (byte) competition.getCurrentWarrior(), value);
         }
     }
 
@@ -330,11 +312,9 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
         for (int i = 0; i < currentWar.getNumWarriors(); i++)
             if (currentWar.getWarrior(i).isAlive()) {
                 CpuStateRiscV state = currentWar.getWarrior(i).getCpuState();
-                short ip = (short) state.getPc();
+                int ip = state.getPc();
 
-                int ipInsideArena = RealModeAddress.linearAddress(ARENA_SEGMENT, ip) - (ARENA_SEGMENT * PARAGRAPH_SIZE);
-
-                this.warCanvas.paintPointer((char) ipInsideArena, (byte) i);
+                this.warCanvas.paintPointer((char) ip, (byte) i);
             }
     }
 

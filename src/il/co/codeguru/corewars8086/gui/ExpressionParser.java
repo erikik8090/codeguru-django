@@ -7,6 +7,7 @@ import java.util.Stack;
 
 public class ExpressionParser
 {
+    //TODO: Change all of this to work with RISC-V
     public interface INode {
         int eval() throws Exception;
     }
@@ -121,7 +122,7 @@ public class ExpressionParser
     static HashSet<String> m_registers = null;
     public ExpressionParser() {
         if (m_registers == null) {
-            m_registers = new HashSet<String>(Arrays.asList("AX","AL","AH","BX","BL","BH","CX","CL","CH","DX","DH","DL","SI","DI","BP","SP","IP","CS","DS","SS","ES","ENERGY","FLAGS"));
+            m_registers = new HashSet<>(Arrays.asList("AX", "AL", "AH", "BX", "BL", "BH", "CX", "CL", "CH", "DX", "DH", "DL", "SI", "DI", "BP", "SP", "IP", "CS", "DS", "SS", "ES", "ENERGY", "FLAGS"));
         }
     }
 

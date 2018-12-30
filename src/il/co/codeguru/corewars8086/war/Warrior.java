@@ -9,6 +9,9 @@ import il.co.codeguru.corewars8086.memory.RealModeAddress;
 import il.co.codeguru.corewars8086.memory.RealModeMemory;
 import il.co.codeguru.corewars8086.memory.RealModeMemoryRegion;
 
+import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
+import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
+
 
 /**
  * A single CoreWars warrior.
@@ -37,7 +40,7 @@ public class Warrior
         String label,
         int codeSize,
         Memory core,
-        RealModeAddress loadAddress,
+        int loadAddress,
         RealModeAddress initialStack,
         RealModeAddress groupSharedMemory,
         short groupSharedMemorySize,
@@ -56,9 +59,9 @@ public class Warrior
         RealModeAddress lowestStackAddress =
             new RealModeAddress(initialStack.getSegment(), (short)0); 
         RealModeAddress lowestCoreAddress =
-            new RealModeAddress(loadAddress.getSegment(), (short)0);
+            new RealModeAddress(ARENA_SEGMENT, (short)0);
         RealModeAddress highestCoreAddress =
-            new RealModeAddress(loadAddress.getSegment(), (short)-1);
+            new RealModeAddress(ARENA_SEGMENT, (short)-1);
         RealModeAddress highestGroupSharedMemoryAddress =
             new RealModeAddress(groupSharedMemory.getSegment(),
             (short)(groupSharedMemorySize-1));
@@ -100,10 +103,10 @@ public class Warrior
      * @return the warrior's load offset.
      */
     public short getLoadOffset() {
-        return m_loadAddress.getOffset();
+        return (short)(m_loadAddress - ARENA_SEGMENT * PARAGRAPH_SIZE);
     }
     public int getLoadOffsetInt() {
-        return m_loadAddress.getLinearAddress() - War.ARENA_SEGMENT*0x10;
+        return m_loadAddress - ARENA_SEGMENT*0x10;
     }
 
     /**
@@ -147,13 +150,15 @@ public class Warrior
      * @param groupSharedMemory The warrior's group shared memory.
      */
     private void initializeCpuState(
-        RealModeAddress loadAddress,
+        int loadAddress,
         RealModeAddress initialStack,
         RealModeAddress groupSharedMemory) {
 
+        int loadIndex = (loadAddress - ARENA_SEGMENT * PARAGRAPH_SIZE) & 0xFFFF;
+
         // initialize registers
-        m_state.setReg(1, loadAddress.getOffset() & 0xFFFF);
-        m_state.setPc(loadAddress.getOffset() & 0xFFFF);
+        m_state.setReg(1, loadIndex);
+        m_state.setPc(loadIndex);
     }
     
     public CpuStateRiscV getCpuState(){
@@ -166,7 +171,7 @@ public class Warrior
     /** Warrior's initial code size */	
     private final int m_codeSize;
     /** Warrior's initial load address */	
-    private final RealModeAddress m_loadAddress;
+    private final int m_loadAddress;
     /** Current state of registers & flags */	
     private CpuStateRiscV m_state;
     /** CPU instance */

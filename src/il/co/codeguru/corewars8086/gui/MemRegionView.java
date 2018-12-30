@@ -12,6 +12,9 @@ import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.*;
 import il.co.codeguru.corewars8086.utils.Unsigned;
 
+import static il.co.codeguru.corewars8086.memory.RealModeAddress.PARAGRAPH_SIZE;
+import static il.co.codeguru.corewars8086.war.War.ARENA_SEGMENT;
+
 public class MemRegionView implements MemoryEventListener
 {
     HTMLElement m_htmlList;
@@ -41,9 +44,9 @@ public class MemRegionView implements MemoryEventListener
             StringBuilder sb = new StringBuilder();
             sb.append(Format.hex5(addr));
             sb.append("   ");
-            sb.append(Format.hex2(Unsigned.unsignedByte(memory.readByte(addr))));
+            sb.append(Format.hex2(Unsigned.unsignedByte(memory.loadByte(addr - (ARENA_SEGMENT * PARAGRAPH_SIZE)))));
             sb.append(TextUtils.SPACE_FOR_HEX_CHAR);
-            sb.append(Format.hex2(Unsigned.unsignedByte(memory.readByte(addr + 1)))); // memory size is always even so no need to check
+            sb.append(Format.hex2(Unsigned.unsignedByte(memory.loadByte(addr + 1 - (ARENA_SEGMENT * PARAGRAPH_SIZE))))); // memory size is always even so no need to check
 
             e.appendChild(DomGlobal.document.createTextNode(sb.toString()));
             df.appendChild(e);

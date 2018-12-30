@@ -160,7 +160,7 @@ public class Debugger {
         DbgLine opline = new DbgLine();
         StringBuilder bs = new StringBuilder();
         for (int i = 0; i < len; ++i) {
-            bs.append(Format.hex2(m_mem.readByte(absaddr + i) & 0xff));
+            bs.append(Format.hex2(m_mem.loadByte(absaddr + i - (ARENA_SEGMENT * PARAGRAPH_SIZE)) & 0xff));
             bs.append(SPACE_FOR_HEX);
         }
 
@@ -187,7 +187,7 @@ public class Debugger {
     }
 
     private void setByteFromMem(int addrInArea) {
-        int value = m_mem.readByte(addrInArea + CODE_ARENA_OFFSET);
+        int value = m_mem.loadByte(addrInArea);
         setByte(addrInArea, (byte) (value & 0xff));
     }
 
@@ -473,7 +473,7 @@ public class Debugger {
 
                 do {
                     // rewriting only a single Opcode so its not possible to cross to a new Opcode which will need reparsing
-                    setByte(ipInsideArena, getMemory().readByte(ipInsideArena + CODE_ARENA_OFFSET));
+                    setByte(ipInsideArena, getMemory().loadByte(ipInsideArena));
                     ++ipInsideArena;
                 } while (ipInsideArena < (ARENA_SEGMENT * PARAGRAPH_SIZE)&& getDbgLine(ipInsideArena) == null);
             }

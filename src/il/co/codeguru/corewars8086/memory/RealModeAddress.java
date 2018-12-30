@@ -31,8 +31,7 @@ public class RealModeAddress {
         int unsignedSegment = Unsigned.unsignedShort(segment);
         int unsignedOffset = Unsigned.unsignedShort(offset);
         int linearAddressFull = unsignedSegment * PARAGRAPH_SIZE + unsignedOffset;
-        int linearAddress = linearAddressFull % MEMORY_SIZE;
-        return linearAddress;
+        return linearAddressFull % MEMORY_SIZE;
     }
 
     /**

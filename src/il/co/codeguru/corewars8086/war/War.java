@@ -22,7 +22,7 @@ import java.util.Random;
  */
 public class War {
     /** Arena's code segment */
-    public final static short ARENA_SEGMENT = 0x100;
+    public final static short ARENA_SEGMENT = 0x1000;
     /** Arena's size in bytes (= size of a single segment) */
     public final static int ARENA_SIZE =
         RealModeAddress.PARAGRAPHS_IN_SEGMENT * RealModeAddress.PARAGRAPH_SIZE;
@@ -100,8 +100,7 @@ public class War {
 
         // initialize arena
         for (int offset = 0; offset < ARENA_SIZE; ++offset) {
-            RealModeAddress tmp = new RealModeAddress(ARENA_SEGMENT, (short)offset);
-            m_core.writeByte(tmp, ARENA_BYTE);			
+            m_core.storeByte(offset, ARENA_BYTE);
         }
 
         isSingleRound = false;
@@ -265,8 +264,8 @@ public class War {
             else
                 loadOffset = (short) warrior.m_debugFixedLoadAddress;
 
-            RealModeAddress loadAddress =
-                    new RealModeAddress(ARENA_SEGMENT, loadOffset);
+            int loadAddress =
+                    new RealModeAddress(ARENA_SEGMENT, loadOffset).getLinearAddress();
             RealModeAddress stackMemory = allocateCoreMemory(STACK_SIZE);
             RealModeAddress initialStack =
                     new RealModeAddress(stackMemory.getSegment(), STACK_SIZE);
@@ -287,8 +286,7 @@ public class War {
             if (m_core.getListener() != null)
                 m_core.getListener().onWriteState(MemoryEventListener.EWriteState.ADD_WARRIORS);
             for (int offset = 0; offset < warriorData.length; ++offset) {
-                RealModeAddress tmp = new RealModeAddress(ARENA_SEGMENT, (short) (loadOffset + offset));
-                m_core.writeByte(tmp, warriorData[offset]);
+                m_core.storeByte((loadOffset + offset), warriorData[offset]);
             }
             if (m_core.getListener() != null)
                 m_core.getListener().onWriteState(MemoryEventListener.EWriteState.RUN);

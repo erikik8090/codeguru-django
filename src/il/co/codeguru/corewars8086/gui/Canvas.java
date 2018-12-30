@@ -187,12 +187,12 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
         m_mem = war.getMemory();
         m_currentWar = war;
         m_indebug = true;
-        int addr = ARENA_SEGMENT * PARAGRAPH_SIZE;
+        int addr = 0;
         for (int y = 0; y < BOARD_SIZE; y++)
         {
             for (int x = 0; x < BOARD_SIZE; x++)
             {
-                values[x][y] = m_mem.readByte(addr);
+                values[x][y] = m_mem.loadByte(addr);
                 addr += 1;
             }
         }
@@ -480,7 +480,7 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
         int my = (int)( (y - m_zrY)/ DOT_SIZE/m_zrVscale );
 
         int addr = (mx+my*256) & 0xffff;
-        int v = m_mem.readByte(addr + (ARENA_SEGMENT * PARAGRAPH_SIZE)) & 0xff;
+        int v = m_mem.loadByte(addr) & 0xff;
 
         StringBuilder sb = new StringBuilder();
         sb.append("0x");
@@ -578,7 +578,7 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
                     else
                         ev = ev & 0xf0 | v;
                     values[ix][iy] = (byte)ev;
-                    m_mem.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)(ix+iy*256)), (byte)ev);
+                    m_mem.storeByte((short)(ix+iy*256), (byte)ev);
                     moveCursor(0.5, 0);
 
                 }

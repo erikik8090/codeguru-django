@@ -14,7 +14,7 @@ import il.co.codeguru.corewars8086.war.Warrior;
 
 import java.util.HashMap;
 
-public class CpuFrame  implements CompetitionEventListener, MemoryEventListener {
+public class CpuFrame implements CompetitionEventListener, MemoryEventListener {
 	
 	//private War currentWar;
 	private CompetitionWindow m_mainwnd;

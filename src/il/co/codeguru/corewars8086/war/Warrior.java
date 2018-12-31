@@ -145,6 +145,8 @@ public class Warrior
 
         // initialize registers
         m_state.setReg(1, loadIndex);
+        m_state.setReg(2, initialStack + STACK_SIZE - 1);
+        m_state.setReg(3, groupSharedMemory);
         m_state.setPc(loadIndex);
 
     }

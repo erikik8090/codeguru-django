@@ -5,7 +5,7 @@ import il.co.codeguru.corewars8086.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.memory.MemoryException;
-import il.co.codeguru.corewars8086.memory.RealModeMemoryRegion;
+import il.co.codeguru.corewars8086.memory.MemoryRegion;
 
 import static il.co.codeguru.corewars8086.war.War.*;
 
@@ -17,8 +17,8 @@ import static il.co.codeguru.corewars8086.war.War.*;
  */
 public class Warrior
 {
-    public RealModeMemoryRegion m_stackWritableRegion;
-    public RealModeMemoryRegion m_sharedWritableRegion;
+    public MemoryRegion m_stackWritableRegion;
+    public MemoryRegion m_sharedWritableRegion;
 
     /**
      * Constructor.
@@ -49,8 +49,8 @@ public class Warrior
         m_state = new CpuStateRiscV();
         initializeCpuState(loadAddress, initialStack, groupSharedMemory);
 
-        m_stackWritableRegion = new RealModeMemoryRegion(initialStack, initialStack + STACK_SIZE - 1);
-        m_sharedWritableRegion = new RealModeMemoryRegion(groupSharedMemory, groupSharedMemory + GROUP_SHARED_MEMORY_SIZE - 1);
+        m_stackWritableRegion = new MemoryRegion(initialStack, initialStack + STACK_SIZE - 1);
+        m_sharedWritableRegion = new MemoryRegion(groupSharedMemory, groupSharedMemory + GROUP_SHARED_MEMORY_SIZE - 1);
 
         m_cpu = new CpuRiscV(m_state, core);
 

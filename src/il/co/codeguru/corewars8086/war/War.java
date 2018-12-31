@@ -300,7 +300,7 @@ public class War {
      * next-free-memory pointer (m_nextFreeAddress).
      * 
      * @param size   Required memory size, must be a multiple of
-     *               RealModeAddress.PARAGRAPH_SIZE 
+     *               Memory.PARAGRAPH_SIZE
      * @return Pointer to the beginning of the allocated memory block.
      */
     private int allocateCoreMemory(short size) {

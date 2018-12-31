@@ -9,13 +9,13 @@ import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.gui.asm_parsers.TextUtils;
 import il.co.codeguru.corewars8086.jsadd.Format;
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
-import il.co.codeguru.corewars8086.memory.RealModeMemoryRegion;
+import il.co.codeguru.corewars8086.memory.MemoryRegion;
 import il.co.codeguru.corewars8086.utils.Unsigned;
 
 public class MemRegionView implements MemoryEventListener
 {
     private HTMLElement m_htmlList;
-    private RealModeMemoryRegion m_currentRegion = new RealModeMemoryRegion();
+    private MemoryRegion m_currentRegion = new MemoryRegion();
     private final String m_innerPrefix;
     private int m_step; // how many bytes in each line (only 2 supported now)
     private int m_lastMovedToLine = -1;
@@ -30,7 +30,7 @@ public class MemRegionView implements MemoryEventListener
     }
 
 
-    public void initMemRegion(RealModeMemoryRegion region, Memory memory, boolean force) {
+    public void initMemRegion(MemoryRegion region, Memory memory, boolean force) {
         if (!force && m_currentRegion.equals(region))
             return; // can happen in shared mem if we move between the two codes of a single player
 

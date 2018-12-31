@@ -6,7 +6,6 @@ public class Memory {
 
     public MemoryEventListener listener;
 
-    //private RealModeMemoryImpl data = new RealModeMemoryImpl();
 
     public byte[] getByteArray()
     {
@@ -27,8 +26,6 @@ public class Memory {
 
     public void storeByte(int index, byte value)
     {
-        //data[index] = value;
-        //data.writeByte(new RealModeAddress(ARENA_SEGMENT, (short)index), value);
         data[index] = value;
         if (listener != null) {
             listener.onMemoryWrite(index , value);
@@ -48,7 +45,6 @@ public class Memory {
 
     public byte loadByte(int index)
     {
-        //return data[index];
         return data[index];
     }
     public short loadHalfWord(int index)

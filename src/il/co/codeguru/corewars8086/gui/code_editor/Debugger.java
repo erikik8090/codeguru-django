@@ -15,9 +15,11 @@ import il.co.codeguru.corewars8086.utils.disassembler.IDisassembler;
 import il.co.codeguru.corewars8086.war.War;
 import il.co.codeguru.corewars8086.war.Warrior;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static il.co.codeguru.corewars8086.gui.code_editor.CodeEditor.PageInfo;
 import static il.co.codeguru.corewars8086.gui.code_editor.CodeEditor.SPACE_FOR_HEX;
-import static il.co.codeguru.corewars8086.jsadd.Format.hex;
 import static il.co.codeguru.corewars8086.war.War.ARENA_SIZE;
 
 public class Debugger {
@@ -44,16 +46,51 @@ public class Debugger {
 
     public static class DbgLine {
         // one such object can appear in multiple addresses for instance the comment int3 line
-        public static final int FLAG_UNPARSED = 1;  // means this is a DbgLine of a value written by a warrior and not yet parsed by the disassembler
-        public static final int FLAG_DEFINE_CODE = 2; // line that came from the user typed text that defines a number (db 123)
-        public static final int FLAG_HAS_COMMENT = 4; // This DbgLine has comment lines after the first code line so when highlighting this line, need to highlight dfXXXXX instead of dXXXXX
-        public static final int FLAG_LSTLINE_MAX = 0x7ff;
-        public static final int FLAG_LSTLINE_SHIFT = 16;
-        public static final int FLAG_LSTLINE = 0x07ff0000; // 5 - upper 12 bits of the flat is a 1-based line number of the LstLine that created this DbgLine or 0 if there isn't one
-        public static final int FLAG_PLAYER_NUM_SHIFT = 27;
-        public static final int FLAG_PLAYER_NUM = 0xf8000000; // upper 5 bits is the player number, valid only if there is a non-zero LstLine
+        static final int FLAG_UNPARSED = 1;  // means this is a DbgLine of a value written by a warrior and not yet parsed by the disassembler
+        static final int FLAG_DEFINE_CODE = 2; // line that came from the user typed text that defines a number (db 123)
+        static final int FLAG_HAS_COMMENT = 4; // This DbgLine has comment lines after the first code line so when highlighting this line, need to highlight dfXXXXX instead of dXXXXX
+        static final int FLAG_LSTLINE_MAX = 0x7ff;
+        static final int FLAG_LSTLINE_SHIFT = 16;
+        static final int FLAG_LSTLINE = 0x07ff0000; // 5 - upper 12 bits of the flat is a 1-based line number of the LstLine that created this DbgLine or 0 if there isn't one
+        static final int FLAG_PLAYER_NUM_SHIFT = 27;
+        static final int FLAG_PLAYER_NUM = 0xf8000000; // upper 5 bits is the player number, valid only if there is a non-zero LstLine
         String text; // includes the command and any comment lines after it
         int flags = 0;
+
+        public DbgLine(){}
+        public DbgLine(String rawBytes, String assemblyCode, boolean toBackfill)
+        {
+            this.rawBytes = rawBytes;
+            this.assemblyCode = assemblyCode;
+            this.toBackfill = toBackfill;
+        }
+
+        public DbgLine(String rawBytes, String assemblyCode)
+        {
+            this(rawBytes, assemblyCode, false);
+        }
+
+
+        String rawBytes = "00";
+        String assemblyCode = "null";
+        boolean toBackfill = true;
+        List<String> comments = new ArrayList<>();
+
+        String getText()
+        {
+            String answer = "";
+            if(toBackfill)
+            {
+                answer += "<span class='dbg_backfill'>" ;
+            }
+            answer += "<span class='dbg_opcodes'>" + rawBytes + "</span>" + assemblyCode;
+            if(toBackfill)
+            {
+                answer += "</span>";
+            }
+
+            return answer;
+        }
     }
 
     public Debugger(CodeEditor codeEditor) {
@@ -71,7 +108,7 @@ public class Debugger {
         m_mem = memory;
     }
 
-    DbgLine getFillCmd() {
+    private DbgLine getFillCmd() {
         return m_fillCmd;
     }
 
@@ -133,7 +170,7 @@ public class Debugger {
 
 
         String ider = "d";
-        if ((m_dbglines[ipInsideArena].flags & DbgLine.FLAG_HAS_COMMENT) != 0)
+        if ((m_dbglines[ipInsideArena].comments.size() > 0))
             ider = "df"; // a line with a comment after, don't highlight the entire line, just the first line. df is assured to exist if we have this flag
 
 
@@ -158,14 +195,12 @@ public class Debugger {
         eraseOpcode(addrInArea); // for example replacing at the start of a long db "ABC"
         int len = dis.lastOpcodeSize();
 
-        DbgLine opline = new DbgLine();
         StringBuilder bs = new StringBuilder();
         for (int i = 0; i < len; ++i) {
             bs.append(Format.hex2(m_mem.loadByte(absaddr + i) & 0xff));
             bs.append(SPACE_FOR_HEX);
         }
-
-        opline.text = "<span class='dbg_opcodes'>" + bs.toString() + "</span>" + text;
+        DbgLine opline = new DbgLine(bs.toString(), text);
         m_dbglines[addrInArea] = opline;
         renderLineIfInView(addrInArea, opline);
         for (int i = 1; i < len; ++i) {
@@ -209,9 +244,9 @@ public class Debugger {
         int val = bval & 0xff; // to unsigned int
         DbgLine byteline = m_singleByte[val];
         if (byteline == null) {
-            byteline = new DbgLine();
             String hexVal = Format.hex2(val);
-            byteline.text = "<span class='dbg_opcodes'>" + hexVal + "</span>db " + hexVal + "h";
+            byteline = new DbgLine(hexVal, "db " + hexVal + "h");
+
             byteline.flags = DbgLine.FLAG_UNPARSED;
         }
         m_singleByte[val] = byteline;
@@ -222,8 +257,7 @@ public class Debugger {
         War war = codeEditor.getCurrentCompetition().getCurrentWar();
 
         if (m_fillCmd == null) {
-            m_fillCmd = new DbgLine();
-            m_fillCmd.text = "<span class='dbg_backfill'><span class='dbg_opcodes'>00</span>null</span>";
+            m_fillCmd = new DbgLine("00", "null", true);
         }
 
         for (int addr = 0; addr < ARENA_SIZE; ++addr) {
@@ -250,40 +284,18 @@ public class Debugger {
                 code.lines.get(br.lineNum - 1).tmp_br = br;
             }
 
-
-            DbgLine last_dbgline = null;
-
-            // comment or label on the first line, need to belong to the address before first
-            if (code.lines.get(0).address == -1) {
-                int befFirst = playerLoadOffset - 1;
-                if (m_dbglines[befFirst] != null) {
-                    last_dbgline = m_dbglines[befFirst];
-                    if (last_dbgline == m_fillCmd) { // it's the shared DbgLine from above, make a copy of it since we don't want to change it
-                        DbgLine copy = new DbgLine();
-                        copy.text = last_dbgline.text;
-                        last_dbgline = copy;
-                        m_dbglines[befFirst] = last_dbgline;
-                    }
-                } else {
-                    last_dbgline = new DbgLine();
-                    last_dbgline.text = "";
-                    m_dbglines[befFirst] = last_dbgline;
-                }
-            }
+            DbgLine last_dbgline = getFirstDbgLine(playerLoadOffset);
 
             for (int lsti = 0; lsti < code.lines.size(); ++lsti) {
                 CodeEditor.LstLine lstline = code.lines.get(lsti);
                 //If line is a comment
                 if (lstline.address == -1) {
                     assert last_dbgline != null : "Unexpected blank prev line";
-                    last_dbgline.flags |= DbgLine.FLAG_HAS_COMMENT;
-                    last_dbgline.text += "</div><div class='dbg_comment_line'>      <span class='dbg_opcodes'></span>" + lstline.code + "</div>";
+                    last_dbgline.comments.add(lstline.code);
                 } else {
-
                     int loadAddr = lstline.address + playerLoadOffset;
-                    DbgLine dbgline = new DbgLine();
+                    DbgLine dbgline = new DbgLine(lstline.opcode, lstline.code);
 
-                    dbgline.text = "<span class='dbg_opcodes'>" + lstline.opcode + "</span>" + lstline.code;
                     if (codeEditor.isDefineCode(lstline.code))
                         dbgline.flags = DbgLine.FLAG_DEFINE_CODE;
 
@@ -305,6 +317,17 @@ public class Debugger {
                 }
             }
         }
+    }
+
+    private DbgLine getFirstDbgLine(int playerLoadOffset) {
+        // comment or label on the first line, need to belong to the address before first
+        int beforeFirst = playerLoadOffset - 1;
+        // it's the shared DbgLine from above, make a copy of it since we don't want to change it
+        if (m_dbglines[beforeFirst] == null || m_dbglines[beforeFirst] == m_fillCmd) {
+            m_dbglines[beforeFirst] = new DbgLine();
+        }
+
+        return m_dbglines[beforeFirst];
     }
 
 
@@ -339,7 +362,7 @@ public class Debugger {
                 br.lineNum = lsti;
                 // check sanity that there isn't a breakpoint in this line
                 for (PlayersPanel.Breakpoint exist_br : codeObj.breakpoints)
-                    assert exist_br.lineNum != br.lineNum : "Breakpoint of this line already exists! " + Integer.toString(br.lineNum);
+                    assert exist_br.lineNum != br.lineNum : "Breakpoint of this line already exists! " + br.lineNum;
                 codeObj.breakpoints.add(br);
             } else {
                 boolean removed = codeObj.breakpoints.remove(br);
@@ -367,10 +390,14 @@ public class Debugger {
         }
 
         String addrhex = Format.hex4(addr);
-        if ((dbgline.flags & DbgLine.FLAG_HAS_COMMENT) != 0) // this div tag is closed inside dbgline.text before the comment starts
-            dline.innerHTML = "<div id='df" + addrstr + "'><span id='da" + addrstr + "'>" + addrhex + "</span>  " + dbgline.text;
+        if (dbgline.comments.size() > 0) { // this div tag is closed inside dbgline.text before the comment starts
+            dline.innerHTML = "<div id='df" + addrstr + "'><span id='da" + addrstr + "'>" + addrhex + "</span>  " + dbgline.getText();
+            for(String comment : dbgline.comments)
+                dline.innerHTML += "</div><div class='dbg_comment_line'><span class='dbg_opcodes'></span>" + comment;
+            dline.innerHTML += "</div>";
+        }
         else
-            dline.innerHTML = "<span id='da" + addrstr + "'>" + addrhex + "</span>  " + dbgline.text;
+            dline.innerHTML = "<span id='da" + addrstr + "'>" + addrhex + "</span>  " + dbgline.getText();
         dline.removeAttribute("style");
 
         HTMLElement da = (HTMLElement) DomGlobal.document.getElementById("da" + addrstr);

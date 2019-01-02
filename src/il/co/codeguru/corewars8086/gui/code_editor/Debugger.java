@@ -28,11 +28,11 @@ public class Debugger {
     private HTMLElement m_lastDbgElement;
     private boolean m_lastIsAlive = false;
     private Memory m_mem = null;
-    private DebuggerMemoryListener memoryListener = new DebuggerMemoryListener();
+    private DefineDataCache cache = new DefineDataCache();
+    private final DebuggerMemoryListener memoryListener = new DebuggerMemoryListener();
 
-    private DbgLine[] m_singleByte = new DbgLine[256]; // hold lines with db XXh for memory write events
     private DbgLine[] m_dbglines;  // for every address, the line of display in the debugger panel or null if line is not displayed
-    private DbgLine m_fillCmd;
+    private final DbgLine m_fillCmd = new DbgLine("00", "null", true);
     private PlayersPanel.Breakpoint[] m_dbgBreakpoints; // for every address, reference to a Breakpoint object if one exists
     private final EventListener m_dbgBrClickHandler = event -> {
         Element e = (Element) event.target;
@@ -54,7 +54,6 @@ public class Debugger {
         static final int FLAG_LSTLINE = 0x07ff0000; // 5 - upper 12 bits of the flat is a 1-based line number of the LstLine that created this DbgLine or 0 if there isn't one
         static final int FLAG_PLAYER_NUM_SHIFT = 27;
         static final int FLAG_PLAYER_NUM = 0xf8000000; // upper 5 bits is the player number, valid only if there is a non-zero LstLine
-        String text; // includes the command and any comment lines after it
         int flags = 0;
 
         public DbgLine(){}
@@ -69,7 +68,6 @@ public class Debugger {
         {
             this(rawBytes, assemblyCode, false);
         }
-
 
         String rawBytes = "00";
         String assemblyCode = "null";
@@ -106,10 +104,6 @@ public class Debugger {
 
     public void setMemory(Memory memory) {
         m_mem = memory;
-    }
-
-    private DbgLine getFillCmd() {
-        return m_fillCmd;
     }
 
     private DbgLine getDbgLine(int index) {
@@ -228,7 +222,7 @@ public class Debugger {
     }
 
     public void setByte(int address, byte value) {
-        DbgLine dbgline = getSingleByteLine(value);
+        DbgLine dbgline = cache.getSingleByteLine(value);
         m_dbglines[address] = dbgline;
         renderLineIfInView(address, dbgline);
     }
@@ -240,25 +234,10 @@ public class Debugger {
         }
     }
 
-    private DbgLine getSingleByteLine(byte bval) {
-        int val = bval & 0xff; // to unsigned int
-        DbgLine byteline = m_singleByte[val];
-        if (byteline == null) {
-            String hexVal = Format.hex2(val);
-            byteline = new DbgLine(hexVal, "db " + hexVal + "h");
 
-            byteline.flags = DbgLine.FLAG_UNPARSED;
-        }
-        m_singleByte[val] = byteline;
-        return byteline;
-    }
 
     public void initDebugAreaLines() {
         War war = codeEditor.getCurrentCompetition().getCurrentWar();
-
-        if (m_fillCmd == null) {
-            m_fillCmd = new DbgLine("00", "null", true);
-        }
 
         for (int addr = 0; addr < ARENA_SIZE; ++addr) {
             m_dbglines[addr] = m_fillCmd;
@@ -390,7 +369,7 @@ public class Debugger {
         }
 
         String addrhex = Format.hex4(addr);
-        if (dbgline.comments.size() > 0) { // this div tag is closed inside dbgline.text before the comment starts
+        if (dbgline.comments.size() > 0) { // this div tag is closed inside dbgline.getText() before the comment starts
             dline.innerHTML = "<div id='df" + addrstr + "'><span id='da" + addrstr + "'>" + addrhex + "</span>  " + dbgline.getText();
             for(String comment : dbgline.comments)
                 dline.innerHTML += "</div><div class='dbg_comment_line'><span class='dbg_opcodes'></span>" + comment;
@@ -466,7 +445,26 @@ public class Debugger {
         m_atScrollP2 = p2;
     }
 
-    public class DebuggerMemoryListener implements MemoryEventListener
+    private class DefineDataCache
+    {
+        private DbgLine[] m_singleByte = new DbgLine[256]; // hold lines with db XXh for memory write events
+
+        DbgLine getSingleByteLine(byte bval) {
+            int val = bval & 0xff; // to unsigned int
+            DbgLine byteline = m_singleByte[val];
+            if (byteline == null) {
+                String hexVal = Format.hex2(val);
+                byteline = new DbgLine(hexVal, "db " + hexVal + "h");
+
+                byteline.flags = DbgLine.FLAG_UNPARSED;
+            }
+            m_singleByte[val] = byteline;
+            return byteline;
+        }
+
+    }
+
+    private class DebuggerMemoryListener implements MemoryEventListener
     {
         private EWriteState m_memWriteState = MemoryEventListener.EWriteState.INIT;
         @Override
@@ -487,7 +485,7 @@ public class Debugger {
 
             DbgLine existing = getDbgLine(ipInsideArena);
 
-            if (existing == getFillCmd()) {
+            if (existing == m_fillCmd) {
                 setByte(ipInsideArena, value);
             }
             else  {

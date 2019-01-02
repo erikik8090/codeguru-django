@@ -7,6 +7,7 @@ import il.co.codeguru.corewars8086.cpu.riscv.Memory;
 import il.co.codeguru.corewars8086.cpu.riscv.instruction_formats.InstructionFormatBase;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.InstructionDecoderRv32c;
 import il.co.codeguru.corewars8086.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
+import il.co.codeguru.corewars8086.utils.Logger;
 
 public class DisassemblerRiscV implements IDisassembler {
 
@@ -58,6 +59,7 @@ public class DisassemblerRiscV implements IDisassembler {
                 instruction = decoder.decode(instructionFormat);
                 lastOpcodeSize = 4;
             } catch (InvalidOpcodeException iv) {
+                Logger.log("Failed");
                 throw new DisassemblerException();
             }
         }

@@ -88,7 +88,7 @@ public class Warrior
         return (short)(m_loadAddress);
     }
     public int getLoadOffsetInt() {
-        return m_loadAddress;
+        return m_loadAddress & 0xFFFF;
     }
 
     /**

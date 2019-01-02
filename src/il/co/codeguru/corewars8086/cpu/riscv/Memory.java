@@ -1,9 +1,6 @@
 package il.co.codeguru.corewars8086.cpu.riscv;
 
 import il.co.codeguru.corewars8086.memory.MemoryEventListener;
-import il.co.codeguru.corewars8086.utils.Logger;
-
-import static il.co.codeguru.corewars8086.jsadd.Format.hex;
 
 public class Memory {
 
@@ -28,7 +25,6 @@ public class Memory {
 
     public void storeByte(int index, byte value)
     {
-        Logger.log("Writing to memory: " + hex(index));
         data[index] = value;
         if (listener != null) {
             listener.onMemoryWrite(index , value);

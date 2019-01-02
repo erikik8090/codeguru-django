@@ -21,7 +21,6 @@ import static elemental2.dom.DomGlobal.document;
 
 public class CodeEditor implements CompetitionEventListener, MemoryEventListener, IBreakpointCheck
 {
-    private final LstParser lstParser = new LstParser(this);
     private final Debugger debugger = new Debugger(this);
     private EditorBreakpointManager breakpointManager = new EditorBreakpointManager(this);
     private HTMLElement asm_output;

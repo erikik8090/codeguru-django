@@ -17,6 +17,7 @@ import il.co.codeguru.corewars8086.war.Warrior;
 
 import static il.co.codeguru.corewars8086.gui.code_editor.CodeEditor.PageInfo;
 import static il.co.codeguru.corewars8086.gui.code_editor.CodeEditor.SPACE_FOR_HEX;
+import static il.co.codeguru.corewars8086.jsadd.Format.hex;
 import static il.co.codeguru.corewars8086.war.War.ARENA_SIZE;
 
 public class Debugger {
@@ -74,7 +75,7 @@ public class Debugger {
         return m_fillCmd;
     }
 
-    DbgLine getDbgLine(int index) {
+    private DbgLine getDbgLine(int index) {
         return m_dbglines[index];
     }
 
@@ -98,7 +99,6 @@ public class Debugger {
         if (currentWarrior == null)
             return;
         final int ipInsideArena = getWarrirorIp(currentWarrior);
-        assert ipInsideArena < ARENA_SIZE : "IP outside of arena";
         final boolean isAlive = currentWarrior.isAlive();
 
 
@@ -137,15 +137,12 @@ public class Debugger {
             ider = "df"; // a line with a comment after, don't highlight the entire line, just the first line. df is assured to exist if we have this flag
 
 
-        HTMLElement dline = (HTMLElement) DomGlobal.document.getElementById(ider + Integer.toString(ipInsideArena));
+        HTMLElement dline = (HTMLElement) DomGlobal.document.getElementById(ider + ipInsideArena);
         dline.classList.add(isAlive ? "current_dbg" : "current_dbg_dead");
         m_lastDbgElement = dline;
         this.m_lastDbgAddr = ipInsideArena;
         this.m_lastDbgAddrEnd = m_lastDbgAddr + 1;
         m_lastIsAlive = isAlive;
-        while (m_lastDbgAddrEnd < (0) && m_dbglines[m_lastDbgAddrEnd] == null)
-            this.m_lastDbgAddrEnd = m_lastDbgAddrEnd + 1;
-
     }
 
     private void disassembleAddress(int absaddr, int addrInArea) {
@@ -155,6 +152,7 @@ public class Debugger {
         try {
             text = dis.nextOpcode();
         } catch (IDisassembler.DisassemblerException e) {
+            Logger.log("falied @ disassembleAddress");
             return;
         }
         eraseOpcode(addrInArea); // for example replacing at the start of a long db "ABC"
@@ -225,7 +223,7 @@ public class Debugger {
 
         if (m_fillCmd == null) {
             m_fillCmd = new DbgLine();
-            m_fillCmd.text = "<span class='dbg_backfill'><span class='dbg_opcodes'>CC</span>int 3</span>";
+            m_fillCmd.text = "<span class='dbg_backfill'><span class='dbg_opcodes'>00</span>null</span>";
         }
 
         for (int addr = 0; addr < ARENA_SIZE; ++addr) {
@@ -244,6 +242,7 @@ public class Debugger {
 
             // transfer breakpoints
             assert code.lines != null : "unexpected null lines for code " + code.label + " of player" + code.player.getName();
+
             for (CodeEditor.LstLine lstline : code.lines)
                 lstline.tmp_br = null;
             for (PlayersPanel.Breakpoint br : code.breakpoints) {
@@ -274,16 +273,17 @@ public class Debugger {
 
             for (int lsti = 0; lsti < code.lines.size(); ++lsti) {
                 CodeEditor.LstLine lstline = code.lines.get(lsti);
+                //If line is a comment
                 if (lstline.address == -1) {
                     assert last_dbgline != null : "Unexpected blank prev line";
                     last_dbgline.flags |= DbgLine.FLAG_HAS_COMMENT;
                     last_dbgline.text += "</div><div class='dbg_comment_line'>      <span class='dbg_opcodes'></span>" + lstline.code + "</div>";
                 } else {
+
                     int loadAddr = lstline.address + playerLoadOffset;
                     DbgLine dbgline = new DbgLine();
-                    String opcode = lstline.opcode;
 
-                    dbgline.text = "<span class='dbg_opcodes'>" + opcode + "</span>" + lstline.code;
+                    dbgline.text = "<span class='dbg_opcodes'>" + lstline.opcode + "</span>" + lstline.code;
                     if (codeEditor.isDefineCode(lstline.code))
                         dbgline.flags = DbgLine.FLAG_DEFINE_CODE;
 
@@ -384,7 +384,7 @@ public class Debugger {
     }
 
     private void setDbgAddrBreakpoint(int addr, boolean v) {
-        Element e = DomGlobal.document.getElementById("da" + Integer.toString(addr));
+        Element e = DomGlobal.document.getElementById("d" + addr);
         if (v)
             e.classList.add("dbg_breakpoint");
         else
@@ -414,7 +414,7 @@ public class Debugger {
     public static int getWarrirorIp(Warrior w) {
         if (w == null)
             return -1;
-        return w.getCpuState().getPc();
+        return w.getCpuState().getPc() & 0xFFFF;
     }
 
     // from javascript scroll of debug area

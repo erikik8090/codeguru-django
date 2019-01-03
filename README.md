@@ -1,7 +1,7 @@
 corewars_js - RISCV
 ===========
 
-This is a fork of corewars8086_js that replaces the x86 assembly with RISC-V assembly.
+This is a fork of corewars_riscv_js that replaces the x86 assembly with RISC-V assembly.
 
  Getting Started
 --------
@@ -28,8 +28,8 @@ This project is licensed under the GPL v3.0 License - see the LICENSE file for d
  References:  
 ---------- 
 https://codeguru.co.il/Xtreme/  
-https://github.com/codeguru-il/corewars8086  
-https://github.com/YoavKa/corewars8086    (disassembler)   
+https://github.com/codeguru-il/corewars_riscv  
+https://github.com/YoavKa/corewars_riscv    (disassembler)   
 https://github.com/kimwalisch/calculator  (watch language)   
 
 

@@ -1,6 +1,8 @@
 corewars_js - RISCV
 ===========
 
+[![Build Status](https://travis-ci.com/westerndigitalcorporation/corewars-risc-v.svg?branch=master)](https://travis-ci.com/westerndigitalcorporation/corewars-risc-v)
+
 This is a fork of corewars8086_js that replaces the x86 assembly with RISC-V assembly.
 
  Getting Started

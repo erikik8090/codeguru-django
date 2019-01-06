@@ -5,7 +5,7 @@ package il.co.codeguru.corewars_riscv.memory;
  * 
  * @author DL
  */
-public class MemoryException extends Exception {
+public class MemoryException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	public MemoryException() {}

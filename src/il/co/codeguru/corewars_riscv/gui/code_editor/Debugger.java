@@ -4,7 +4,8 @@ import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import elemental2.dom.EventListener;
 import elemental2.dom.HTMLElement;
-import il.co.codeguru.corewars_riscv.cpu.riscv.Memory;
+import il.co.codeguru.corewars_riscv.memory.Memory;
+import il.co.codeguru.corewars_riscv.memory.RawMemory;
 import il.co.codeguru.corewars_riscv.gui.PlayersPanel;
 import il.co.codeguru.corewars_riscv.gui.widgets.Console;
 import il.co.codeguru.corewars_riscv.jsadd.Format;
@@ -27,7 +28,7 @@ public class Debugger {
 
     private HTMLElement m_lastDbgElement;
     private boolean m_lastIsAlive = false;
-    private Memory m_mem = null;
+    private RawMemory m_mem = null;
     private DefineDataCache cache = new DefineDataCache();
     private final DebuggerMemoryListener memoryListener = new DebuggerMemoryListener();
 
@@ -102,7 +103,7 @@ public class Debugger {
     
     public MemoryEventListener getMemoryListener() { return memoryListener;}
 
-    public void setMemory(Memory memory) {
+    public void setMemory(RawMemory memory) {
         m_mem = memory;
     }
 

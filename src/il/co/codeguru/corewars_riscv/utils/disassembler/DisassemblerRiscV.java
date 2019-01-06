@@ -3,7 +3,8 @@ package il.co.codeguru.corewars_riscv.utils.disassembler;
 import il.co.codeguru.corewars_riscv.cpu.exceptions.InvalidOpcodeException;
 import il.co.codeguru.corewars_riscv.cpu.riscv.Instruction;
 import il.co.codeguru.corewars_riscv.cpu.riscv.InstructionDecoder;
-import il.co.codeguru.corewars_riscv.cpu.riscv.Memory;
+import il.co.codeguru.corewars_riscv.memory.Memory;
+import il.co.codeguru.corewars_riscv.memory.RawMemory;
 import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.InstructionFormatBase;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.InstructionDecoderRv32c;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
@@ -14,13 +15,13 @@ public class DisassemblerRiscV implements IDisassembler {
     private InstructionDecoder decoder;
     private InstructionDecoderRv32c cDecoder;
 
-    private Memory memory;
+    private Memory Memory;
     private int index;
     private int endIndex;
     private int lastOpcodeSize = 0;
 
     public DisassemblerRiscV(byte[] memory, int index, int endIndex) {
-        this.memory = new Memory(memory);
+        this.Memory = new RawMemory(memory);
         this.index = index;
         this.endIndex = endIndex;
 
@@ -35,7 +36,7 @@ public class DisassemblerRiscV implements IDisassembler {
     }
 
     private Instruction getCInstruction() {
-        short rawInstruction = memory.loadHalfWord(this.index);
+        short rawInstruction = Memory.loadHalfWord(this.index);
         CInstructionFormatBase instructionFormat = new CInstructionFormatBase(rawInstruction);
         return cDecoder.decode(instructionFormat);
     }
@@ -47,7 +48,7 @@ public class DisassemblerRiscV implements IDisassembler {
 
     @Override
     public String nextOpcode() throws DisassemblerException {
-        int rawInstruction = memory.loadWord(this.index);
+        int rawInstruction = Memory.loadWord(this.index);
         InstructionFormatBase instructionFormat = new InstructionFormatBase(rawInstruction);
         Instruction instruction= getCInstruction();
 

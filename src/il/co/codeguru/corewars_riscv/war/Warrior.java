@@ -3,7 +3,7 @@ package il.co.codeguru.corewars_riscv.war;
 import il.co.codeguru.corewars_riscv.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
-import il.co.codeguru.corewars_riscv.cpu.riscv.Memory;
+import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
 import il.co.codeguru.corewars_riscv.memory.MemoryRegion;
 
@@ -112,7 +112,7 @@ public class Warrior
     /**
      * Performs the warrior's next turn (= next InstructionInfo).
      * @throws CpuException     on any CPU error.
-     * @throws MemoryException  on any Memory error.
+     * @throws MemoryException  on any RawMemory error.
      */
     public void nextOpcode() throws CpuException, MemoryException {
         m_cpu.nextOpcode();

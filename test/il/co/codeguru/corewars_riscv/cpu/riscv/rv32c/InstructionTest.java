@@ -3,7 +3,8 @@ package il.co.codeguru.corewars_riscv.cpu.riscv.rv32c;
 import il.co.codeguru.corewars_riscv.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
-import il.co.codeguru.corewars_riscv.cpu.riscv.Memory;
+import il.co.codeguru.corewars_riscv.memory.Memory;
+import il.co.codeguru.corewars_riscv.memory.RawMemory;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
 import il.co.codeguru.corewars_riscv.utils.Logger;
@@ -32,7 +33,7 @@ public class InstructionTest {
     @Before
     public void setUp() {
         state = new CpuStateRiscV();
-        memory = new Memory(0x10000);
+        memory = new RawMemory(0x10000);
         cpu = new CpuRiscV(state, memory);
         Logger.setTestingMode();
     }

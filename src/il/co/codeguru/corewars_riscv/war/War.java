@@ -1,7 +1,7 @@
 package il.co.codeguru.corewars_riscv.war;
 
 import il.co.codeguru.corewars_riscv.cpu.exceptions.CpuException;
-import il.co.codeguru.corewars_riscv.cpu.riscv.Memory;
+import il.co.codeguru.corewars_riscv.memory.RawMemory;
 import il.co.codeguru.corewars_riscv.gui.IBreakpointCheck;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import static il.co.codeguru.corewars_riscv.cpu.riscv.Memory.*;
+import static il.co.codeguru.corewars_riscv.memory.RawMemory.*;
 
 
 /**
@@ -53,7 +53,7 @@ public class War {
      */
     private int m_nextFreeAddress;
     /** The 'physical' memory core */
-    private Memory m_core;
+    private RawMemory m_core;
 
     /** The number of the current warrior */
     private int m_currentWarrior;
@@ -95,7 +95,7 @@ public class War {
         m_warriors = new Warrior[MAX_WARRIORS];
         m_numWarriors = 0;
         m_numWarriorsAlive = 0;
-        m_core = new Memory(MEMORY_SIZE);
+        m_core = new RawMemory(MEMORY_SIZE);
         m_nextFreeAddress = ARENA_SIZE;
 
         // initialize arena
@@ -144,7 +144,7 @@ public class War {
                 }
                 catch (MemoryException e) {
                     if(m_warListener != null)
-                        m_warListener.onWarriorDeath(warrior, "Memory exception: " + e.getMessage());
+                        m_warListener.onWarriorDeath(warrior, "RawMemory exception: " + e.getMessage());
                     warrior.kill();
                     warrior.getCpuState().setPc(savedIp);
                     --m_numWarriorsAlive;
@@ -300,7 +300,7 @@ public class War {
      * next-free-memory pointer (m_nextFreeAddress).
      * 
      * @param size   Required memory size, must be a multiple of
-     *               Memory.PARAGRAPH_SIZE
+     *               RawMemory.PARAGRAPH_SIZE
      * @return Pointer to the beginning of the allocated memory block.
      */
     private int allocateCoreMemory(short size) {
@@ -462,7 +462,7 @@ public class War {
     	return this.isSingleRound;
     }
     
-    public Memory getMemory(){
+    public RawMemory getMemory(){
     	return m_core;
     }
     

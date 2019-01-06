@@ -5,7 +5,7 @@ import elemental2.dom.DocumentFragment;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLElement;
-import il.co.codeguru.corewars_riscv.cpu.riscv.Memory;
+import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.gui.asm_parsers.TextUtils;
 import il.co.codeguru.corewars_riscv.jsadd.Format;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
@@ -30,7 +30,7 @@ public class MemRegionView implements MemoryEventListener
     }
 
 
-    public void initMemRegion(MemoryRegion region, Memory memory, boolean force) {
+    public void initMemRegion(MemoryRegion region, Memory Memory, boolean force) {
         if (!force && m_currentRegion.equals(region))
             return; // can happen in shared mem if we move between the two codes of a single player
 
@@ -43,9 +43,9 @@ public class MemRegionView implements MemoryEventListener
 
             String sb = Format.hex5(addr) +
                     "   " +
-                    Format.hex2(Unsigned.unsignedByte(memory.loadByte(addr))) +
+                    Format.hex2(Unsigned.unsignedByte(Memory.loadByte(addr))) +
                     TextUtils.SPACE_FOR_HEX_CHAR +
-                    Format.hex2(Unsigned.unsignedByte(memory.loadByte(addr + 1)));
+                    Format.hex2(Unsigned.unsignedByte(Memory.loadByte(addr + 1)));
             e.appendChild(DomGlobal.document.createTextNode(sb // memory size is always even so no need to check
             ));
             df.appendChild(e);

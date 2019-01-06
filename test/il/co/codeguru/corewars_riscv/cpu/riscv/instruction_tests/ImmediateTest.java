@@ -3,7 +3,8 @@ package il.co.codeguru.corewars_riscv.cpu.riscv.instruction_tests;
 import il.co.codeguru.corewars_riscv.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
-import il.co.codeguru.corewars_riscv.cpu.riscv.Memory;
+import il.co.codeguru.corewars_riscv.memory.Memory;
+import il.co.codeguru.corewars_riscv.memory.RawMemory;
 import il.co.codeguru.corewars_riscv.cpu.riscv.RV32I;
 import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.InstructionFormatBase;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
@@ -27,7 +28,7 @@ public class ImmediateTest {
     @Before
     public void setUp() {
         state = new CpuStateRiscV();
-        Memory memory = new Memory(0x10000);
+        Memory memory = new RawMemory(0x10000);
         cpu = new CpuRiscV(state, memory);
         Logger.setTestingMode();
     }

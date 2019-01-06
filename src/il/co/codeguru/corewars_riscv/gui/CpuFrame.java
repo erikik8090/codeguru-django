@@ -3,7 +3,7 @@ package il.co.codeguru.corewars_riscv.gui;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
-import il.co.codeguru.corewars_riscv.cpu.riscv.Memory;
+import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.gui.widgets.Console;
 import il.co.codeguru.corewars_riscv.jsadd.Format;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
@@ -194,7 +194,7 @@ public class CpuFrame implements CompetitionEventListener, MemoryEventListener {
 
 	private static class StateAccess implements ExpressionParser.IStateAccess {
 		public CpuStateRiscV state;
-		public Memory memory;
+		public Memory Memory;
 
 		@Override
 		public short getRegisterValue(String name) throws Exception{
@@ -217,9 +217,9 @@ public class CpuFrame implements CompetitionEventListener, MemoryEventListener {
 		@Override
 		public int getMemory(int addr, int seg, int size) {
 			if (size == 1)
-				return memory.loadByte(addr) & 0xff;
+				return Memory.loadByte(addr) & 0xff;
 			else
-				return memory.loadHalfWord(addr) & 0xffff;
+				return Memory.loadHalfWord(addr) & 0xffff;
 		}
 
 	}
@@ -320,7 +320,7 @@ public class CpuFrame implements CompetitionEventListener, MemoryEventListener {
 		stackView.initMemRegion(warrior.m_stackWritableRegion, currentWar.getMemory(), force);
 		sharedMemView.initMemRegion(warrior.m_sharedWritableRegion, currentWar.getMemory(), force);
 
-		m_stateAccess.memory = currentWar.getMemory();
+		m_stateAccess.Memory = currentWar.getMemory();
 	}
 
 	@Override

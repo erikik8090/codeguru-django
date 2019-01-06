@@ -1,6 +1,8 @@
 package il.co.codeguru.corewars_riscv.cpu.riscv;
 
 import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.*;
+import il.co.codeguru.corewars_riscv.memory.Memory;
+import il.co.codeguru.corewars_riscv.memory.MemoryException;
 
 public class InstructionRunner {
 
@@ -58,7 +60,7 @@ public class InstructionRunner {
      * The SW (Store word) instruction stores 32-bit value from register rs2 to memory
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void sw(InstructionFormatS i) {
+    public void sw(InstructionFormatS i) throws MemoryException {
         memory.storeWord(state.getReg(i.getRs1()) + i.getImm(), state.getReg(i.getRs2()));
     }
 
@@ -66,7 +68,7 @@ public class InstructionRunner {
      * The SH (Store Halfword) instruction stores 16-bit value from the low bits of register rs2 to memory
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void sh(InstructionFormatS i) {
+    public void sh(InstructionFormatS i) throws MemoryException {
         memory.storeHalfWord(state.getReg(i.getRs1()) + i.getImm(), (short) state.getReg(i.getRs2()));
     }
 
@@ -74,7 +76,7 @@ public class InstructionRunner {
      * The SB (Store Byte) instruction stores 8-bit value from the low bits of register rs2 to memory
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void sb(InstructionFormatS i) {
+    public void sb(InstructionFormatS i) throws MemoryException {
         memory.storeByte(state.getReg(i.getRs1()) + i.getImm(), (byte) state.getReg(i.getRs2()));
     }
 
@@ -192,7 +194,7 @@ public class InstructionRunner {
      * The LW instruction loads a 32-bit value from memory into rd
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void lw(InstructionFormatI i) {
+    public void lw(InstructionFormatI i) throws MemoryException {
         state.setReg(i.getRd(), memory.loadWord(state.getReg(i.getRs1()) + i.getImmediate()));
     }
 
@@ -200,7 +202,7 @@ public class InstructionRunner {
      * LH loads a 16-bit value from memory,then sign-extends to 32-bits before storing in rd
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void lh(InstructionFormatI i) {
+    public void lh(InstructionFormatI i) throws MemoryException {
         state.setReg(i.getRd(), memory.loadHalfWord(state.getReg(i.getRs1()) + i.getImmediate()));
     }
 
@@ -208,7 +210,7 @@ public class InstructionRunner {
      * LHU loads a 16-bit value from memory,then zero-extends to 32-bits before storing in rd
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void lhu(InstructionFormatI i) {
+    public void lhu(InstructionFormatI i) throws MemoryException {
         int val = memory.loadHalfWord(state.getReg(i.getRs1()) + i.getImmediate());
         state.setReg(i.getRd(), val & 0xFFFF);
     }
@@ -217,7 +219,7 @@ public class InstructionRunner {
      * LB loads a 8-bit value from memory,then sign-extends to 32-bits before storing in rd
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void lb(InstructionFormatI i) {
+    public void lb(InstructionFormatI i) throws MemoryException {
         state.setReg(i.getRd(), memory.loadByte(state.getReg(i.getRs1()) + i.getImmediate()));
     }
 
@@ -225,7 +227,7 @@ public class InstructionRunner {
      * LBU loads a 8-bit value from memory,then zero-extends to 32-bits before storing in rd
      * The effective byte address is obtained by adding register rs1 to the sign-extended 12-bit offset
      */
-    public void lbu(InstructionFormatI i) {
+    public void lbu(InstructionFormatI i) throws MemoryException {
         int val = memory.loadByte(state.getReg(i.getRs1()) + i.getImmediate());
         state.setReg(i.getRd(), val & 0xFF);
     }
@@ -264,7 +266,7 @@ public class InstructionRunner {
     /**
      * BEQ (Branch if Equal) takes the branch if registers rs1 and rs2 are equal
      */
-    public void beq(InstructionFormatSB i) {
+    void beq(InstructionFormatSB i) {
         beq(i,4);
     }
 
@@ -275,7 +277,7 @@ public class InstructionRunner {
     /**
      * BNE (Branch if Not Equal) takes the branch if registers rs1 and rs2 are not equal
      */
-    public void bne(InstructionFormatSB i) {
+    void bne(InstructionFormatSB i) {
         bne(i, 4);
     }
 
@@ -286,28 +288,28 @@ public class InstructionRunner {
     /**
      * BLT (Branch Less than) takes the branch if register rs1 is less than rs2 using signed comparision
      */
-    public void blt(InstructionFormatSB i) {
+    void blt(InstructionFormatSB i) {
         if (state.getReg(i.getRs1()) < state.getReg(i.getRs2())) jump(state, i.getImm());
     }
 
     /**
      * BLTU (Branch Less than Unsigned) takes the branch if register rs1 is less than rs2 using unsigned comparision
      */
-    public void bltu(InstructionFormatSB i) {
+    void bltu(InstructionFormatSB i) {
         if (state.getReg(i.getRs1()) + 0x80000000 < state.getReg(i.getRs2()) + 0x80000000) jump(state, i.getImm());
     }
 
     /**
      * BGE (Branch Greater or Equal) takes the branch if register rs1 is greater than rs2 or equal using signed comparision
      */
-    public void bge(InstructionFormatSB i) {
+    void bge(InstructionFormatSB i) {
         if (state.getReg(i.getRs1()) >= state.getReg(i.getRs2())) jump(state, i.getImm());
     }
 
     /**
      * BGE (Branch Greater or Equal Unsigned) takes the branch if register rs1 is greater than rs2 or equal using unsigned comparision
      */
-    public void bgeu(InstructionFormatSB i) {
+    void bgeu(InstructionFormatSB i) {
         if (state.getReg(i.getRs1()) + 0x80000000 >= state.getReg(i.getRs2()) + 0x80000000) jump(state, i.getImm());
     }
 

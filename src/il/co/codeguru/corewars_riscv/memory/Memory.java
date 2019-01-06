@@ -1,59 +1,38 @@
-package il.co.codeguru.corewars_riscv.cpu.riscv;
+package il.co.codeguru.corewars_riscv.memory;
 
-import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
-
-public class Memory {
-
+public abstract class Memory {
     public MemoryEventListener listener;
 
-    public byte[] getByteArray()
-    {
-        return data;
-    }
+    protected abstract void setByte(int index, byte value) throws MemoryException;
 
-    private byte[] data;
-
-    public Memory(int size)
+    public void storeByte(int index, byte value) throws MemoryException
     {
-        data= new byte[size];
-    }
-
-    public Memory(byte[] data)
-    {
-        this.data = data;
-    }
-
-    public void storeByte(int index, byte value)
-    {
-        data[index] = value;
+        setByte(index, value);
         if (listener != null) {
             listener.onMemoryWrite(index , value);
         }
     }
 
-    public void storeHalfWord(int index, short value)
+    public void storeHalfWord(int index, short value) throws MemoryException
     {
         storeByte(index,(byte)(value & 0xff));
         storeByte(index + 1,(byte)((value >> 8) & 0xff));
     }
 
-    public void storeWord(int index, int value)
+    public void storeWord(int index, int value) throws MemoryException
     {
         storeHalfWord(index, (short) (value & 0xffff));
         storeHalfWord(index + 2, (short) ((value >> 16) & 0xffff));
     }
 
 
-    public byte loadByte(int index)
-    {
-        return data[index];
-    }
-    public short loadHalfWord(int index)
+    public abstract byte loadByte(int index) throws MemoryException;
+    public short loadHalfWord(int index) throws MemoryException
     {
         return (short)(loadByte(index) & 0xFF |
-                      (loadByte(index + 1) << 8));
+                (loadByte(index + 1) << 8));
     }
-    public int loadWord(int index)
+    public int loadWord(int index) throws MemoryException
     {
         return  (loadHalfWord(index) & 0xFFFF |
                 (loadHalfWord(index+2) << 16));
@@ -76,5 +55,4 @@ public class Memory {
     public static final int PARAGRAPH_SIZE = 0x10;
     public static final int PARAGRAPHS_IN_SEGMENT = 0x1000;
     public static final int MEMORY_SIZE = NUM_PARAGRAPHS * PARAGRAPH_SIZE;
-
 }

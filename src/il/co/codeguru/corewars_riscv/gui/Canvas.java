@@ -2,12 +2,14 @@ package il.co.codeguru.corewars_riscv.gui;
 
 import elemental2.dom.*;
 import elemental2.dom.CanvasRenderingContext2D.FillStyleUnionType;
-import il.co.codeguru.corewars_riscv.cpu.riscv.Memory;
+import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.gui.widgets.Color;
 import il.co.codeguru.corewars_riscv.gui.widgets.Console;
 import il.co.codeguru.corewars_riscv.gui.widgets.Dimension;
 import il.co.codeguru.corewars_riscv.gui.widgets.JComponent;
 import il.co.codeguru.corewars_riscv.jsadd.Format;
+import il.co.codeguru.corewars_riscv.memory.MemoryException;
+import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.war.War;
 
 
@@ -188,7 +190,13 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
         {
             for (int x = 0; x < BOARD_SIZE; x++)
             {
-                values[x][y] = m_mem.loadByte(addr);
+                try {
+                    values[x][y] = m_mem.loadByte(addr);
+                }
+                catch (MemoryException e)
+                {
+                    Logger.error(e.getMessage());
+                }
                 addr += 1;
             }
         }
@@ -476,7 +484,12 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
         int my = (int)( (y - m_zrY)/ DOT_SIZE/m_zrVscale );
 
         int addr = (mx+my*256) & 0xffff;
-        int v = m_mem.loadByte(addr) & 0xff;
+        int v = 0;
+        try {
+            v = m_mem.loadByte(addr) & 0xff;
+        } catch (MemoryException e) {
+            Logger.error(e.getMessage());
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("0x");
@@ -574,7 +587,11 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
                     else
                         ev = ev & 0xf0 | v;
                     values[ix][iy] = (byte)ev;
-                    m_mem.storeByte((short)(ix+iy*256), (byte)ev);
+                    try {
+                        m_mem.storeByte((short)(ix+iy*256), (byte)ev);
+                    } catch (MemoryException e) {
+                        Logger.error(e.getMessage());
+                    }
                     moveCursor(0.5, 0);
 
                 }

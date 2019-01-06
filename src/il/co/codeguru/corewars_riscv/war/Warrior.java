@@ -6,6 +6,7 @@ import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
 import il.co.codeguru.corewars_riscv.memory.MemoryRegion;
+import il.co.codeguru.corewars_riscv.memory.RestrictedMemory;
 
 import static il.co.codeguru.corewars_riscv.war.War.*;
 
@@ -17,8 +18,9 @@ import static il.co.codeguru.corewars_riscv.war.War.*;
  */
 public class Warrior
 {
-    public MemoryRegion m_stackWritableRegion;
-    public MemoryRegion m_sharedWritableRegion;
+    public MemoryRegion stackRegion;
+    public MemoryRegion sharedRegion;
+    public final MemoryRegion arenaRegion = new MemoryRegion(0, ARENA_SIZE -1);
 
     /**
      * Constructor.
@@ -49,10 +51,14 @@ public class Warrior
         m_state = new CpuStateRiscV();
         initializeCpuState(loadAddress, initialStack, groupSharedMemory);
 
-        m_stackWritableRegion = new MemoryRegion(initialStack, initialStack + STACK_SIZE - 1);
-        m_sharedWritableRegion = new MemoryRegion(groupSharedMemory, groupSharedMemory + GROUP_SHARED_MEMORY_SIZE - 1);
+        stackRegion = new MemoryRegion(initialStack, initialStack + STACK_SIZE - 1);
+        sharedRegion = new MemoryRegion(groupSharedMemory, groupSharedMemory + GROUP_SHARED_MEMORY_SIZE - 1);
 
-        m_cpu = new CpuRiscV(m_state, core);
+        RestrictedMemory memory = new RestrictedMemory(core, new MemoryRegion[]{
+                sharedRegion, stackRegion, arenaRegion
+        });
+
+        m_cpu = new CpuRiscV(m_state, memory);
 
         m_isAlive = true;		
     }
@@ -105,9 +111,7 @@ public class Warrior
     public short getEnergy() {
         return 0;
     }
-    public void setEnergy(short value) {
-
-    }
+    public void setEnergy(short value) { }
 
     /**
      * Performs the warrior's next turn (= next InstructionInfo).
@@ -125,15 +129,13 @@ public class Warrior
 
     /**
      * Initializes the CpuRiscV registers & flags:
-     *  CS,DS                    - set to the core's segment.
-     *  ES                       - set to the group's shared memory segment.
-     *  AX,IP                    - set to the load address.
-     *  SS                       - set to the private stack's segment.
-     *  SP                       - set to the private stack's offset.
-     *  BX,CX,DX,SI,DI,BP, flags - set to zero.
-     * 
+     *
+     *  x1 and PC - To the warriors load address in the memory
+     *  x2 - The stack
+     *  x3 - The shared memory between the players in the team
+     *
      * @param loadAddress       Warrior's load address in the core.
-     * @param initialStack      Warrior's private stack (initial SS:SP).
+     * @param initialStack      Warrior's private stack.
      * @param groupSharedMemory The warrior's group shared memory.
      */
     private void initializeCpuState(

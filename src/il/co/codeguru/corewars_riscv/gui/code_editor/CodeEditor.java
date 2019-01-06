@@ -16,6 +16,7 @@ import il.co.codeguru.corewars_riscv.utils.disassembler.IDisassembler;
 import il.co.codeguru.corewars_riscv.war.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static elemental2.dom.DomGlobal.document;
 
@@ -726,7 +727,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
             msg = Integer.toString(lineNum+1) + ": Although this is a legal RISC-V Opcode, codewars-risc-v does not support it";
         }
         catch(RuntimeException e) {
-            Console.error("failed parsing binbuf RuntimeException"); // this should not happen. only happens for missing cases
+            Console.errorStream().print(Arrays.toString(e.getStackTrace())); // this should not happen. only happens for missing cases
         }
         return msg;
     }

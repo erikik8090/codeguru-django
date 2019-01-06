@@ -1,15 +1,18 @@
 package il.co.codeguru.corewars_riscv.memory;
 
+import il.co.codeguru.corewars_riscv.utils.Logger;
+
 import static il.co.codeguru.corewars_riscv.jsadd.Format.hex;
 
 public class RestrictedMemory extends Memory{
-    Memory memory;
-    MemoryRegion[] allowedRegions;
+    private Memory memory;
+    private MemoryRegion[] allowedRegions;
 
     public RestrictedMemory(Memory raw, MemoryRegion[] allowedRegions)
     {
         this.memory = raw;
         this.allowedRegions = allowedRegions;
+        setListener(raw.getListener());
     }
 
     private boolean isAddressAllowed(int index)

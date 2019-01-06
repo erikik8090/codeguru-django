@@ -57,12 +57,6 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
 
 	public Canvas(String id) {
 		super(id);
-		//eventCaster = new EventMulticasterMouse();
-		//eventHandler = (MouseAddressRequest) eventCaster.getProxy();
-		//this.addMouseMotionListener(this);
-		//this.addMouseListener(this);
-		//this.MouseX = 0;
-		//this.MouseY = 0;
 		ctx = (CanvasRenderingContext2D)(Object)m_element.getContext("2d");
 
 		Dimension d = getMinimumSize();
@@ -190,13 +184,7 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
         {
             for (int x = 0; x < BOARD_SIZE; x++)
             {
-                try {
-                    values[x][y] = m_mem.loadByte(addr);
-                }
-                catch (MemoryException e)
-                {
-                    Logger.error(e.getMessage());
-                }
+                values[x][y] = m_mem.loadByte(addr);
                 addr += 1;
             }
         }
@@ -485,11 +473,7 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
 
         int addr = (mx+my*256) & 0xffff;
         int v = 0;
-        try {
-            v = m_mem.loadByte(addr) & 0xff;
-        } catch (MemoryException e) {
-            Logger.error(e.getMessage());
-        }
+        v = m_mem.loadByte(addr) & 0xff;
 
         StringBuilder sb = new StringBuilder();
         sb.append("0x");
@@ -560,7 +544,6 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
             if (!m_showContent)
                 return;
             String key = ((KeyboardEvent)event).key;
-            //Console.log(key);
             event.preventDefault();
             if (key == "ArrowUp")
                 moveCursor(0,-1);
@@ -587,11 +570,8 @@ public class Canvas extends JComponent<HTMLCanvasElement> {
                     else
                         ev = ev & 0xf0 | v;
                     values[ix][iy] = (byte)ev;
-                    try {
-                        m_mem.storeByte((short)(ix+iy*256), (byte)ev);
-                    } catch (MemoryException e) {
-                        Logger.error(e.getMessage());
-                    }
+                    m_mem.storeByte((short)(ix+iy*256), (byte)ev);
+
                     moveCursor(0.5, 0);
 
                 }

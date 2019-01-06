@@ -6,6 +6,7 @@ import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars_riscv.gui.widgets.*;
 import il.co.codeguru.corewars_riscv.jsadd.Format;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
+import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.utils.Unsigned;
 import il.co.codeguru.corewars_riscv.war.Competition;
 import il.co.codeguru.corewars_riscv.war.CompetitionEventListener;

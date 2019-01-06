@@ -48,8 +48,6 @@ public class DisassemblerRiscV implements IDisassembler {
 
     @Override
     public String nextOpcode() throws DisassemblerException {
-        int rawInstruction = Memory.loadWord(this.index);
-        InstructionFormatBase instructionFormat = new InstructionFormatBase(rawInstruction);
         Instruction instruction= getCInstruction();
 
         if(instruction != null){
@@ -57,10 +55,11 @@ public class DisassemblerRiscV implements IDisassembler {
         }
         else {
             try {
+                int rawInstruction = Memory.loadWord(this.index);
+                InstructionFormatBase instructionFormat = new InstructionFormatBase(rawInstruction);
                 instruction = decoder.decode(instructionFormat);
                 lastOpcodeSize = 4;
             } catch (InvalidOpcodeException iv) {
-                Logger.log("Failed");
                 throw new DisassemblerException();
             }
         }

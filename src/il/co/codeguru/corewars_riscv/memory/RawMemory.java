@@ -22,13 +22,13 @@ public class RawMemory extends Memory {
 
     @Override
     public void setByte(int index, byte value) throws MemoryException {
-        if(index < 0 || index > data.length) throw new MemoryException("Unexpected write at " + hex(index));
+        if(index < 0 || index >= data.length) throw new MemoryException("Write out of bounds - at " + hex(index));
         data[index] = value;
     }
 
     @Override
     public byte loadByte(int index) throws MemoryException {
-        if(index < 0 || index > data.length) throw new MemoryException("Unexpected read at " + hex(index));
+        if(index < 0 || index >= data.length) throw new MemoryException("Read out of bounds - at " + hex(index));
         return data[index];
     }
 

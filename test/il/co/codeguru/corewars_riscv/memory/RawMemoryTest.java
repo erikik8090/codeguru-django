@@ -1,11 +1,9 @@
 package il.co.codeguru.corewars_riscv.memory;
 
-import il.co.codeguru.corewars_riscv.memory.Memory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class RawMemoryTest {
 
@@ -41,6 +39,12 @@ public class RawMemoryTest {
         assertEquals(0x1234, memory.loadHalfWord(2));
         assertEquals(0x5678, memory.loadHalfWord(0));
         assertEquals(0x3456, memory.loadHalfWord(1));
+    }
+
+    @Test(expected = MemoryException.class)
+    public void readFailOutOfBounds()
+    {
+        memory.loadWord(1024);
     }
 
 }

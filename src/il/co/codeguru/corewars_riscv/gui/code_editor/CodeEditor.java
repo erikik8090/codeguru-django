@@ -5,12 +5,14 @@ import elemental2.dom.*;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars_riscv.gui.IBreakpointCheck;
 import il.co.codeguru.corewars_riscv.gui.PlayersPanel;
+import il.co.codeguru.corewars_riscv.gui.Settings;
 import il.co.codeguru.corewars_riscv.gui.asm_parsers.GasListParser;
 import il.co.codeguru.corewars_riscv.gui.asm_parsers.IListParser;
 import il.co.codeguru.corewars_riscv.gui.asm_parsers.NasmListParser;
 import il.co.codeguru.corewars_riscv.gui.widgets.Console;
 import il.co.codeguru.corewars_riscv.jsadd.Format;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
+import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.utils.disassembler.DisassemblerRiscV;
 import il.co.codeguru.corewars_riscv.utils.disassembler.IDisassembler;
 import il.co.codeguru.corewars_riscv.war.*;
@@ -754,6 +756,7 @@ public class CodeEditor implements CompetitionEventListener, MemoryEventListener
 
     public void setDebugMode(boolean v) {
         if (v) {
+            Logger.log("" + Settings.useNewMemory());
             editor_bottom.style.display = "none";
             asm_edit.style.display= "none"; // just the textarea
             editor_title.readOnly = true;

@@ -6,10 +6,12 @@
     <title>CodeWars8086</title>
 
     <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 
     <script type="text/javascript" language="javascript" src="gas_riscv_js.js"></script>
     <script type="text/javascript" language="javascript" src="codewars_js/codewars_js.nocache.js"></script>
     <script type="text/javascript" language="javascript" src="main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 </head>
 
 <body onload="start()">
@@ -22,11 +24,13 @@
             </div>
 
             <div id="edit_panel">
-                <input type="text" id="editor_title" spellcheck="false">
-                <input id="uploadBinInput" type="file" class="hidden" onchange="return triggerUploadBinChanged()">
-                <label id="uploadBinBut" class="sc-btn" for="uploadBinInput" title="Upload binary file"></label>
-                <label id="aboutBtn" class="sc-btn" title="About" onclick="triggerAbout(true)"></label>
-
+                <div id="top-bar">
+                    <input type="text" id="editor_title" spellcheck="false">
+                    <input id="uploadBinInput" type="file" class="hidden" onchange="return triggerUploadBinChanged()">
+                    <label id="uploadBinBut" class="sc-btn" for="uploadBinInput" title="Upload binary file"></label>
+                    <a id="aboutBtn" class="sc-btn" title="About" href="#about"></a>
+                    <a href="#settings" id="settingsBtn" class="fas fa-cog sc-btn"></a>
+                </div>
                 <br>
                 <div id="editor_boxes">
                     <div id="edit_area">
@@ -282,8 +286,8 @@
 
     </div>
 
-    <div id="aboutBack" class="popupBack" onclick="triggerAbout(false)">
-        <div id="aboutWin" class="popupWin">
+    <div id="about" class="popupBack" onclick="hidePopup(event);">
+        <div id="about-win" class="popupWin">
             <h1>codewars8086_js</h1><br>
             <h2>Javascript GUI, integrated editor and debugger: Shy Shalom<br>
                 <h2>Original codeguru emulator: Danny Leshem<br>
@@ -294,6 +298,13 @@
                         <h3>
         </div>
     </div>
+
+    <div id="settings" class="popupBack" onclick="hidePopup(event);">
+            <div class="popupWin">
+                <input type="checkbox" id="new-memory">
+                Enable new memory mode
+            </div>
+        </div>
 
 </body>
 

@@ -713,7 +713,7 @@ function addWatchLine() {
     grip.addEventListener('mousedown', function(e) {
         moving = true;
         startOffset = watch_expr_list[0].offsetWidth - e.pageX;
-        //console.log("CAPTURE")
+        //consolelog("CAPTURE")
     });
 
 
@@ -724,7 +724,6 @@ function addWatchLine() {
               watch_expr_list[elemi].style.width = watch_expr_size + 'px';
           e.preventDefault(); // prevent selection action from messing it up
 
-          //console.log(watch_expr_size + "  " + watchArea.offsetWidth - 30)
           if (watch_expr_size > watchArea.offsetWidth - 50)
               watchArea.style.overflowX = "auto"
           else
@@ -734,7 +733,6 @@ function addWatchLine() {
 
     document.addEventListener('mouseup', function() {
         moving = false;
-        //console.log("-release")
     });
 
 }
@@ -991,14 +989,7 @@ function competeFinished()
 function eventStopProp(e) {
     e.stopPropagation()
 }
-function triggerAbout(v, ev) {
-    aboutBtn.checked = v
-    if (v) {
-        aboutBack.style.display = "inline"
-    }
-    else {
-        aboutBack.style.display = "none"
-    }
-
-    aboutWin.onclick = eventStopProp
+function hidePopup(event) {
+    if($(event.target).closest('.popupWin').length == 0)
+        window.location.replace('#');
 }

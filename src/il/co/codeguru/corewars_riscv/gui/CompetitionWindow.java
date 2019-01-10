@@ -15,8 +15,7 @@ import java.util.Arrays;
 /**
  * @author BS
  */
-public class CompetitionWindow extends JFrame
-    implements ScoreEventListener, CompetitionEventListener {
+public class CompetitionWindow extends JFrame implements ScoreEventListener, CompetitionEventListener {
 	private static final long serialVersionUID = 1L;
 	
 	private Competition competition;
@@ -253,7 +252,7 @@ public class CompetitionWindow extends JFrame
         columnGraph.addToValue(groupIndex, subIndex, addedValue);
     }
 
-    public void setDebugMode(boolean v) {
+    private void setDebugMode(boolean v) {
         m_codeEditor.setDebugMode(v);
         m_playersPanel.setDebugMode(v);
 

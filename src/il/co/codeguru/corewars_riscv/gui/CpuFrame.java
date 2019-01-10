@@ -24,7 +24,6 @@ public class CpuFrame implements CompetitionEventListener, MemoryEventListener {
 	private Competition competition;
 	private int m_base = 16;
 
-
 	private RegisterField[] registers;
 	private RegisterField regPc;
 
@@ -35,11 +34,25 @@ public class CpuFrame implements CompetitionEventListener, MemoryEventListener {
 	MemRegionView sharedMemView;
 
     public void setVisible(boolean v) {
-        if (v)
-            cpuPanel.style.display = "";
-        else
-            cpuPanel.style.display = "none";
+        if (v) {
+			cpuPanel.style.display = "";
+			showMemoryRegions(SettingsPanel.useNewMemory());
+		}
+        else {
+			cpuPanel.style.display = "none";
+		}
     }
+
+    private native void showMemoryRegions(boolean toShow) /*-{
+    	if(toShow){
+    		$wnd.$('#sharedMemArea').removeClass('hide');
+    		$wnd.$('#stackArea').removeClass('hide');
+    	}
+    	else {
+    		$wnd.$('#sharedMemArea').addClass('hide');
+    		$wnd.$('#stackArea').addClass('hide');
+    	}
+    }-*/;
 
 	public void setSelectedPlayer(String playerLabel, boolean isDebugMode) {
 		m_currentWarriorLabel = playerLabel;

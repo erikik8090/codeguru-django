@@ -558,6 +558,7 @@ function triggerDebug() {
             var uz = g_usedZnums[uzi]
             document.getElementById("player_erase_z" + uz).setAttribute("disabled", true)
         }
+        $('#settingsBtn').addClass('hide');
     }
     else {
         j_stopDebug()
@@ -583,7 +584,7 @@ function triggerDebug() {
             var uz = g_usedZnums[uzi]
             document.getElementById("player_erase_z" + uz).removeAttribute("disabled")
         }
-
+        $('#settingsBtn').removeClass('hide');
     }
 }
 

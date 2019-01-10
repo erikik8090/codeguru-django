@@ -40,7 +40,8 @@ public class Warrior
             int loadAddress,
             int initialStack,
             int groupSharedMemory,
-            int myIndex)
+            int myIndex,
+            boolean useNewMemory)
     {
         m_label = label;  // this comes from Code label
         m_name = name;
@@ -49,14 +50,14 @@ public class Warrior
         m_myIndex = myIndex;
 
         m_state = new CpuStateRiscV();
-        initializeCpuState(loadAddress, initialStack, groupSharedMemory);
+        initializeCpuState(loadAddress, initialStack, groupSharedMemory, useNewMemory);
 
         stackRegion = new MemoryRegion(initialStack, initialStack + STACK_SIZE - 1);
         sharedRegion = new MemoryRegion(groupSharedMemory, groupSharedMemory + GROUP_SHARED_MEMORY_SIZE - 1);
 
         RestrictedMemory memory = new RestrictedMemory(core, new MemoryRegion[]{
                 sharedRegion, stackRegion, arenaRegion
-        });
+        }, useNewMemory);
 
         m_cpu = new CpuRiscV(m_state, memory);
 
@@ -141,15 +142,19 @@ public class Warrior
     private void initializeCpuState(
         int loadAddress,
         int initialStack,
-        int groupSharedMemory) {
+        int groupSharedMemory,
+        boolean useNewMemory) {
 
         int loadIndex = (loadAddress) & 0xFFFF;
 
         // initialize registers
-        m_state.setReg(1, loadIndex);
-        m_state.setReg(2, initialStack + STACK_SIZE - 1);
-        m_state.setReg(3, groupSharedMemory);
         m_state.setPc(loadIndex);
+        m_state.setReg(1, loadIndex);
+        if(useNewMemory) {
+            m_state.setReg(2, initialStack + STACK_SIZE - 1);
+            m_state.setReg(3, groupSharedMemory);
+        }
+
 
     }
     

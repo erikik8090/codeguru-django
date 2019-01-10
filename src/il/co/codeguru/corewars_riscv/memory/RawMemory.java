@@ -21,9 +21,12 @@ public class RawMemory extends Memory {
     }
 
     @Override
-    public void setByte(int index, byte value) throws MemoryException {
+    public void storeByte(int index, byte value) throws MemoryException {
         if(index < 0 || index >= data.length) throw new MemoryException("Write out of bounds - at " + hex(index));
         data[index] = value;
+        if (listener != null) {
+            listener.onMemoryWrite(index , value);
+        }
     }
 
     @Override
@@ -32,7 +35,7 @@ public class RawMemory extends Memory {
         return data[index];
     }
 
-    public static final int NUM_PARAGRAPHS = 64 * 1024;
+    private static final int NUM_PARAGRAPHS = 64 * 1024;
     public static final int PARAGRAPH_SIZE = 0x10;
     public static final int PARAGRAPHS_IN_SEGMENT = 0x1000;
     public static final int MEMORY_SIZE = NUM_PARAGRAPHS * PARAGRAPH_SIZE;

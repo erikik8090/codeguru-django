@@ -1,6 +1,6 @@
 package il.co.codeguru.corewars_riscv.gui;
 
-public class Settings {
+public class SettingsPanel {
     public static boolean useNewMemory()
     {
         return getCheckboxValue("#new-memory");

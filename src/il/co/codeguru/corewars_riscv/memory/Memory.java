@@ -3,15 +3,7 @@ package il.co.codeguru.corewars_riscv.memory;
 public abstract class Memory {
     public MemoryEventListener listener;
 
-    protected abstract void setByte(int index, byte value) throws MemoryException;
-
-    public void storeByte(int index, byte value) throws MemoryException
-    {
-        setByte(index, value);
-        if (listener != null) {
-            listener.onMemoryWrite(index , value);
-        }
-    }
+    public abstract void storeByte(int index, byte value) throws MemoryException;
 
     public void storeHalfWord(int index, short value) throws MemoryException
     {

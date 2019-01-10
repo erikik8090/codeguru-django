@@ -3,15 +3,14 @@ package il.co.codeguru.corewars_riscv.gui;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars_riscv.gui.code_editor.CodeEditor;
+import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.war.*;
 import com.google.gwt.animation.client.AnimationScheduler;
 
 import il.co.codeguru.corewars_riscv.gui.widgets.*;
 //import java.awt.*;
 //import java.awt.event.*;
-import java.io.IOException;
 import java.util.Arrays;
-//import javax.swing.*;
 
 /**
  * @author BS
@@ -38,7 +37,7 @@ public class CompetitionWindow extends JFrame
 
     private boolean m_isStartPaused = false;
 
-    public CodeEditor m_codeEditor;
+    CodeEditor m_codeEditor;
     public PlayersPanel m_playersPanel;
     private HTMLElement stepnum;
 
@@ -47,13 +46,14 @@ public class CompetitionWindow extends JFrame
         return m_isBattleShown;
     }
 
-    public CompetitionWindow() throws IOException
+    public CompetitionWindow()
     {
         super("CodeGuru Extreme - Competition Viewer");
         getContentPane().setLayout(new BorderLayout());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         competition = new Competition();
+        Logger.log("Creating new Competition");
         competition.addCompetitionEventListener(this);
         WarriorRepository warriorRepository = competition.getWarriorRepository();
         warriorRepository.addScoreEventListener(this);
@@ -77,11 +77,7 @@ public class CompetitionWindow extends JFrame
         controlPanel.setLayout(new FlowLayout());
         controlPanel.add(new JLabel("Survivor groups per session:"));
 
-        // If total number of teams is less then four, make it the defauld number
-		int numberOfGropus = Math.min(4,
-            competition.getWarriorRepository().getNumberOfGroups());
-
-		controlPanel.add(new JLabel("Sessions per groups combination:"));
+        controlPanel.add(new JLabel("Sessions per groups combination:"));
 		battlesPerGroupField = new JTextField("battlesPerGroupField", "100", 4);
 		seed = new JTextField("seed", null, 4);
 		seed.setText("guru");
@@ -176,7 +172,7 @@ public class CompetitionWindow extends JFrame
     };
 
     private void callContinueRun() throws Exception {
-        boolean needMore = competition.continueRun(isBattleShown());
+        boolean needMore = competition.continueRun();
         outRoundNum();
         if (needMore)
             requestFrame();
@@ -233,7 +229,7 @@ public class CompetitionWindow extends JFrame
         }
 
         try {
-            competition.runCompetition(battlesPerGroup, numOfGroups, m_isStartPaused, isBattleShown());
+            competition.runCompetition(battlesPerGroup, numOfGroups, m_isStartPaused, isBattleShown(), SettingsPanel.useNewMemory());
             callContinueRun(); // when runWar() returns we want the War object to be already constructured and ready
             if (isBattleShown()) { // add breakpointchecked only if we're in debugger
                 War war = competition.getCurrentWar();

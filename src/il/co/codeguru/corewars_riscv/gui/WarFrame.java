@@ -35,7 +35,7 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
      * the canvas which show the core war memory area
      */
     Canvas warCanvas;
-    public CpuFrame cpuframe;
+    CpuFrame cpuframe;
     JButton btnPause;
     JButton btnSingleRound;
     JSlider speedSlider;
@@ -194,7 +194,7 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
     /**
      * Add a message to the message zone
      */
-    public void addMessage(String message) {
+    private void addMessage(String message) {
         messagesArea.append(message + "\n");
         messagesArea.scrollToBottom();
     }
@@ -202,7 +202,7 @@ public class WarFrame extends JFrame implements MemoryEventListener, Competition
     /**
      * Add a message to the message zone (with round number)
      */
-    public void addMessage(int round, String message) {
+    private void addMessage(int round, String message) {
         addMessage("[" + round + "] " + message);
     }
 

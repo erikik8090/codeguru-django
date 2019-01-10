@@ -65,6 +65,7 @@ public class War {
     private int m_uiWarriorIndex = -1; // break in breakpoints only of this warrior (he's the one selected in the PlayersPanel)
     private boolean m_inDebugger = false; // controls the end condition
     private boolean m_hasEnded = false; // this war has ended but the object remains alive for post-mortem examination
+    private boolean useNewMemory;
 
     public void setUiWarrior(Warrior warrior) {
         if (warrior != null)
@@ -89,7 +90,7 @@ public class War {
      * Constructor.
      * Fills the Arena with its initial data. 
      */
-    public War(MemoryEventListener memoryListener, CompetitionEventListener warListener, boolean startPaused) {
+    public War(MemoryEventListener memoryListener, CompetitionEventListener warListener, boolean startPaused, boolean useNewMemory) {
     	isPaused = startPaused; //startPaused; // startPause just causes control to  return after startWar, we don't want to pause the first round
         m_warListener = warListener;
         m_warriors = new Warrior[MAX_WARRIORS];
@@ -97,6 +98,7 @@ public class War {
         m_numWarriorsAlive = 0;
         m_core = new RawMemory(MEMORY_SIZE);
         m_nextFreeAddress = ARENA_SIZE;
+        this.useNewMemory = useNewMemory;
 
         // initialize arena
         for (int offset = 0; offset < ARENA_SIZE; ++offset) {
@@ -274,7 +276,8 @@ public class War {
                     loadOffset,
                     stackMemory,
                     groupSharedMemory,
-                    m_numWarriors);
+                    m_numWarriors,
+                    useNewMemory);
             m_warriors[m_numWarriors++] = w;
 
             // load warrior to arena

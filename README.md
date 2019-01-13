@@ -1,7 +1,10 @@
 corewars_js - RISCV
 ===========
 
-This is a fork of corewars_riscv_js that replaces the x86 assembly with RISC-V assembly.
+
+[![Build Status](https://travis-ci.com/westerndigitalcorporation/corewars-risc-v.svg?branch=master)](https://travis-ci.com/westerndigitalcorporation/corewars-risc-v)
+
+This is a fork of corewars8086 Javascript engine + debugger that uses RISC-V assembly instead of x86.
 
  Getting Started
 --------

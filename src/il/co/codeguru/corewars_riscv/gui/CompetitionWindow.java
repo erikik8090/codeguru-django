@@ -108,7 +108,6 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
 
     public void setPlatform(String plat) {
         m_codeEditor.setPlatform(plat);
-        m_playersPanel.setPlatform(plat);
     }
 
     public static native void call_gwtStart() /*-{

@@ -1,4 +1,4 @@
-package il.co.codeguru.corewars_riscv.gui.asm_parsers;
+package il.co.codeguru.corewars_riscv.gui.code_editor.asm_parsers;
 
 
 import elemental2.dom.DocumentFragment;
@@ -10,25 +10,9 @@ import il.co.codeguru.corewars_riscv.war.WarriorRepository;
 import java.util.ArrayList;
 
 public class GasListParser implements IListParser {
-
-    enum Field {
-        START_SPACE,
-        INDEX,
-        SINGLE_SPACE_AFTER_INDEX,
-        SPACE_BEFORE_CODE,
-        ADDRESS,
-        SPACE_AFTER_ADDRESS,
-        OPCODE,
-        WARNING,
-        CODE,
-        PARSE_ERR
-    };
-    
     @Override
     public boolean parseLst(String lsttext, StringBuilder opcodesText, ArrayList<CodeEditor.LstLine> m_currentListing)
     {
-        //Console.log(lsttext);
-
         String[] lines = lsttext.split("\\n");
 
         int lineIndex = 1; // does not increment in warning lines that appear in the listing file
@@ -154,7 +138,7 @@ public class GasListParser implements IListParser {
                 continue;
             }
             else if (l.lineNum != lineIndex) {
-                Console.log("wrong line number " + Integer.toString(l.lineNum) + " at " + Integer.toString(lineIndex));
+                Console.log("wrong line number " + l.lineNum + " at " + lineIndex);
                 return false;
             }
 
@@ -188,22 +172,19 @@ public class GasListParser implements IListParser {
         char[] m_errLines = new char[countAllNL]; // for every line in the asmText, 0,'e' or 'w'
 
         // go over stdout, find out which lines need marking
-        for(int i = 0; i < lines.length; ++i)
-        {
-            String line = lines[i];
+        for (String line : lines) {
             int firstColon = -1;
             int lineNum = -1; // this would be zero based
             char lineType = 0;
             // find first and second columns chars
-            for(int j = 0 ; j < line.length(); ++j) {
+            for (int j = 0; j < line.length(); ++j) {
                 if (line.charAt(j) == ':') {
                     if (firstColon == -1)
                         firstColon = j;
                     else {
                         if (line.charAt(firstColon + 1) == ' ') { // number-less warning line
                             lineNum = -2;
-                        }
-                        else {
+                        } else {
                             lineNum = Integer.parseInt(line.substring(firstColon + 1, j));
                             lineNum -= 1; // read numbers are 1 based
                             assert lineNum < countAllNL : "unexpected lineNum";
@@ -223,14 +204,13 @@ public class GasListParser implements IListParser {
             }
 
 
-            stdoutShorten.append("<div class='stdout_line_" + lineType + "'");
+            stdoutShorten.append("<div class='stdout_line_").append(lineType).append("'");
             if (lineNum != -2)
-                stdoutShorten.append("ondblclick='asm_cursorToLine(" + Integer.toString(m_lineOffsets.get(lineNum)) +")'");
+                stdoutShorten.append("ondblclick='asm_cursorToLine(").append(m_lineOffsets.get(lineNum)).append(")'");
             stdoutShorten.append(">");
             stdoutShorten.append(line.substring(firstColon + 1));
             stdoutShorten.append("</div>");
-            //if (i < lines.length - 1)
-            //    stdoutShorten.append('\n');
+
         }
 
 
@@ -240,7 +220,7 @@ public class GasListParser implements IListParser {
             if (ec == 0)
                 continue;
 
-            Element e = TextUtils.DocumentFragment_getElementById(asmElem, "mline_" + Integer.toString(lineNum+1));
+            Element e = TextUtils.DocumentFragment_getElementById(asmElem, "mline_" + (lineNum + 1));
             if (e == null)
                 continue; // can happen with some strange case of dz... ? could not reproduce but it happened
             if (ec == 'e')

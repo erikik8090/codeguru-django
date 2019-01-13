@@ -29,7 +29,7 @@ public class PlayersPanel
         public Code(PlayerInfo p, int idx) {
             player = p;
             index = idx;
-            label = p.label + Integer.toString(idx); // p.label is a single letter, index is 0 or 1
+            label = p.label + idx; // p.label is a single letter, index is 0 or 1
             breakpoints = new ArrayList<>();
         }
         public String getName() {
@@ -43,10 +43,10 @@ public class PlayersPanel
         public PlayerInfo player; // reference back to the player this is in
         public int index; // 0 or 1 - there are two snippets per player
         public String name; // name of this code snippet (name on the button)
-        public String label; // the label of the player + the index of the warrior (0,1), for instance A0, A1
+        private String label; // the label of the player + the index of the warrior (0,1), for instance A0, A1
         public String asmText = "";
         public byte[] bin = null;  // can be null if last output was empty
-        public boolean lastCompileOk = true;
+        boolean lastCompileOk = true;
         public ArrayList<CodeEditor.LstLine> lines; //managed by the editor
         public boolean startAddrRandom = true;
         public String startAddress = "A000"; // from UI, as given from the input, may fail to parse address
@@ -65,14 +65,14 @@ public class PlayersPanel
         public String getName() {
             return title;
         }
-        public void setWType(EWarriorType v) {
+        void setWType(EWarriorType v) {
             wtype = v;
         }
-        public int activeCodes() {
+        int activeCodes() {
             return (wtype == EWarriorType.SINGLE) ? 1:2;
         }
 
-        public boolean isEnabled = true; // the checkbox next to the player TBD
+        boolean isEnabled = true; // the checkbox next to the player TBD
         public String label;  // 'A', 'B' etc, the string on the elements of the player
         public String title;  // 'Player A'
         public Code[] code = new Code[2];
@@ -80,12 +80,12 @@ public class PlayersPanel
     }
 
     private CompetitionWindow m_mainWnd;
-    private ArrayList<PlayerInfo> m_players = new ArrayList<PlayerInfo>();
+    private ArrayList<PlayerInfo> m_players = new ArrayList<>();
     private Code m_inEditor = null; // point to the above ArrayList
     private boolean m_isDebugMode = false;
 
 
-    public PlayersPanel(CompetitionWindow mainWnd) {
+    PlayersPanel(CompetitionWindow mainWnd) {
         m_mainWnd = mainWnd;
         exportMethods();
     }
@@ -102,7 +102,7 @@ public class PlayersPanel
         $wnd.j_loadBinary      = $entry(function(b) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_loadBinary(Lcom/google/gwt/typedarrays/shared/ArrayBuffer;)(b) });
     }-*/;
 
-    public PlayerInfo findPlayer(String label) {
+    private PlayerInfo findPlayer(String label) {
         for(PlayerInfo p : m_players) {
             if (p.label.equals(label))
                 return p;
@@ -149,15 +149,6 @@ public class PlayersPanel
             "j x1\n";
 
 
-    //public InitPlayers m_initPlayers = m_initPlayers_riscv;
-
-    public void setPlatform(String plat) {
-        if (plat.equals("8086")) {}
-            //m_initPlayers = m_initPlayers_x86;
-        else if (plat.equals("riscv")) {}
-            //m_initPlayers = m_initPlayers_riscv;
-    }
-
     private void demo_like_original() {
         addPlayerPanel(); // this demo has 4 players. initialization of the page adds 2 panels
 
@@ -201,7 +192,7 @@ public class PlayersPanel
         p.code[0].name = tu + "1";
         p.code[1].name = tu + "2";
         m_players.add(p);
-        Console.log("Added " + label + " " + Integer.toString(m_players.size()));
+        Console.log("Added " + label + " " + m_players.size());
     }
 
     public native void setPressedCodeBut(String label, int num) /*-{
@@ -215,7 +206,7 @@ public class PlayersPanel
         for(PlayerInfo p : m_players) {
             if (label.equals(p.label)) {
                 m_players.remove(p);
-                Console.log("Removed " + label + " " + Integer.toString(m_players.size()));
+                Console.log("Removed " + label + " " + m_players.size());
                 if (m_inEditor.player == p) { // removing currently selected player
                     setPressedCodeBut(m_players.get(0).label, 1);
                     j_srcSelectionChanged(m_players.get(0).label, 1);
@@ -410,7 +401,7 @@ public class PlayersPanel
         m_inEditor.lastCompileOk = true; // it's a binary that means it was compiled
         m_inEditor.breakpoints.clear(); // any breakpoints that were no longer matter
 
-        m_mainWnd.m_codeEditor.loadedNewBinary(m_inEditor, this);
+        m_inEditor.asmText = m_mainWnd.m_codeEditor.loadedNewBinary(m_inEditor.bin, m_inEditor.breakpoints, this);
 
     }
 

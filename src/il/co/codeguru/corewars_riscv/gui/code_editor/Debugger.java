@@ -255,7 +255,7 @@ public class Debugger {
             PlayersPanel.Code code = codeEditor.getPlayerPanel().findCode(w.getLabel());
 
             // transfer breakpoints
-            assert code.lines != null : "unexpected null lines for code " + code.label + " of player" + code.player.getName();
+            assert code.lines != null : "unexpected null lines for code " + code.getLabel() + " of player" + code.player.getName();
 
             for (CodeEditor.LstLine lstline : code.lines)
                 lstline.tmp_br = null;

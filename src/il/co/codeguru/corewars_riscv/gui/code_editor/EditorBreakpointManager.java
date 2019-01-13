@@ -2,23 +2,23 @@ package il.co.codeguru.corewars_riscv.gui.code_editor;
 
 import il.co.codeguru.corewars_riscv.gui.PlayersPanel;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 public class EditorBreakpointManager {
     private final CodeEditor codeEditor;
 
-    private ArrayList<PlayersPanel.Breakpoint> m_breakpoints = null;
+    private List<PlayersPanel.Breakpoint> m_breakpoints = null;
 
     public EditorBreakpointManager(CodeEditor codeEditor) {
         this.codeEditor = codeEditor;
     }
 
-    public void setBreakpoints(ArrayList<PlayersPanel.Breakpoint> newBreakpoints) {
+    public void setBreakpoints(List<PlayersPanel.Breakpoint> newBreakpoints) {
         m_breakpoints = newBreakpoints;
     }
 
-    public void changePlayer(ArrayList<PlayersPanel.Breakpoint> newBreakpoints)
+    public void changePlayer(List<PlayersPanel.Breakpoint> newBreakpoints)
     {
         m_breakpoints = newBreakpoints;
         for(PlayersPanel.Breakpoint b: m_breakpoints)
@@ -46,7 +46,7 @@ public class EditorBreakpointManager {
                 codeEditor.setLineNumBreakpoint(b.lineNum, false);
     }
 
-    public void updateBreakpoints(ArrayList<Integer> prevLineOffsets, int prevLineCount, String prevInText, int selStart, int selEnd, String keydown) {
+    public void updateBreakpoints(List<Integer> prevLineOffsets, int prevLineCount, String prevInText, int selStart, int selEnd, String keydown) {
         if (m_breakpoints == null || m_breakpoints.size() == 0)
             return;
 

@@ -1,4 +1,4 @@
-package il.co.codeguru.corewars_riscv.gui.asm_parsers;
+package il.co.codeguru.corewars_riscv.gui.code_editor.asm_parsers;
 
 import elemental2.dom.DocumentFragment;
 import elemental2.dom.Element;

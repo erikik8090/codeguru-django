@@ -6,7 +6,7 @@ import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars_riscv.memory.Memory;
-import il.co.codeguru.corewars_riscv.gui.asm_parsers.TextUtils;
+import il.co.codeguru.corewars_riscv.gui.code_editor.asm_parsers.TextUtils;
 import il.co.codeguru.corewars_riscv.jsadd.Format;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
 import il.co.codeguru.corewars_riscv.memory.MemoryRegion;

@@ -128,48 +128,19 @@ public class PlayersPanel
     }-*/;
 
 
-    private static class InitPlayers {
-        public InitPlayers(String shooter, String bimp) { shooterCode = shooter; bimpCode = bimp; }
-        String shooterCode;
-        String bimpCode;
-    }
-
-    public static InitPlayers m_initPlayers_x86 = new InitPlayers(
-            " PUSH DS\n POP ES\n MOV DI, AX\n MOV AX, 0xCCCC\nagain:\n STOSW\n ADD WORD DI, 0xB\n JMP again\n",
-            "PUSH DS\nPOP ES\nXCHG DI, AX\nADD WORD DI, 0xC\nMOV SI, DI\nADD WORD SI, 0xA\nSTD\nDEC DI\nDEC DI\nMOVSW\nMOVSW\nMOVSW\nMOVSW\nMOVSW\nMOVSW\nINC DI\nINC DI\nJMP DI\n"
-    );
-    public static InitPlayers m_initPlayers_riscv = new InitPlayers(
-            "# Technique - Blind Knight\n" +
-                    "add x2, x2, 4\n" +
-                    "add x1, x1, x2\n" +
-                    "sw x2, 16(x1)\n" +
-                    "sub x1, x1, x2\n" +
-                    "j x1",
-            "# Technique - Blind Ranger\n" +
-                    "add x2, x2, 750\n" +
-                    "add x1, x1, x2\n" +
-                    "sw x2, 32(x1)\n" +
-                    "sub x1, x1, x2\n" +
-                    "j x1\n"
-    );
-
     public static String blindRanger =
             "# Technique - Blind Ranger\n" +
-            "li x4, 0xFFFF\n" +
             "loop:\n" +
             "add x2, x2, 750\n" +
             "add x3, x1, x2\n" +
-            "and x3, x3, x4\n" +
             "sw x2, 32(x3)\n" +
             "j loop\n";
 
     public static String blindWarrior =
             "# Technique - Blind Knight\n" +
-            "li x4, 0xFFFF\n" +
             "loop:\n" +
             "add x2, x2, 4\n" +
             "add x3, x1, x2\n" +
-            "and x3, x3, x4\n" +
             "sw x2, 32(x3)\n" +
             "j loop\n";
 
@@ -178,13 +149,13 @@ public class PlayersPanel
             "j x1\n";
 
 
-    public InitPlayers m_initPlayers = m_initPlayers_riscv;
+    //public InitPlayers m_initPlayers = m_initPlayers_riscv;
 
     public void setPlatform(String plat) {
-        if (plat.equals("8086"))
-            m_initPlayers = m_initPlayers_x86;
-        else if (plat.equals("riscv"))
-            m_initPlayers = m_initPlayers_riscv;
+        if (plat.equals("8086")) {}
+            //m_initPlayers = m_initPlayers_x86;
+        else if (plat.equals("riscv")) {}
+            //m_initPlayers = m_initPlayers_riscv;
     }
 
     private void demo_like_original() {

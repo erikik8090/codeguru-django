@@ -143,15 +143,13 @@ input:disabled + .sc-btn:active,
 }
 
 .dbg_breakpoint:after {
-    content: url(breakpoint_light.png);
+    content: url(img/breakpoint_light.png);
     position: absolute;
     left: 31px;
 }
 
 .edit_breakpoint:after {
-    /*background: #ff5555;*/
-    /*background: url(breakpoint_light.png) no-repeat right center;*/
-    content: url(breakpoint_light.png);
+    content: url(img/breakpoint_light.png);
     position: absolute;
     right: 2px;
 }
@@ -351,7 +349,7 @@ input:disabled + .sc-btn:active,
     background-color: #ddddff;
 }
 .current_dbg_dead {
-    background-image: url("dbg_fail_red_ex.png");
+    background-image: url("img/dbg_fail_red_ex.png");
     background-color: #ffc7c7;
     background-repeat: no-repeat;
     background-position: calc( 100% - 5px) 1px;
@@ -468,15 +466,15 @@ input:disabled + .sc-btn:active,
 }
 
 .mycheck + .mycheck_label {
-    background-image: url(check_none.png);
+    background-image: url(img/check_none.png);
     background-repeat: no-repeat;
     display: inline-block;
 }
 .mycheck:checked + .mycheck_label {
-    background-image: url(check_checked.png);
+    background-image: url(img/check_checked.png);
 }
 .mycheck:indeterminate + .mycheck_label {
-    background-image: url(check_int.png);
+    background-image: url(img/check_int.png);
 }
 .mycheck[disabled="true"] + .mycheck_label {
     filter: brightness(90%);
@@ -509,7 +507,7 @@ input:disabled + .sc-btn:active,
 }
 
 .opt_single {
-    background: url(check_none.png) no-repeat;
+    background: url(img/check_none.png) no-repeat;
 }
 .src_sel_but {
     height: 30px;
@@ -521,45 +519,29 @@ input:disabled + .sc-btn:active,
 }
 
 #addPlayerBtn {
-    width: 34px;
-    height: 34px;
-    margin: 4px 7px 0px 11px;;
-}
-#addPlayerBtnIn {
-    background-image: url(plus.png);
-    background-position: center;
-    background-repeat: no-repeat;
-    display: inline-block;
-    width: 34px;
-    height: 33px;
-}
-.sc-btn[disabled="true"] > #addPlayerBtnIn {
-    box-shadow: initial;
-    background-image: linear-gradient( rgba(255,255,255, 0.4),rgba(255,255,255, 0.4) ), url(plus.png);
-}
-.sc-btn[disabled="true"] > #addZombieBtnIn {
-    box-shadow: initial;
-    background-image: linear-gradient( rgba(255,255,255, 0.4),rgba(255,255,255, 0.4) ), url(plus.png);
+    margin: 4px 7px 0px 11px;
+    height: 1em;
+    width: 1em;
+    padding: 0.4em;
 }
 
 .pl_close_icon {
-    width: 15px;
-    height: 15px;
-    background-image: url('reddish_ex.png');
-    background-position: center;
-    background-repeat: no-repeat;
+    width: 1em;
+    height: 1em;
+    text-align:center;
+    color: #c38c8c;
     float: right;
-    /*border: #aa0000 solid 1px;*/
     border-radius: 6px;
-    padding: 4px;
+    padding: 2px;
 }
 .pl_close_icon:hover {
-    background-image: url('red_ex.png');
+    color: red;
     background-color: rgba(255,255,255,0.7);
 }
 .pl_close_icon[disabled="true"] {
-    background-image: url('gray_ex.png');
+    color:#818181;
     background-color: transparent;
+    
 }
 
 #pl_frame_zombies {
@@ -567,15 +549,10 @@ input:disabled + .sc-btn:active,
     padding-bottom: 0px;
 }
 #addZombieBtn {
-    width: 28px;
-    height: 28px;
+    width: 1em;
+    height: 1em;
+    padding:0.4em;
     margin: 4px 7px 7px 15px;
-}
-#addZombieBtnIn {
-    background: url(plus.png) 6px 5px no-repeat;
-    display: inline-block;
-    width: 28px;
-    height: 28px;
 }
 
 .zomb_sel_but {
@@ -659,7 +636,7 @@ input:disabled + .sc-btn:active,
     height: 30px;
     vertical-align: -8px;
     margin: 0 0px 0 9px;
-    background-image: url(green_play.png);
+    background-image: url(img/green_play.png);
 }
 #debugBtnIn2 {
     margin: 0 0 0 3px;
@@ -691,7 +668,7 @@ input:disabled + .sc-btn:active,
 }
 #competeRunBtnIn {
     display: inline-block;
-    background-image: url(green_play.png);
+    background-image: url(img/green_play.png);
     width: 30px;
     height: 30px;
     margin: 0 0px 0 9px;
@@ -829,7 +806,7 @@ input:disabled + .sc-btn:active,
     border: 1px solid #d2cfcf;
     display: inline-block;
     vertical-align: -4px;
-    background-image: url(zero_but.png);
+    background-image: url(img/zero_but.png);
     background-repeat: no-repeat;
     background-position: 3px 3px;
 }
@@ -999,7 +976,7 @@ input:disabled + .sc-btn:active,
 #add_watch_but {
     width: 19px;
     height: 19px;
-    background: url(small_plus.png) no-repeat;
+    background: url(img/small_plus.png) no-repeat;
     background-position: 3px 3px;
     background-color: #d5d5ff;
     line-height:18px;
@@ -1010,25 +987,22 @@ input:disabled + .sc-btn:active,
 
 
 .watch_del_but {
-    width: 19px;
-    height: 19px;
-    background-image: url(small_ex.png) !important;
-    background-repeat: no-repeat;
+    width: 1em;
+    height: 1em;
     line-height:18px;
     border-radius:3px;
+    font-size:1.25em;
     position: absolute;
     left: calc(100% - 21px);
     margin: 0;
-    background-position: 4px;
-    background-color: #ffcdcd !important; /* override the sc-btn behaviour */
-    display: none;
+    display: none !important;
 }
 .watch_row:hover > .watch_del_but {
-    display:initial;
+    display:initial !important;
 }
 
 #uploadBinBut {
-    background-image: url(upload_bin.png);
+    background-image: url(img/upload_bin.png);
     background-repeat: no-repeat;
     background-position: 2px 3px;
     height: 34px;
@@ -1037,12 +1011,12 @@ input:disabled + .sc-btn:active,
 }
 #uploadBinBut:active {
     background-position: 3px 4px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)), url(upload_bin.png);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)), url(img/upload_bin.png);
     background-repeat: repeat, no-repeat; /* needed to avoid strange shadow when pressed */
 }
 
 #aboutBtn {
-    background-image: url(q_mark.png);
+    background-image: url(img/q_mark.png);
     background-repeat: no-repeat;
     background-position: 8px 3px;
     height: 34px;
@@ -1051,7 +1025,7 @@ input:disabled + .sc-btn:active,
 }
 #aboutBtn:active {
     background-position: 9px 4px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)), url(q_mark.png);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)), url(img/q_mark.png);
     background-repeat: repeat, no-repeat;
 }
 .popupBack {

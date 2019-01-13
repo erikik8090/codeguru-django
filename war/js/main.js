@@ -278,7 +278,7 @@ function addPlayersPanel() {
             <input class="fam_check_box hidden mycheck" id="player_check_pLETTER" type="checkbox" checked onchange="" >\
             <label class="fam_check mycheck_label" for="player_check_pLETTER"></label>\
             <label id="player_name_lbl_pLETTER" class="fam_label">Player LETTER</label>\
-            <label id="player_erase_pLETTER" class="pl_close_icon" onclick="triggerErasePlayer(this, pl_frame_pLETTER, \'LETTER\')"></label>\
+            <label id="player_erase_pLETTER" class="fas fa-times pl_close_icon" onclick="triggerErasePlayer(this, pl_frame_pLETTER, \'LETTER\')"></label>\
           </div>\
           <input class="fam_check_box hidden mycheck" id="wtype_pLETTER" type="checkbox" onchange="changedWType(\'pLETTER\', this.checked)" >\
           <label class="fam_check mycheck_label wtype_label" for="wtype_pLETTER">Two Warriors</label>\
@@ -393,7 +393,7 @@ function addZombieCode() {
     var text = '<div id="zomb_line_zNUM">\
         <input id="sel_code_w1_zNUM" class="hidden sc-check" onclick="triggerSrc(\'zNUM\', 1)" type="radio" name="src_select">\
         <label id="player_name_lbl_zNUM" class="sc-btn src_sel_but zomb_sel_but" for="sel_code_w1_zNUM" >Zombie NUM</label>\
-        <label id="player_erase_zNUM" class="pl_close_icon za_close_icon" onclick="triggerEraseZombie(this, zomb_line_zNUM, \'NUM\')"></label>\
+        <label id="player_erase_zNUM" class="fas fa-times pl_close_icon za_close_icon" onclick="triggerEraseZombie(this, zomb_line_zNUM, \'NUM\')"></label>\
         </div>'
 
     addTextChild(zombies_container, text.replace(/NUM/g, g_nextZombNum))
@@ -524,7 +524,7 @@ function triggerDebug() {
             return
         }
 
-        debugBtnIn.style.backgroundImage = "url(red_stop.png)"
+        debugBtnIn.style.backgroundImage = "url(img/red_stop.png)"
         debugBtnIn2.innerText = "Stop"
         competeCheckbox.setAttribute("disabled", true);
 
@@ -648,7 +648,7 @@ function addWatchLine() {
                      <input type="text" class="watch_expr_edit" id="watchID_expr_edit" spellcheck="false">\
                      <div class="watch_grip" id="watchID_grip"></div>\
                   </div><div class="watch_val allow_select" id="watchID_val"></div>\
-                  <div id="watchID_del_but" class="sc-btn watch_del_but" title="Remove watch"></div> \
+                  <div id="watchID_del_but" class="fas fa-times watch_del_but" title="Remove watch"></div> \
                </div>'
     text = text.replace(/ID/g, wid)
 
@@ -972,7 +972,7 @@ function triggerStartCompete()
             return
         }
 
-        competeRunBtnIn.style.backgroundImage = "url(red_stop.png)"
+        competeRunBtnIn.style.backgroundImage = "url(img/red_stop.png)"
         competeRunBtnIn2.innerText = "Stop"
     }
     else {

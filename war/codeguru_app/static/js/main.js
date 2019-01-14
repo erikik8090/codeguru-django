@@ -524,7 +524,7 @@ function triggerDebug() {
             return
         }
 
-        debugBtnIn.style.backgroundImage = "url(img/red_stop.png)"
+        debugBtnIn.style.backgroundImage = "url(static/img/red_stop.png)"
         debugBtnIn2.innerText = "Stop"
         competeCheckbox.setAttribute("disabled", true);
 
@@ -972,7 +972,7 @@ function triggerStartCompete()
             return
         }
 
-        competeRunBtnIn.style.backgroundImage = "url(img/red_stop.png)"
+        competeRunBtnIn.style.backgroundImage = "url(static/img/red_stop.png)"
         competeRunBtnIn2.innerText = "Stop"
     }
     else {

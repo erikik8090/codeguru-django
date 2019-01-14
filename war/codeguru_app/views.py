@@ -6,10 +6,11 @@ from django.contrib.auth.forms import UserCreationForm
 
 # Create your views here.
 def index(request):
-    #return redirect('login')
-    return render(request, 'page.html')
+    if request.user.is_authenticated:
+        return render(request, 'page.html')
+    return redirect('login')
 
-def signup(request):
+def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():

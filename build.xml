@@ -30,8 +30,8 @@
   </target>
 
   <target name="libs" depends="resolve" description="Copy libs to WEB-INF/lib">
-    <mkdir dir="war/WEB-INF/lib" />
-    <copy todir="war/WEB-INF/lib" flatten="true">
+    <mkdir dir="${output.dir}/WEB-INF/lib" />
+    <copy todir="${output.dir}/WEB-INF/lib" flatten="true">
       <path refid="provided.path"/>
     </copy>
   </target>
@@ -58,7 +58,7 @@
         <path refid="compile.path"/>
       </classpath>
       <arg line="-war"/>
-      <arg value="war"/>
+      <arg value="${output.dir}"/>
       <arg line="${gwt.args}"/>
       <arg value="com.codewars_js"/>
 
@@ -80,7 +80,7 @@
       <arg value="-startupUrl"/>
       <arg value="page.html"/>
       <arg line="-war"/>
-      <arg value="war"/>
+      <arg value="${output.dir}"/>
       <arg line="${gwt.args}"/>
       <arg value="com.codewars_js"/>
 
@@ -164,7 +164,7 @@
 
   <target name="clean" description="Cleans this project">
     <delete dir="${class.dir}" failonerror="false" />
-    <delete dir="war/codewars_js" failonerror="false" />
+    <delete dir="${output.dir}/codewars_js" failonerror="false" />
   </target>
 
 

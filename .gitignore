@@ -7,5 +7,6 @@ target/
 jacoco.dev.exec
 jacoco.prod.exec
 .sonar/
-war/codewars_js
+**/codewars_js
 www-test/
+**/WEB-INF/classes

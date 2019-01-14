@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+STATIC_URL = '/static/'
 
 # Application definition
 
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +53,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'codeguru_extreme.urls'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 TEMPLATES = [
     {

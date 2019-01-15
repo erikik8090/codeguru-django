@@ -9,10 +9,11 @@
     <link rel="stylesheet" type="text/css" href="{% static "main.css" %}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script type="text/javascript" language="javascript" src="{% static "js/gas_riscv_js.js" %}"></script>
     <script type="text/javascript" language="javascript" src="{% static "codewars_js/codewars_js.nocache.js" %}"></script>
+    <script type="text/javascript" language="javascript" src="{% static "js/dom_effects.js" %}"></script>
     <script type="text/javascript" language="javascript" src="{% static "js/main.js" %}"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 </head>
 
 <body onload="start()">
@@ -175,20 +176,22 @@
 
         </div>
     </div>
-    <div id="gray_out_debugger" ontransitionend="gray_out_anim_end()"></div>
+    <div id="gray_out_debugger"></div>
 
     <div id="players_panel">
         <div id="players_rel">
-            <input id="competeCheckbox" class="hidden sc-check" onchange="openCompete()" type="checkbox">
-            <label id="competeBtn" class="sc-btn" for="competeCheckbox">
-                <span id="competeBtnIn2">Competition</span>
-            </label>
-            <br>
-            <input id="debugCheckbox" class="hidden" onchange="triggerDebug()" type="checkbox">
-            <label id="debugBtn" class="sc-btn" for="debugCheckbox">
-                <span id="debugBtnIn" class="sc-span"></span>
-                <span id="debugBtnIn2">Debug</span>
-            </label>
+            <div id="action-buttons">
+                <button id="competeBtn" class="sc-btn" >
+                    <span id="competeBtnIn2">Competition</span>
+                </button>
+                <button id="debugBtn" class="sc-btn" onclick="triggerDebug(true)">
+                    <span id="debugBtnIn" class="sc-span"></span>
+                    <span id="debugBtnIn2">Debug</span>
+                </button>
+                <button id="tournament-btn" class="sc-btn">
+                    <label>Tournament </label>
+                </button>
+            </div>
             <div id="players_contaier">
 
             </div>
@@ -212,7 +215,7 @@
         </div>
     </div>
 
-    <div id="graphs_panel" style="width:0; opacity:0;" ontransitionend="graph_panel_anim_end()">
+    <div id="graphs_panel" class="side-panel">
         <div id="graphs_title">Competition</div>
         <div id="graphs_control">
             <input id="competeRunCheckbox" class="hidden" onchange="triggerStartCompete()" type="checkbox">
@@ -228,6 +231,10 @@
 
     </div>
 
+    <div id="tournament-panel" class="side-panel">
+        Hello there
+    </div>
+
     <div id="about" class="popupBack" onclick="hidePopup(event);">
         <div id="about-win" class="popupWin">
             <h1>codewars8086_js</h1><br>
@@ -237,16 +244,16 @@
                         <a href="https://github.com/shooshx/corewars_riscv_js/issues" target="_blank">https://github.com/shooshx/corewars_riscv_js/issues</a><br>
                         Or email to:<br>
                         <a href="mailto:shooshx@gmail.com" target="_blank">shooshx@gmail.com</a><br>
-                        <h3>
+                    <h3>
         </div>
     </div>
 
     <div id="settings" class="popupBack" onclick="hidePopup(event);">
-            <div class="popupWin">
-                <input type="checkbox" id="new-memory">
-                Enable new memory mode
-            </div>
+        <div class="popupWin">
+            <input type="checkbox" id="new-memory">
+            Enable new memory mode
         </div>
+    </div>
 
 </body>
 

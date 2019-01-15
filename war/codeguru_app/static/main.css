@@ -14,6 +14,10 @@ a {
     width: fit-content;
 }
 
+button {
+    border:none;
+}
+
 .hide {
     display: none !important;
 }
@@ -63,6 +67,10 @@ a {
 }
 .sc-btn:disabled {
    color: #ddd;
+   opacity: 0.65; 
+    pointer-events: none;
+    cursor: initial;
+    box-shadow: initial;
 }
 
 .sc-btn[disabled="true"] {
@@ -393,18 +401,7 @@ input:disabled + .sc-btn:active,
 #action_rel {
   position: relative;
 }
-#gray_out_debugger {
-    position: absolute;
-    background: rgba(200,200,200,0.8);
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-    visibility: hidden;
-    left: 190px;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    overflow: hidden;
-}
+
 
 #edit_panel {
   position: absolute;
@@ -679,6 +676,13 @@ input:disabled + .sc-btn:active,
 }
 #competeRunBtnIn2 {
     margin: 0 0 0 3px;
+}
+
+#tournament-btn {
+    text-align: center;
+    width: 130px;
+    height: 40px;
+    margin-left: 20px;
 }
 
 /* --------------------- cpuPanel --------------------- */
@@ -1083,11 +1087,29 @@ h3 {
 
 /*----------------------- graphs panel ---------------------------*/
 
-#graphs_panel {
+#gray_out_debugger {
+    position: absolute;
+    background: rgba(200,200,200,0.8);
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    left: 190px;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    overflow: hidden;
+}
+
+#gray_out_debugger.active {
+    display: block;
+    opacity: 1;
+}
+
+.side-panel {
     position: absolute;
     top: 10px;
     left: 191px;
-    width: 710px;
+    width: 0px;
+    opacity: 0;
     background: linear-gradient(to right, #c9c9c9 0%,#fdfdfd 20px); /* http://www.colorzilla.com/gradient-editor/ */
     border: 1px solid;
     border-left: none;
@@ -1098,6 +1120,15 @@ h3 {
     transition: width 0.3s cubic-bezier(0.36, 0.29, 0.79, 1.07), opacity 0.3s cubic-bezier(0.32, 0.57, 0.15, 1);
     box-sizing: border-box;
     overflow: hidden; /* when the panel is hidden, hide its content */
+}
+
+.side-panel.active {
+    width: 710px;
+    opacity: 1;
+}
+
+.side-panel.after-transition {
+    transition: width 0.3s cubic-bezier(0.36, 0.29, 0.79, 1.07), opacity 0.3s cubic-bezier(0.56, 0.02, 0.89, 0.26);
 }
 
 #graphs_canvas {

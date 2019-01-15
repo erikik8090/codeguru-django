@@ -31,12 +31,14 @@ function reinitMem() {
     HEAP32[DYNAMICTOP_PTR>>2] = DYNAMIC_BASE; // basic memory allocation need this (done in global scope on the startup of the process)
 }
 
-
 function start()
 {
     if (did_start)
         return;
     console.log("start()");
+
+    setUpDomEffects()
+
     run_gas = Module.cwrap('run_gas', null, ['string', 'string'])
 
     asm_edit.addEventListener("keydown", fixhscroll)
@@ -508,24 +510,20 @@ function fixIndent(e) {
 var debug_area_shown = false
 var deferredEditorToAddress = -1 // set by code in CodeEditor.java
 
-var prevDebug = false;
-function triggerDebug() {
-    console.log("triggerDebug " + debugCheckbox.checked)
-    if (prevDebug == debugCheckbox.checked) // not sure how this is possible
-        return;
-    prevDebug = debugCheckbox.checked
+function triggerDebug(isInDebug) {
+    console.log("triggerDebug " + isInDebug)
+    
 
-    if (debugCheckbox.checked)
+    if (isInDebug)
     {
         if (!j_startDebug()) {
             console.error("cannot start debug")
-            debugCheckbox.checked = false;
-            prevDebug = debugCheckbox.checked
             return
         }
 
         debugBtnIn.style.backgroundImage = "url(static/img/red_stop.png)"
         debugBtnIn2.innerText = "Stop"
+        debugBtn.onclick = function() { triggerDebug(false) };
         competeCheckbox.setAttribute("disabled", true);
 
         edit_area.style.display="none"
@@ -545,7 +543,7 @@ function triggerDebug() {
         j_debugUiInited();
 
         // disable editing the players
-        addPlayerBtn.setAttribute("disabled", true)
+        $('#competeBtn').prop("disabled", true)
         for(var ui in g_usedLetters) {
             var u = g_usedLetters[ui]
             document.getElementById("player_erase_p" + u).setAttribute("disabled", true)
@@ -565,7 +563,8 @@ function triggerDebug() {
 
         debugBtnIn.style.backgroundImage = ""
         debugBtnIn2.innerText = "Debug"
-        competeCheckbox.removeAttribute("disabled");
+        debugBtn.onclick = function() { triggerDebug(true) };
+        $("#competeBtn").prop('disabled', false);
 
         edit_area.style.display=""
         debug_area.style.display="none"
@@ -912,10 +911,9 @@ function js_initZoom() {
 }
 function js_resetZoom() {
     var initial = 1;
-    //var computedStyle = window.getComputedStyle(warCanvas, null);
 
-    width = 256*3; //parseInt(computedStyle.width, 10);
-    height = 256*3; //parseInt(computedStyle.height, 10);
+    width = 256*3; 
+    height = 256*3; 
     bgWidth = width * initial;
     bgHeight = height * initial;
     bgPosX = -(bgWidth - width)/2;
@@ -924,43 +922,6 @@ function js_resetZoom() {
 }
 
 // ------------------------------------------ Competition --------------------------------------------
-
-function graph_panel_anim_end() {
-    if (competeCheckbox.checked) {
-        // setting the style in the normal way doesn't work here for some reason
-        graphs_panel.setAttribute("style", "opacity: 1; transition: width 0.3s cubic-bezier(0.36, 0.29, 0.79, 1.07), opacity 0.3s cubic-bezier(0.56, 0.02, 0.89, 0.26);");
-    }
-    else {
-        graphs_panel.style.transition = "";
-    }
-}
-
-function gray_out_anim_end() {
-    if (competeCheckbox.checked) {
-    }
-    else {
-        gray_out_debugger.style.visibility = "hidden";
-        //gray_out_debugger.style.transition = "";
-    }
-}
-
-function openCompete() {
-    if (competeCheckbox.checked) {
-        graphs_panel.style.width = "";
-        graphs_panel.style.opacity = 1;
-        gray_out_debugger.style.visibility = "visible";
-        gray_out_debugger.style.opacity = 1;
-        debugCheckbox.setAttribute("disabled", true);
-        debugBtn.setAttribute("disabled", true);
-    }
-    else {
-        graphs_panel.style.width = "0";
-        graphs_panel.style.opacity = 0;
-        gray_out_debugger.style.opacity = 0;
-        debugCheckbox.removeAttribute("disabled");
-        debugBtn.removeAttribute("disabled");
-    }
-}
 
 function triggerStartCompete()
  {
@@ -990,7 +951,4 @@ function competeFinished()
 function eventStopProp(e) {
     e.stopPropagation()
 }
-function hidePopup(event) {
-    if($(event.target).closest('.popupWin').length == 0)
-        window.location.replace('#');
-}
+

@@ -323,9 +323,6 @@ input:disabled + .sc-btn:active,
     height: 25px;
 }
 
-#asm_load_addr_type {
-}
-
 .edit_text_error {
     background-color: rgb(255,140,140);
 }
@@ -366,9 +363,6 @@ input:disabled + .sc-btn:active,
     color: #000000;
 }
 
-.dbg_comment_line {
-    /*background-color: white; no needed since if there's a comment first line will be in a dfXXXX div */
-}
 .dbg_opcodes {
     display: inline-block;
     width: 200px;
@@ -569,8 +563,7 @@ input:disabled + .sc-btn:active,
     padding: 0 0 0 10px;
     border: 1px solid #000000;
 }
-#editor_boxes {
-}
+
 
 .small_editline {
     height: 19px;
@@ -766,7 +759,6 @@ input:disabled + .sc-btn:active,
 
 .base-btn:active, .sc-check:checked+.base-btn {
     background-image: linear-gradient(to bottom, #479ceb, #1067c1);
-    /*color: #000;*/
 }
 
 .title-buttons {
@@ -779,10 +771,6 @@ input:disabled + .sc-btn:active,
 }
 #dbgButtons {
     margin: 0 0 6px 7px;
-}
-#btnPause {
-}
-#btnSingleRound {
 }
 #speedSliderCont {
     vertical-align: 10px;
@@ -870,11 +858,6 @@ input:disabled + .sc-btn:active,
 #sharedMemArea {
     width: 160px;
 }
-
-#stackView {
-}
-#sharedMemView {
-}
 .submem_title {
     background: #eaeaea;
     border-radius: 6px 6px 0 0;;
@@ -939,9 +922,6 @@ input:disabled + .sc-btn:active,
     border-left: none;
     padding: 0 0 0 3px;
     box-sizing: border-box;
-}
-.watch_expr {
-
 }
 .watch_val {
     border-right: none;
@@ -1114,7 +1094,6 @@ h3 {
     border: 1px solid;
     border-left: none;
     border-radius: 0 15px 15px 0;
-   /* bottom: 30px;*/
     box-shadow: 2px 2px 14px -1px rgba(255, 255, 255, 1), 4px 4px 14px -1px rgba(0, 0, 0, 1);
 
     transition: width 0.3s cubic-bezier(0.36, 0.29, 0.79, 1.07), opacity 0.3s cubic-bezier(0.32, 0.57, 0.15, 1);
@@ -1135,13 +1114,20 @@ h3 {
     margin: 10px 10px 10px 20px;
 }
 
-#graphs_title {
+.panel-title {
     border-bottom: 1px solid;
     text-align: center;
     padding: 5px;
     font-size: 120%;
     background: linear-gradient(to right, #c9c9c9 0%,#eeeeee 20px);
+    overflow: hidden;
+    width: 709px;
+}
 
+.panel-body {
+    overflow: hidden;
+    position: relative;
+    width: 709px;
 }
 
 #battlesPerGroupField {
@@ -1168,13 +1154,6 @@ h3 {
     position: absolute;
     right: 0;
 }
-#graphs_control {
-    overflow: hidden;
-    position: relative;
-    width: 709px;
-}
-
-
 #top-bar {
     width: 100%;
     display: flex;

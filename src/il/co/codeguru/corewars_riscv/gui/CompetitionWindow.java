@@ -34,7 +34,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
     private static final String SEED_PREFIX = "SEED#";
 	private JTextField seed;
 
-    private boolean m_isStartPaused = false;
+    private boolean isInDebug = false;
 
     CodeEditor m_codeEditor;
     public PlayersPanel m_playersPanel;
@@ -130,7 +130,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
     {
         if (!m_playersPanel.checkPlayersReady())
             return false;
-        return gui_runWar(true, true);
+        return gui_runWar( true);
     }
 
     public void j_stopDebug()
@@ -143,7 +143,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
     {
         if (!m_playersPanel.checkPlayersReady())
             return false;
-        return gui_runWar(false, false);
+        return gui_runWar( false);
     }
     public void j_stopCompete()
     {
@@ -198,10 +198,9 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
                 seedValue = seed.getText().hashCode();
             }
             competition.setSeed(seedValue);
-            battlesPerGroup = 0; // in case parseInt fails
             battlesPerGroup = Integer.parseInt(battlesPerGroupField.getText().trim());
-        } catch (NumberFormatException e2) {
-            JOptionPane.showMessageDialog(this, "Error in configuration");
+        } catch (NumberFormatException e) {
+            Logger.error("Invalid number input");
         }
 
         // having numItems and groupSize allows having 4 players and running competitions of just any 3 of them
@@ -227,9 +226,9 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
         }
 
         try {
-            competition.runCompetition(battlesPerGroup, numOfGroups, m_isStartPaused, isBattleShown(), SettingsPanel.useNewMemory());
+            competition.runCompetition(battlesPerGroup, numOfGroups, this.isInDebug, SettingsPanel.useNewMemory());
             callContinueRun(); // when runWar() returns we want the War object to be already constructured and ready
-            if (isBattleShown()) { // add breakpointchecked only if we're in debugger
+            if (this.isInDebug) { // add breakpointchecked only if we're in debugger
                 War war = competition.getCurrentWar();
                 war.setBreakpointCheck(m_codeEditor);
                 Warrior inEditorWarrior = war.getWarriorByLabel(m_playersPanel.getCodeInEditor().getLabel());
@@ -260,15 +259,12 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
             battleFrame.warCanvas.revokeWar();
     }
 
-    public boolean gui_runWar(Boolean isBattleShown, Boolean isStartPaused) {
-        if (isBattleShown != null)
-            m_isBattleShown = isBattleShown;
-        if (isStartPaused != null)
-            m_isStartPaused = isStartPaused;
-        if (runWar(isBattleShown)) {
+    public boolean gui_runWar(boolean inDebug) {
+        m_isBattleShown = inDebug;
+        isInDebug = inDebug;
+        if (runWar(inDebug)) {
             competitionRunning = true;
-            //runWarButton.setEnabled(false);
-            if (isBattleShown)
+            if (inDebug)
                 setDebugMode(true);
 
             stepnum.innerHTML = "0";

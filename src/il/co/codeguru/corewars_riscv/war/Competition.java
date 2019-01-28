@@ -1,6 +1,5 @@
 package il.co.codeguru.corewars_riscv.war;
 
-import il.co.codeguru.corewars_riscv.gui.widgets.Console;
 import il.co.codeguru.corewars_riscv.gui.widgets.EventMulticasterCompetition;
 import il.co.codeguru.corewars_riscv.gui.widgets.EventMulticasterMemory;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
@@ -67,19 +66,20 @@ public class Competition {
     private void doneCompetition() {
         competitionEventListener.onCompetitionEnd();
         long elapsed = System.currentTimeMillis() - compState.startTime;
-        Console.log("Total time=" + elapsed / 1000.0);
+        Logger.log("Total time=" + elapsed / 1000.0);
         compState = null;
     }
 
     // return true if need to continue after
     public boolean continueRun() throws Exception
     {
+        Logger.log("Seed ~ " + getSeed());
         if (globalPause) {
             Logger.log("globalPause");
             return false;
         }
         if (compState.abort) {
-            Console.log("Abort");
+            Logger.log("Abort");
             doneWar();
             doneCompetition();
             return false;
@@ -150,7 +150,7 @@ public class Competition {
 
         // run on every possible combination of warrior groups
         competitionEventListener.onCompetitionStart();
-        Console.log("runCompetition " + warsPerCombination + " wars");
+        Logger.log("runCompetition " + warsPerCombination + " wars");
 
         compState = new CompState();
         compState.warIndex = 0;
@@ -163,6 +163,8 @@ public class Competition {
             switchToDebug();
         else
             switchToCompete();
+
+        Logger.log("Seed: " + getSeed());
 
     }
 

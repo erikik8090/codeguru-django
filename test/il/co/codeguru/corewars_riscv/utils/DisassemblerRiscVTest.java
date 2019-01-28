@@ -19,7 +19,7 @@ public class DisassemblerRiscVTest {
     @Before
     public void setUp()
     {
-        Logger.setTestingMode();
+        Logger.outputToStdout();
     }
 
     private byte[] loadInstructions(InstructionFormatBase[] instructions)

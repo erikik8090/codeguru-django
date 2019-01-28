@@ -1,5 +1,6 @@
 package il.co.codeguru.corewars_riscv.gui.widgets;
 
+import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.war.CompetitionEventListener;
 import il.co.codeguru.corewars_riscv.war.Warrior;
 
@@ -107,6 +108,7 @@ public class EventMulticasterCompetition extends EventMulticasterBase<Competitio
 		@Override
 		public void onCompetitionStart() {
 			for (Object mListener : mListenersArr) {
+			    Logger.log(mListener.toString());
                 ((CompetitionEventListener)mListener).onCompetitionStart();
 			}
 		}

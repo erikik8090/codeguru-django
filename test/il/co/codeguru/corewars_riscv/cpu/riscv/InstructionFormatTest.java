@@ -11,7 +11,7 @@ public class InstructionFormatTest {
 
     @Before
     public void setUp() {
-        Logger.setTestingMode();
+        Logger.outputToStdout();
     }
 
     @Test

@@ -20,7 +20,7 @@ public class WarTest {
     @Before
     public void setUp()
     {
-        Logger.setTestingMode();
+        Logger.outputToStdout();
     }
 
     @Test

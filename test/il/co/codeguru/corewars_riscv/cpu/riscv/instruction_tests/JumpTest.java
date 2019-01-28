@@ -34,7 +34,7 @@ public class JumpTest {
         state = new CpuStateRiscV();
         Memory memory = new RawMemory(0x10000);
         cpu = new CpuRiscV(state, memory);
-        Logger.setTestingMode();
+        Logger.outputToStdout();
 
     }
 

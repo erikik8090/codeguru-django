@@ -131,7 +131,6 @@ public class Warrior
         {
             throw new MemoryException("Warrior " + m_name + " tried to execute instructions outside of the arena");
         }
-
     }
 
     /**

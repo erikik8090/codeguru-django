@@ -183,7 +183,7 @@ public class InstructionFormatTest {
     @Test
     public void testCj()
     {
-        Logger.setTestingMode();
+        Logger.outputToStdout();
         CInstructionFormatCJ cd = new CInstructionFormatCJ((short)0xbfed);
         assertEquals(1, cd.getOpcode());
         assertEquals(5, cd.getFunct3());

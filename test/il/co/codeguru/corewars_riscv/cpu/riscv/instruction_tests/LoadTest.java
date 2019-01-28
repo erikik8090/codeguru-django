@@ -34,7 +34,7 @@ public class LoadTest {
         cpu = new CpuRiscV(state, memory);
         //To not interrupt the 0 memory location
         state.setPc(0x100);
-        Logger.setTestingMode();
+        Logger.outputToStdout();
 
     }
 

@@ -6,7 +6,6 @@ import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.InstructionFo
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
 import il.co.codeguru.corewars_riscv.utils.Logger;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static junit.framework.TestCase.fail;
@@ -19,7 +18,7 @@ public class InstructionDecoderTest {
     public void setUp()
     {
         decoder = new InstructionDecoder();
-        Logger.setTestingMode();
+        Logger.outputToStdout();
     }
 
     @Test

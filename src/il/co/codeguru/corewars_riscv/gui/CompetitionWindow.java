@@ -128,6 +128,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
 
     public boolean j_startDebug()
     {
+        Logger.log("j_startDebug");
         if (!m_playersPanel.checkPlayersReady())
             return false;
         return gui_runWar( true);
@@ -162,14 +163,14 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
 
     private AnimationScheduler.AnimationCallback animCallback = timestamp -> {
         try {
-            callContinueRun();
+            startRunAnimation();
         } catch (Exception e) {
             Console.log("continueRun EXCEPTION " + e.toString());
             e.printStackTrace();
         }
     };
 
-    private void callContinueRun() throws Exception {
+    private void startRunAnimation() throws Exception {
         boolean needMore = competition.continueRun();
         outRoundNum();
         if (needMore)
@@ -188,20 +189,16 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
      */
     public boolean runWar(boolean isInDebug)
     {
-        int battlesPerGroup = 0;
-        try {
-            long seedValue;
-            if (seed.getText().startsWith(SEED_PREFIX)){
-                seedValue = Long.parseLong(seed.getText().substring(SEED_PREFIX.length()));
-            }
-            else {
-                seedValue = seed.getText().hashCode();
-            }
-            competition.setSeed(seedValue);
-            battlesPerGroup = Integer.parseInt(battlesPerGroupField.getText().trim());
-        } catch (NumberFormatException e) {
-            Logger.error("Invalid number input");
+        long seedValue;
+        if (seed.getText().startsWith(SEED_PREFIX)){
+            seedValue = Long.parseLong(seed.getText().substring(SEED_PREFIX.length()));
         }
+        else {
+            seedValue = seed.getText().hashCode();
+        }
+        competition.setSeed(seedValue);
+
+        int battlesPerGroup = Integer.parseInt(battlesPerGroupField.getText().trim());
 
         // having numItems and groupSize allows having 4 players and running competitions of just any 3 of them
         // this is hardly useful in reality so I just set it to the same size
@@ -227,13 +224,12 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
 
         try {
             competition.runCompetition(battlesPerGroup, numOfGroups, this.isInDebug, SettingsPanel.useNewMemory());
-            callContinueRun(); // when runWar() returns we want the War object to be already constructured and ready
+            startRunAnimation(); // when runWar() returns we want the War object to be already constructured and ready
             if (this.isInDebug) { // add breakpointchecked only if we're in debugger
                 War war = competition.getCurrentWar();
                 war.setBreakpointCheck(m_codeEditor);
                 Warrior inEditorWarrior = war.getWarriorByLabel(m_playersPanel.getCodeInEditor().getLabel());
                 war.setUiWarrior(inEditorWarrior);
-                war.setInDebugger();
             }
             return true;
         }

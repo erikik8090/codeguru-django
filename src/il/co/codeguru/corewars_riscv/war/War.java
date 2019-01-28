@@ -63,7 +63,6 @@ public class War {
 
     private IBreakpointCheck m_breakpointCheck = null;
     private int m_uiWarriorIndex = -1; // break in breakpoints only of this warrior (he's the one selected in the PlayersPanel)
-    private boolean m_inDebugger = false; // controls the end condition
     private boolean m_hasEnded = false; // this war has ended but the object remains alive for post-mortem examination
     private boolean useNewMemory;
 
@@ -75,9 +74,6 @@ public class War {
     }
     public void setBreakpointCheck(IBreakpointCheck brc) {
         m_breakpointCheck = brc;
-    }
-    public void setInDebugger() {
-        m_inDebugger = true;
     }
     public boolean hasEnded() {
         return m_hasEnded;
@@ -372,7 +368,7 @@ public class War {
         }
 
         if (!found) {
-            throw new Exception();
+            throw new RuntimeException("Too many players - not enough space in the memory left to spawn all warriors");
         }
 
         return (short)loadAddress;

@@ -143,8 +143,7 @@ public class Competition {
 
 
 
-    public void runCompetition(int warsPerCombination, int warriorsPerGroup, boolean isInDebugger, boolean useNewMemory) throws Exception
-    {
+    public void runCompetition(int warsPerCombination, int warriorsPerGroup, boolean isInDebugger, boolean useNewMemory) {
         this.warsPerCombination = warsPerCombination;
         Logger.log("Running competition");
         competitionIterator = new CompetitionIterator(warriorRepository.getNumberOfGroups(), warriorsPerGroup, seed);
@@ -204,7 +203,6 @@ public class Competition {
         return 1;
     }
 
-    // return true if needs another round
     private void startWar(WarriorGroup[] warriorGroups) throws Exception
     {
         currentWar = new War(memoryEventListener, competitionEventListener, compState.isInDebugger, compState.useNewMemory);
@@ -261,7 +259,6 @@ public class Competition {
                 }
                 else { // == 0
                     compState.waitedFrames = -speed;
-                    stepsCount = 1;
                 }
             }
         }

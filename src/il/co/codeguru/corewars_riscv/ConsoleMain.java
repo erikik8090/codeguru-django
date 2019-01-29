@@ -79,7 +79,8 @@ public class ConsoleMain {
         File folder = new File(path);
         File[] teamDirList = folder.listFiles();
         if (teamDirList == null) {
-            throw new NullPointerException(path + " is not a valid path or doesn't exist");
+            System.err.println(path + " is not a valid path or doesn't exist");
+            System.exit(1);
         }
         List<PlayersPanel.Code> ans = new ArrayList<>(teamDirList.length);
 

@@ -52,14 +52,19 @@
   </target>
 
   <target name="console" depends="libs" description="Compile java source to console application">
+    <mkdir dir="console"/>
+    <mkdir dir="console/build"/>
     <javac srcdir="src" includes="**" encoding="utf-8"
-           destdir="console"
+           destdir="console/build"
            source="8" target="8" nowarn="true"
            debug="true" debuglevel="lines,vars,source">
       <classpath>
         <path refid="compile.path"/>
       </classpath>
     </javac>
+    <jar destfile="console/corewars-risc-v.jar" basedir="console/build" manifest="console.mf">
+
+    </jar>
   </target>
 
   <target name="gwtc" depends="javac" description="GWT compile to JavaScript (production mode)">

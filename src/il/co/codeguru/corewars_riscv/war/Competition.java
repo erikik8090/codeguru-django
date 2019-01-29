@@ -73,7 +73,6 @@ public class Competition {
     // return true if need to continue after
     public boolean continueRun() throws Exception
     {
-        Logger.log("Seed ~ " + getSeed());
         if (globalPause) {
             Logger.log("globalPause");
             return false;
@@ -163,8 +162,6 @@ public class Competition {
             switchToDebug();
         else
             switchToCompete();
-
-        Logger.log("Seed: " + getSeed());
 
     }
 

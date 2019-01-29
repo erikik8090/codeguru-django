@@ -6,10 +6,13 @@ import il.co.codeguru.corewars_riscv.war.Competition;
 import il.co.codeguru.corewars_riscv.war.WarriorGroup;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class ConsoleMain {
     public static void main(String[] args) {
@@ -19,20 +22,11 @@ public class ConsoleMain {
         }
         Logger.outputToStdout();
 
-        //TODO: Load config file - useNewMemory, battlePerGroup(?)
-
+        Properties config = loadConfig("config.properties");
         List<PlayersPanel.Code> binaries = loadBinaryFiles(args[0]);
 
-        Competition competition = new Competition();
-        boolean ok = competition.getWarriorRepository().loadWarriors(
-                binaries.toArray(new PlayersPanel.Code[0]),
-                new PlayersPanel.Code[]{},
-                false
-        );
-        if(!ok) throw new RuntimeException("Failed to load warriors");
+        Competition competition = setupCompetition(binaries, config);
 
-        competition.runCompetition(100, competition.getWarriorRepository().getNumberOfGroups(), false, false);
-        Logger.log("Seed: " + competition.getSeed());
         try {
             while (competition.continueRun()) ;
         }
@@ -48,6 +42,27 @@ public class ConsoleMain {
 
         //TODO: Output it in a file
 
+    }
+
+
+
+    public static Competition setupCompetition(List<PlayersPanel.Code> binaries, Properties config)
+    {
+        Competition competition = new Competition();
+        boolean ok = competition.getWarriorRepository().loadWarriors(
+                binaries.toArray(new PlayersPanel.Code[0]),
+                new PlayersPanel.Code[]{},
+                false
+        );
+        if(!ok) throw new RuntimeException("Failed to load warriors");
+
+        competition.runCompetition(
+                100,
+                competition.getWarriorRepository().getNumberOfGroups(),
+                false,
+                config.getProperty("NEW_MEMORY", "false").equals("true")
+        );
+        return competition;
     }
 
     /**
@@ -90,6 +105,23 @@ public class ConsoleMain {
             }
         }
         return ans;
+    }
+
+    public static Properties loadConfig(String filename)
+    {
+        Properties config = new Properties();
+        FileInputStream is;
+        try {
+            is = new FileInputStream(filename);
+        } catch (FileNotFoundException ex) {
+            return config;
+        }
+        try {
+            config.load(is);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        return config;
     }
 }
 

@@ -4,11 +4,9 @@ import il.co.codeguru.corewars_riscv.gui.PlayersPanel;
 import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.war.Competition;
 import il.co.codeguru.corewars_riscv.war.WarriorGroup;
+import il.co.codeguru.corewars_riscv.war.WarriorRepository;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +35,13 @@ public class ConsoleMain {
 
         for(WarriorGroup group : competition.getWarriorRepository().getWarriorGroups())
         {
-            System.out.println(group.getName() + " : " + group.getGroupScore());
+            System.out.println(group.getName() + ":" + group.getGroupScore());
         }
 
-        //TODO: Output it in a file
-
+        outputRepoToFile(
+                competition.getWarriorRepository(),
+                config.getProperty("OUTPUT_FILE", "output.txt")
+        );
     }
 
 
@@ -106,6 +106,26 @@ public class ConsoleMain {
         }
         return ans;
     }
+
+    public static void outputRepoToFile(WarriorRepository repository, String filename)
+    {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+
+            for(WarriorGroup group : repository.getWarriorGroups())
+            {
+                writer.write(group.getName() + ":" + group.getGroupScore());
+                writer.newLine();
+            }
+            writer.close();
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex);
+        }
+
+    }
+
 
     public static Properties loadConfig(String filename)
     {

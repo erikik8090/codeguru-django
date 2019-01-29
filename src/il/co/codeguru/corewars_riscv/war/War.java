@@ -345,7 +345,6 @@ public class War {
             if (WarriorRepository.m_Fixed_loadAddressChecker != null) {
                 if (!WarriorRepository.m_Fixed_loadAddressChecker.checkOverlap(loadAddress, warriorSize)) {
                     found = false;
-                    Logger.log("overlap with fixed!");
                     continue;
                 }
             }
@@ -361,7 +360,6 @@ public class War {
 
                 if ((loadAddress+warriorSize >= otherStart) && (loadAddress < otherEnd)) {
                     found = false;
-                    Logger.log("overlap with loaded!");
                     break;
                 }
             }

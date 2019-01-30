@@ -6,6 +6,7 @@ from django.dispatch import receiver
 class Team(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     #Additional info
+    current_code = models.FileField(upload_to='codes/') 
 
 @receiver(post_save, sender=User)
 def create_user_team(sender, instance, created, **kwargs):

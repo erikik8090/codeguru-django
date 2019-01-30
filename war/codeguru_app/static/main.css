@@ -1128,6 +1128,12 @@ h3 {
     overflow: hidden;
     position: relative;
     width: 709px;
+    
+}
+
+#tournament-panel .panel-body {
+    padding: 1em;
+    text-align: center;
 }
 
 #battlesPerGroupField {

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
@@ -23,3 +23,10 @@ def register(request):
     else:
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
+
+def submit(request):
+    if request.method == 'POST':
+        print(request.POST)
+        return JsonResponse(data={'OK' : True})
+    else:
+        return HttpResponseNotFound()

@@ -342,6 +342,7 @@ function changedWType(label, v, move_ui)
 
 function triggerSrc(label, index)
 {
+    console.log(`${label} - ${index}`);
     j_srcSelectionChanged(label, index)
 }
 
@@ -524,7 +525,7 @@ function triggerDebug(isInDebug) {
         debugBtnIn.style.backgroundImage = "url(static/img/red_stop.png)"
         debugBtnIn2.innerText = "Stop"
         debugBtn.onclick = function() { triggerDebug(false) };
-        competeCheckbox.setAttribute("disabled", true);
+        $('#competeBtn').prop("disabled", true)
 
         edit_area.style.display="none"
         debug_area.style.display=""
@@ -543,7 +544,6 @@ function triggerDebug(isInDebug) {
         j_debugUiInited();
 
         // disable editing the players
-        $('#competeBtn').prop("disabled", true)
         for(var ui in g_usedLetters) {
             var u = g_usedLetters[ui]
             document.getElementById("player_erase_p" + u).setAttribute("disabled", true)

@@ -26,20 +26,39 @@ function setUpTournamentPanel() {
     tournamentPanel.addListener(selectBox);
 
     $("#submit-button").click(function() {
-        selectedWarrior = selectBox.find(":selected").val()
-        triggerSrc(selectedWarrior, 1);
+        selectedWarrior = selectBox.find(":selected")
+        panel = $(`#pl_frame_${selectedWarrior.val()}`)
+        checkbox = panel.find('.fam_check_box')
 
-        code = $('#asm_edit').val()
+        codes = []
 
-        $.ajax({
-            headers: {"X-CSRFToken": csrf_token },
-            method: "POST",
-            url: "/submit/",
-            dataType: 'json',
-            data: { code: code }
-          }).done(function( msg ) {
-                console.log( "Data Saved: " + msg.OK );
-            });
+        triggerSrc(selectedWarrior.val(), 1);
+
+        code = $('#asm_edit').val();
+        codes.push({name: selectedWarrior.text() + '1', code: code});
+
+        console.log(`pl_frame_${selectedWarrior.val()}`)
+
+        if(checkbox.prop('checked')) {
+            triggerSrc(selectedWarrior.val(), 2);
+
+            code = $('#asm_edit').val()
+            codes.push({name: selectedWarrior.text() + '2', code: code});
+        }
+
+        sendCodeToServer(JSON.stringify(codes));
+    });
+}
+
+function sendCodeToServer(codes) {
+    $.ajax({
+        headers: {"X-CSRFToken": csrf_token },
+        method: "POST",
+        url: "/submit/",
+        dataType: 'json',
+        data: {codes: codes}
+    }).done(function( msg ) {
+        console.log( "Data Saved: " + msg.OK );
     });
 }
 

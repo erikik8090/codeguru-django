@@ -35,7 +35,7 @@ public class InstructionTest {
         state = new CpuStateRiscV();
         memory = new RawMemory(0x10000);
         cpu = new CpuRiscV(state, memory);
-        Logger.setTestingMode();
+        Logger.outputToStdout();
     }
 
     private void loadInstruction(CInstructionFormatBase i) {

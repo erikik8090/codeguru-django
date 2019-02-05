@@ -32,6 +32,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 
+ASSEMBLER = r"C:\Users\7318989\riscv32-unknown-elf-gcc\bin\riscv32-unknown-elf-as.exe"
+OBJ_COPY = r"C:\Users\7318989\riscv32-unknown-elf-gcc\bin\riscv32-unknown-elf-objcopy.exe"
+ENGINE = r"C:\Users\7318989\CodeGuru\codeguru-riscv\console\corewars-risc-v.jar"
+
 # Application definition
 
 INSTALLED_APPS = [

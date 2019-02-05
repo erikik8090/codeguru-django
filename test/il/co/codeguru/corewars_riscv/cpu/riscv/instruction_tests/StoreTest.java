@@ -33,7 +33,7 @@ public class StoreTest {
         memory = new RawMemory(0x10000);
         cpu = new CpuRiscV(state, memory);
         state.setPc(0x100);
-        Logger.setTestingMode();
+        Logger.outputToStdout();
     }
 
     private void loadInstruction(InstructionFormatBase i) {

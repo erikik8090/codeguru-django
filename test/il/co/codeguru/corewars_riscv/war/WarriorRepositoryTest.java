@@ -14,7 +14,7 @@ public class WarriorRepositoryTest {
     @Before
     public void setUp()
     {
-        Logger.setTestingMode();
+        Logger.outputToStdout();
         repo = new WarriorRepository();
     }
 

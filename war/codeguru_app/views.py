@@ -5,10 +5,12 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 
 from codeguru_extreme import settings
-from codeguru_app import models
+from . import models, game
 
 import json
 import os
+import subprocess
+import collections
 
 
 def index(request):
@@ -47,3 +49,10 @@ def submit(request):
 
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()
+
+def play_game(request):
+    if request.method == 'POST':
+        game.play()
+        return JsonResponse(data={'OK': True})
+    return HttpResponseNotFound()
+    

@@ -10,3 +10,4 @@ jacoco.prod.exec
 **/codewars_js
 www-test/
 **/WEB-INF/classes
+console/

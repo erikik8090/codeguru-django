@@ -51,7 +51,7 @@ class Code(models.Model):
 
         path = os.path.join(settings.MEDIA_ROOT,'codes', username)
         temp = os.path.join(path,'temp.s')
-        filename = os.path.join(username, name)
+        filename = os.path.join(username, name + '.s')
 
         with open(temp, 'w') as f:
             f.write(code)

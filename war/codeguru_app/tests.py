@@ -44,19 +44,19 @@ class SubmitCodeTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(os.path.exists(
-            os.path.join(settings.MEDIA_ROOT, 'codes', self.username1, code_name)
-        ))
+            os.path.join(settings.MEDIA_ROOT, 'codes', self.username1, code_name + '.s')
+        ), msg='Code file wasn\'t created')
         self.assertIsNotNone(self.user.team.current_code)
         self.assertTrue(
             self.user.team.current_code.warrior1.name,
-            os.path.join('codes', self.username1, code_name)
+            os.path.join('codes', self.username1, code_name + '.s')
         )
         self.assertEqual(
             self.user.team.current_code.warrior1.path,
-            os.path.join(settings.MEDIA_ROOT, 'codes', self.username1, code_name)
+            os.path.join(settings.MEDIA_ROOT, 'codes', self.username1, code_name + '.s')
         )
         self.assertEqual(
-            read_file(os.path.join(settings.MEDIA_ROOT, 'codes', self.username1, code_name)),
+            read_file(os.path.join(settings.MEDIA_ROOT, 'codes', self.username1, code_name + '.s')),
             code_content
         )
 

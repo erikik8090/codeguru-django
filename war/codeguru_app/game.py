@@ -8,7 +8,7 @@ from codeguru_extreme import settings
 def play():
     for root, dirs, files in os.walk(os.path.join(settings.MEDIA_ROOT, 'codes')):
         for file in files:
-            if file.endswith('.s'):
+            if file.startswith('current') and file.endswith('.s'):
                 assemble(root, file[:-2])
                 objcopy(root, file[:-2])
     run_engine()

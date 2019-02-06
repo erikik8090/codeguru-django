@@ -41,18 +41,24 @@ def submit(request):
         if len(codes) > 2:
             return HttpResponse('Error: You may not upload more than 2 warriors', status=409)
 
-        new_code = models.Code.create(request.user.username, codes)
         if request.user.team.current_code:
             request.user.team.current_code.delete()
+        new_code = models.Code.create(request.user.username, codes)
         request.user.team.current_code = new_code
         request.user.save()
-
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()
 
 def play_game(request):
     if request.method == 'POST':
-        game.play()
+        results = game.play()
+        save_results(results)
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()
     
+def save_results(results):
+    for team_name, score in results.items():
+        team = models.User.objects.get(username=team_name).team
+        result = models.Result.create(team, 1, score)
+        result.save()
+        

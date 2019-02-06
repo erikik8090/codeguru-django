@@ -55,10 +55,21 @@ def play_game(request):
         save_results(results)
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()
-    
+
+# REFACTOR_ME: Move this to tounament model (when we (me) create one)
 def save_results(results):
     for team_name, score in results.items():
         team = models.User.objects.get(username=team_name).team
         result = models.Result.create(team, 1, score)
         result.save()
-        
+
+def scores(request):
+    if request.user.is_authenticated:
+        scores = models.Result.objects.all()
+
+        table_content = dict()
+        for user in models.Result.objects.values_list('team__user__username', flat=True):
+            table_content[user] = models.Result.objects.filter(team__user__username=user)
+
+        print(table_content)
+        return render(request, 'scores.html', {'hey': 'asdf', 'scores' : table_content})

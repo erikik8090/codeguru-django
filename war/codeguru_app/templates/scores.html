@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container h-75">
+    <div class="row justify-content-center align-items-center h-100">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Team</th>
+                    <th scope="col">Round 1</th>
+                    <th scope="col">Round 2</th>
+                </tr>
+            </thead>
+            <tbody>
+                {# Change this to order by current winner #}
+                {% for user, rounds in scores.items %}
+                    <tr>
+                        <th scope="row"> {{forloop.counter}} </th>
+                        <td> {{user}} </td>
+                        {% for round in rounds %}
+                        <td> {{round.score}} </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}

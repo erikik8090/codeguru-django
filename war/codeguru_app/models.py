@@ -108,6 +108,15 @@ class Tournament(models.Model):
             result.save()
         self.rounds += 1
         self.save()
+    
+    def reset(self):
+        self.rounds = 0
+        for result in self.result_set.all():
+            result.delete()
+        self.save()
+
+    def __str__(self):
+        return self.name
 
 class Team(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -143,6 +152,10 @@ class Result(models.Model):
         model.tournament = tournament
         model.code = Code.create_from_code(team.current_code, team.user.username, tournament.current_round)
         return model
+
+    def delete(self, *args, **kwargs):
+        self.code.delete()
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f'{self.team.user.username} - {self.round}, Score: {self.score}'

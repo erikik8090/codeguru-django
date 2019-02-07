@@ -28,7 +28,7 @@ function setUpTournamentPanel() {
     $("#submit-button").click(function() {
         selectedWarrior = selectBox.find(":selected")
         panel = $(`#pl_frame_${selectedWarrior.val()}`)
-        checkbox = panel.find('.fam_check_box')
+        checkbox = panel.find(`#wtype_${selectedWarrior.val()}`)
 
         codes = []
 

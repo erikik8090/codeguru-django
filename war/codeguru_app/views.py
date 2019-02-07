@@ -52,16 +52,9 @@ def submit(request):
 def play_game(request):
     if request.method == 'POST':
         results = game.play()
-        save_results(results)
+        models.Tournament.current().save_round_results(results)
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()
-
-# REFACTOR_ME: Move this to tounament model (when we (me) create one)
-def save_results(results):
-    for team_name, score in results.items():
-        team = models.User.objects.get(username=team_name).team
-        result = models.Result.create(team, 1, score)
-        result.save()
 
 def scores(request):
     if request.user.is_authenticated:
@@ -71,5 +64,4 @@ def scores(request):
         for user in models.Result.objects.values_list('team__user__username', flat=True):
             table_content[user] = models.Result.objects.filter(team__user__username=user)
 
-        print(table_content)
-        return render(request, 'scores.html', {'hey': 'asdf', 'scores' : table_content})
+        return render(request, 'scores.html', {'rounds': range(1, models.Tournament.current().current_round), 'scores' : table_content})

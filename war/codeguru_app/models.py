@@ -9,6 +9,7 @@ import shutil
 
 from codeguru_extreme import settings
 
+
 class Code(models.Model):
     
     warrior1 = models.FileField(upload_to='codes/')
@@ -19,7 +20,8 @@ class Code(models.Model):
         model = cls()
 
         cls._copy_file(model.warrior1, old_code.warrior1.path, os.path.join(username, f'{round_number}1.s'))
-        cls._copy_file(model.warrior2, old_code.warrior2.path, os.path.join(username, f'{round_number}2.s'))
+        if old_code.warrior2:
+            cls._copy_file(model.warrior2, old_code.warrior2.path, os.path.join(username, f'{round_number}2.s'))
 
         return model
 
@@ -50,9 +52,6 @@ class Code(models.Model):
 
     @staticmethod
     def _copy_file(file_field, old_file_path, new_file_name):
-        if not old_file_path or not os.path.exists(old_file_path):
-            return
-        
         if os.path.exists(os.path.join(settings.MEDIA_ROOT, 'codes', new_file_name)):
             print('WARNING: Overwriting existing code files - round files already existing')
             os.remove(os.path.join(settings.MEDIA_ROOT, 'codes', new_file_name))
@@ -67,6 +66,7 @@ class Code(models.Model):
         Code._dir_exists(path)
         temp = os.path.join(*path,'temp.s')
 
+        # TODO: Change this to work with tempfile 
         with open(temp, 'w') as f:
             f.write(content)
         
@@ -85,11 +85,32 @@ class Code(models.Model):
             current_path = os.path.join(*current_path_list)
             if not os.path.exists(current_path):
                 os.mkdir(current_path)
-        
+
+class Tournament(models.Model):
+    name = models.CharField(max_length=120)
+    active = models.BooleanField(default=True)    
+    #NOTE: Maybe change this to many-to-one model with a Round class? 
+    # Maybe useful if we need to save more data on each round
+    rounds = models.PositiveSmallIntegerField(default=0)
+
+    @classmethod
+    def current(cls):
+        return cls.objects.first()  
+
+    @property
+    def current_round(self):
+        return self.rounds + 1  
+
+    def save_round_results(self, results):
+        for team_name, score in results.items():
+            team = User.objects.get(username=team_name).team
+            result = Result.create(team, self, score)
+            result.save()
+        self.rounds += 1
+        self.save()
 
 class Team(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    #Additional info
     current_code = models.ForeignKey(Code, null=True, on_delete=models.SET_NULL) #Just copy over the file later. TODO: Find a better way to do this 
 
     def __str__(self):
@@ -107,18 +128,20 @@ def save_user_team(sender, instance, **kwargs):
 
 
 class Result(models.Model):
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
     round = models.PositiveSmallIntegerField()
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     score = models.PositiveSmallIntegerField()
     code = models.ForeignKey(Code, on_delete=models.CASCADE)
 
     @classmethod
-    def create(cls, team, round, score):
+    def create(cls, team, tournament, score):
         model = cls()
         model.team = team
-        model.round = round
+        model.round = tournament.current_round
         model.score = score
-        model.code = Code.create_from_code(team.current_code, team.user.username, round)
+        model.tournament = tournament
+        model.code = Code.create_from_code(team.current_code, team.user.username, tournament.current_round)
         return model
 
     def __str__(self):

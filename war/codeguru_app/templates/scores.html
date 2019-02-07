@@ -8,12 +8,15 @@
     <div class="row justify-content-center align-items-center h-100">
         <table class="table">
             <thead>
+                {% if scores %}
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Team</th>
-                    <th scope="col">Round 1</th>
-                    <th scope="col">Round 2</th>
+                    {% for i in rounds %}
+                        <th scope="col"> Round {{i}}</th>
+                    {% endfor %}
                 </tr>
+                {% endif %}
             </thead>
             <tbody>
                 {# Change this to order by current winner #}
@@ -25,6 +28,8 @@
                         <td> {{round.score}} </td>
                         {% endfor %}
                     </tr>
+                {% empty %}
+                    No scores yet
                 {% endfor %}
             </tbody>
         </table>

@@ -26,9 +26,6 @@ class SubmitCodeTestCase(TestCase):
         for code in codes:
             code.delete()
 
-    def test_pass(self):
-        self.assertEqual(1, 1)
-
     def test_submit_single_code(self):
         code_name = 'test1'
         code_content = 'random content'

@@ -55,7 +55,7 @@ class CodeModelTestCase(TestCase):
         code = Code.create(self.username, [{'code': code_content}])
         code.save()
 
-        new_code = Code.create_from_code(self.username, 'new_code', code)
+        new_code = Code.create_from_code(code, self.username, 'new_code')
         new_code.save()
 
         self.assertPathsEqual(new_code.warrior1.name, os.path.join('codes', self.username ,'new_code.s'))
@@ -69,7 +69,7 @@ class CodeModelTestCase(TestCase):
         code = Code.create(self.username, [{'code': code_content1}, {'code': code_content2}])
         code.save()
 
-        new_code = Code.create_from_code(self.username, 'new_code', code)
+        new_code = Code.create_from_code(code, self.username, 'new_code')
         new_code.save()
 
         self.assertPathsEqual(new_code.warrior1.name, os.path.join('codes', self.username ,'new_code1.s'))

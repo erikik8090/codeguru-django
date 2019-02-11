@@ -59,12 +59,12 @@ def play_game(request):
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()
 
+@login_required
 def scores(request):
-    if request.user.is_authenticated:
-        scores = models.Result.objects.all()
+    scores = models.Result.objects.all()
 
-        table_content = dict()
-        for user in models.Result.objects.values_list('team__user__username', flat=True):
-            table_content[user] = models.Result.objects.filter(team__user__username=user)
+    table_content = dict()
+    for user in models.Result.objects.values_list('team__user__username', flat=True):
+        table_content[user] = models.Result.objects.filter(team__user__username=user)
 
-        return render(request, 'scores.html', {'rounds': range(1, models.Tournament.current().current_round), 'scores' : table_content})
+    return render(request, 'scores.html', {'rounds': range(1, models.Tournament.current().current_round), 'scores' : table_content})

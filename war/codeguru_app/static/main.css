@@ -1,5 +1,9 @@
 body {
     margin: 0;
+    max-width: 100%;
+    max-height: 120%;
+    overflow-y: visible;
+    padding-top: 50px;
     -moz-user-select: -moz-none;
     -khtml-user-select: none;
     -webkit-user-select: none;
@@ -374,10 +378,8 @@ input:disabled + .sc-btn:active,
 /*--------------- side panel -----------------*/
 
 #players_panel {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
+    height: 100%;
+    float:left;
     background: #ececec;
     width: 190px;
     border-right: 1px solid #008800;
@@ -385,11 +387,7 @@ input:disabled + .sc-btn:active,
 }
 
 #action_panel {
-  position: absolute;
-  left: 200px;
-  top: 0;
-  bottom: 0;
-  right: 0;
+    height: 100%;
   overflow: auto;
 }
 #action_rel {
@@ -511,8 +509,8 @@ input:disabled + .sc-btn:active,
 
 #addPlayerBtn {
     margin: 4px 7px 0px 11px;
-    height: 1em;
-    width: 1em;
+    height: auto;
+    width: auto;
     padding: 0.4em;
 }
 
@@ -540,8 +538,8 @@ input:disabled + .sc-btn:active,
     padding-bottom: 0px;
 }
 #addZombieBtn {
-    width: 1em;
-    height: 1em;
+    width: auto;
+    height: auto;
     padding:0.4em;
     margin: 4px 7px 7px 15px;
 }
@@ -615,43 +613,31 @@ input:disabled + .sc-btn:active,
     margin: 5px;
 }
 
-#debugBtn{
-    width: 130px;
-    text-align:left;
-    margin-left: 20px;
-}
 #debugBtnIn {
     display: inline-block;
     width: 30px;
     height: 30px;
     vertical-align: -8px;
-    margin: 0 0px 0 9px;
     background-image: url(img/green_play.png);
 }
-#debugBtnIn2 {
-    margin: 0 0 0 3px;
+
+#action-buttons {
+    text-align: center;
 }
-#competeBtn{
-    width: 130px;
-    text-align:left;
-    margin-left: 20px;
-    margin-bottom: 0;
+
+#action-buttons .sc-btn {
+    width: 80%;
 }
+
 #competeBtnIn {
     display: inline-block;
     width: 30px;
     height: 30px;
     vertical-align: -8px;
-    margin: 0 0px 0 9px;
-}
-#competeBtnIn2 {
-    margin: 0 0 0 12px;
 }
 
 #competeRunBtn{
     width: 120px;
-    text-align:left;
-    margin: 10px 0 0 20px;
     height: 35px;
     line-height: 35px;
 
@@ -661,23 +647,11 @@ input:disabled + .sc-btn:active,
     background-image: url(img/green_play.png);
     width: 30px;
     height: 30px;
-    margin: 0 0px 0 9px;
     vertical-align: -10px;
     background-size: 80%;
     background-repeat: no-repeat;
 
 }
-#competeRunBtnIn2 {
-    margin: 0 0 0 3px;
-}
-
-#tournament-btn {
-    text-align: center;
-    width: 130px;
-    height: 40px;
-    margin-left: 20px;
-}
-
 /* --------------------- cpuPanel --------------------- */
 
 #cpuPanel {
@@ -702,7 +676,7 @@ input:disabled + .sc-btn:active,
     font-weight: bold;
     border-radius: 4px;
     border: 2px solid #aaaaaa;
-    height: 17px;
+    height: 1.5em;
     margin: 2px 0 2px 0px;
     padding: 1px 0 1px 0px;
     font-size: 16px;
@@ -1086,7 +1060,7 @@ h3 {
 
 .side-panel {
     position: absolute;
-    top: 10px;
+    top: 60px;
     left: 191px;
     width: 0px;
     opacity: 0;

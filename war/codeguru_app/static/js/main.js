@@ -52,6 +52,7 @@ function start()
     setup_breakpoints_savers()
 }
 
+window.onload = start;
 
 var saved_selectionStart = -1 // need to be int for java to read
 var saved_selectionEnd = -1
@@ -116,7 +117,8 @@ function populate_debug_area()
 }
 
 function cssRuleBySelector(selText) {
-    var rules = document.styleSheets[0].cssRules
+    var rules = document.styleSheets[1].cssRules
+    console.log(rules);
     for(var i = 0; i < rules.length; ++i)
         if (rules[i].selectorText == selText)
             return rules[i]
@@ -133,6 +135,7 @@ function fix_debug_scroll_placeholders_size()
     single_part_height = dpart0.offsetHeight
     if (single_part_height == 0)
         throw "did not get placeholder height"
+    console.log(dplace_css);
     dplace_css.style.height = dpart0.offsetHeight + "px"
 }
 

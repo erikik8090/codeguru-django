@@ -12,17 +12,20 @@ from codeguru_extreme import settings
 
 class Code(models.Model):
     
+    #creator = models.ForeignKey(User, on_delete=models.CASCADE)
     warrior1 = models.FileField(upload_to='codes/')
     warrior2 = models.FileField(upload_to='codes/')
 
     @classmethod
-    def create_from_code(cls, old_code, username, round_number):
+    def create_from_code(cls, username, name, old_code):
         model = cls()
 
-        cls._copy_file(model.warrior1, old_code.warrior1.path, os.path.join(username, f'{round_number}1.s'))
-        if old_code.warrior2:
-            cls._copy_file(model.warrior2, old_code.warrior2.path, os.path.join(username, f'{round_number}2.s'))
-
+        if not old_code.warrior2:
+            cls._copy_file(model.warrior1, old_code.warrior1.path, os.path.join(username, f'{name}.s'))
+        else:
+            cls._copy_file(model.warrior1, old_code.warrior1.path, os.path.join(username, f'{name}1.s'))
+            cls._copy_file(model.warrior2, old_code.warrior2.path, os.path.join(username, f'{name}2.s'))    
+        
         return model
 
     @classmethod
@@ -38,17 +41,6 @@ class Code(models.Model):
             cls._save_file(model.warrior2, username, 'current2', codes[1]['code'])
         model.save()
         return model
-
-    def delete(self, *args, **kwargs):
-        try:
-            os.remove(self.warrior1.path)
-            os.remove(self.warrior2.path)
-        except:
-            print('The following file/s have already been removed when trying to delete Code object:\n' 
-                + self.warrior1.path
-                + '\n'
-                + self.warrior2.path if self.warrior2 else '')
-        super().delete(*args, **kwargs)
 
     @staticmethod
     def _copy_file(file_field, old_file_path, new_file_name):
@@ -85,6 +77,17 @@ class Code(models.Model):
             current_path = os.path.join(*current_path_list)
             if not os.path.exists(current_path):
                 os.mkdir(current_path)
+
+@receiver(models.signals.post_delete, sender=Code)
+def delete_code(sender, instance, **kwargs):
+        try:
+            os.remove(instance.warrior1.path)
+            os.remove(instance.warrior2.path)
+        except:
+            print('The following file/s have already been removed when trying to delete Code object:\n' 
+                + instance.warrior1.path
+                + '\n'
+                + instance.warrior2.path if instance.warrior2 else '')
 
 class Tournament(models.Model):
     name = models.CharField(max_length=120)

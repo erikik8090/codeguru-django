@@ -17,7 +17,7 @@ class Code(models.Model):
     warrior2 = models.FileField(upload_to='codes/')
 
     @classmethod
-    def create_from_code(cls, username, name, old_code):
+    def create_from_code(cls, old_code, username, name ):
         model = cls()
 
         if not old_code.warrior2:

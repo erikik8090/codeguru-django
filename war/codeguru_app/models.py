@@ -77,6 +77,16 @@ class Code(models.Model):
             current_path = os.path.join(*current_path_list)
             if not os.path.exists(current_path):
                 os.mkdir(current_path)
+    
+    def get_code(self, i=None):
+        if i:
+            return None
+        return [read_file(warrior.path) for warrior in [self.warrior1, self.warrior2] if warrior]
+
+def read_file(filename):
+    with open(filename) as f:
+        s = f.read()
+    return s
 
 @receiver(models.signals.post_delete, sender=Code)
 def delete_code(sender, instance, **kwargs):

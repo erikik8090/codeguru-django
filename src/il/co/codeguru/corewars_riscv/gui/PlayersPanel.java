@@ -98,7 +98,6 @@ public class PlayersPanel
         $wnd.j_addPlayer =    $entry(function(a,b,c,d,e) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_addPlayer(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;)(a,b,c,d,e) });
         $wnd.j_removePlayer = $entry(function(s) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_removePlayer(Ljava/lang/String;)(s) });
         $wnd.j_changedWType = $entry(function(a,b) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_changedWType(Ljava/lang/String;Ljava/lang/String;)(a,b) });
-        $wnd.j_demoDebugPlayers = $entry(function() { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_demoDebugPlayers()() });
         $wnd.j_loadAddrChanged = $entry(function(s,b) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_loadAddrChanged(Ljava/lang/String;Z)(s,b) });
         $wnd.j_loadBinary      = $entry(function(b) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_loadBinary(Lcom/google/gwt/typedarrays/shared/ArrayBuffer;)(b) });
     }-*/;
@@ -120,14 +119,6 @@ public class PlayersPanel
         int ci = label.charAt(label.length()-1) - '0';
         return pi.code[ci];
     }
-
-    public native void addPlayerPanel() /*-{
-        $wnd.player_container.add();
-    }-*/;
-    public native void changedWType(String label, String v) /*-{
-        $wnd.changedWType(label, v, true);
-    }-*/;
-
 
     // from js
     public void j_addPlayer(String label, String title, String code1, String code2, Boolean wtype) {

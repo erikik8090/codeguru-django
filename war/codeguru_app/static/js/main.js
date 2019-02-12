@@ -118,7 +118,6 @@ function populate_debug_area()
 
 function cssRuleBySelector(selText) {
     var rules = document.styleSheets[1].cssRules
-    console.log(rules);
     for(var i = 0; i < rules.length; ++i)
         if (rules[i].selectorText == selText)
             return rules[i]
@@ -135,7 +134,6 @@ function fix_debug_scroll_placeholders_size()
     single_part_height = dpart0.offsetHeight
     if (single_part_height == 0)
         throw "did not get placeholder height"
-    console.log(dplace_css);
     dplace_css.style.height = dpart0.offsetHeight + "px"
 }
 
@@ -276,11 +274,6 @@ function asm_cursorToLine(charOffset) {
 
 }
 
-/*function asm_pre_mousewheel(event) {
-    asm_edit.dispatchEvent(new event.constructor(event.type, event));
-}  scrolling in the code and numbers panes not working */
-
-
 function handle_asm_edit_scroll() {
     var roundedScroll = Math.floor(asm_edit.scrollTop);
 
@@ -371,12 +364,8 @@ function triggerDebug(isInDebug) {
         j_debugUiInited();
 
         // disable editing the players
-        for(var ui in g_usedLetters) {
-            var u = g_usedLetters[ui]
-            document.getElementById("player_erase_p" + u).setAttribute("disabled", true)
-            document.getElementById("player_check_p" + u).setAttribute("disabled", true)
-            document.getElementById("wtype_p" + u).setAttribute("disabled", true)
-        }
+        window.player_container.disable()
+
         player_check_zombies.setAttribute("disabled", true)
         addZombieBtn.setAttribute("disabled", true)
         for(var uzi in g_usedZnums) {
@@ -398,12 +387,7 @@ function triggerDebug(isInDebug) {
 
 
         addPlayerBtn.removeAttribute("disabled")
-        for(var ui in g_usedLetters) {
-            var u = g_usedLetters[ui]
-            document.getElementById("player_erase_p" + u).removeAttribute("disabled")
-            document.getElementById("player_check_p" + u).removeAttribute("disabled")
-            document.getElementById("wtype_p" + u).removeAttribute("disabled")
-        }
+        window.player_container.enable();
         player_check_zombies.removeAttribute("disabled")
         addZombieBtn.removeAttribute("disabled")
         for(var uzi in g_usedZnums) {
@@ -672,7 +656,6 @@ function onWarCanvasWheel(e) {
         bgWidth -= bgWidth*settings.zoom;
         bgHeight -= bgHeight*settings.zoom;
     }
-    //console.log("sz: " + bgWidth + "," + bgHeight);
 
     if (settings.maxZoom) {
         bgWidth = Math.min(width*settings.maxZoom, bgWidth);

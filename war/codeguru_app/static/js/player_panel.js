@@ -1,10 +1,6 @@
 function initPlayerPanel() {
     var container = new PlayerContainer()
     window.player_container = container;
-
-    $('#addPlayerBtn').click(function () {
-        window.player_container.add()
-    });
 }
 
 const blindRanger =
@@ -28,37 +24,61 @@ const still =
     "j x1\n";
 
 function initDefaultPlayers() {
-    window.player_container.add('Ranger', blindRanger, blindRanger, true);
+    $.ajax({
+        headers: {"X-CSRFToken": csrf_token },
+        method: "GET",
+        url: `/codes/${username}/current`,
+    }).done(function( msg ) {
+        let [code1, code2] = [msg.code[0], msg.code[1]];
+        user_panel = window.player_container.add_constant(username, code1, code2, code2!=undefined, true);
+        triggerSrc(user_panel.label, 1);
+    });
+    window.player_container.add('Ranger', blindRanger, blindRanger);
     window.player_container.add('Still', still);
     window.player_container.add('Warrior', blindWarrior);
-    triggerSrc('pA', 1);
-    $('#sel_code_w1_pA').prop('checked',true)
+
 }
 
 class PlayerContainer {
     constructor() {
         this.$container = $('#players_contaier');
+        this.$addButton = $('#addPlayerBtn');
+        this.nextLetter = 'A'
+        this.usedLetters = []
+        this.playerPanels = []
+
+        this.enable()
     }
 
-    add(name, code1, code2, two_warriors) {
-        if (g_usedLetters.length >= 20) {
+    add_constant(name, code1, code2, two_warriors) {
+        let panel = this.add(name, code1, code2, two_warriors, true);
+        panel.$panel.find('.pl_close_icon').remove();
+        panel.$panel.css('background','#ababab');
+        return panel;
+    }
+
+    add(name, code1, code2, two_warriors, atStart) {
+        if (this.usedLetters.length >= 20) {
             return; // max players
         }
 
-        const playerName = name || 'Player ' + g_nextLetter
+        const playerName = name || 'Player ' + this.nextLetter
         const wtype = two_warriors || false;
 
-        this.$container.append(createPlayerPanelString(g_nextLetter, playerName));
-        const a = new PlayerPanel(g_nextLetter, playerName, code1, code2, wtype);
-        var container = this;
-        a.$panel.find('.pl_close_icon').click(function () {
-            container.remove(a);
-        });
+        if(atStart != undefined && atStart === true) {
+            this.$container.prepend(createPlayerPanelString(this.nextLetter, playerName));
+        }
+        else {
+            this.$container.append(createPlayerPanelString(this.nextLetter, playerName));
+        }
+        const playerPanel = new PlayerPanel(this.nextLetter, playerName, code1, code2, wtype);        
 
-        a.changeWType(wtype); // do update label
+        playerPanel.changeWType(wtype); // do update label
 
-        g_usedLetters.push(g_nextLetter);
-        g_nextLetter = asciiAdd(g_nextLetter, 1)
+        this.usedLetters.push(this.nextLetter);
+        this.nextLetter = asciiAdd(this.nextLetter, 1);
+        this.playerPanels.push(playerPanel);
+        return playerPanel;
     }
 
     remove(panel) {
@@ -70,31 +90,51 @@ class PlayerContainer {
         })
         elem.addClass('removed_anim')
 
-        arrayRemove(g_usedLetters, letter);
+        arrayRemove(this.usedLetters, letter);
+        arrayRemove(this.playerPanels, panel);
         j_removePlayer('p' + letter)
 
-        if (g_usedLetters.length == 0) {
-            g_nextLetter = 'A'
+        if (this.usedLetters.length == 0) {
+            this.nextLetter = 'A'
         } else {
             // figure out what would be the next letter
             var check = 'Z' // check from Z backwards
             while (true) {
-                if (g_usedLetters.indexOf(check) > -1)
+                if (this.usedLetters.indexOf(check) > -1)
                     break;
                 check = asciiAdd(check, -1)
             }
             if (check != 'Z')
-                g_nextLetter = asciiAdd(check, 1)
+                this.nextLetter = asciiAdd(check, 1)
             else { // all letters are used up, check for holes
                 check = 'A'
                 while (check != 'Z') {
-                    if (g_usedLetters.indexOf(check) == -1)
+                    if (this.usedLetters.indexOf(check) == -1)
                         break;
                     check = asciiAdd(check, 1)
                 }
-                g_nextLetter = check // upper limit on number of players should avoid this causing a problem
+                this.nextLetter = check // upper limit on number of players should avoid this causing a problem
             }
         }
+        triggerSrc('p' + this.playerPanels[0].letter, 1  )
+    }
+
+    getByName(name) {
+        return this.playerPanels.find(panel => panel.name == name);
+    }
+
+    disable() {
+        this.playerPanels.forEach(p => p.disable())
+        this.$addButton.off('click')
+        this.$addButton.attr('disabled', "true");
+    }
+
+    enable() {
+        this.playerPanels.forEach(p => p.enable());
+        this.$addButton.click(function() {
+            window.player_container.add();
+        })
+        this.$addButton.attr('disabled', false);
     }
 }
 
@@ -107,17 +147,17 @@ function createPlayerPanelString(letter, name) {
 
 class PlayerPanel {
     constructor(letter, name, code1, code2, wtype) {
-        this.$panel = $('#pl_frame_p' + letter)
-        this.letter = letter
+        this.$panel = $('#pl_frame_p' + letter);
+        this.$wtype = this.$panel.find('.wtype_checkbox');
 
-        var panel = this;
-        const playerCode1 = code1 || ""
-        const playerCode2 = code2 || ""
+        this.letter = letter;
+        this.label = 'p'+letter;
+        this.name = name;
+        const playerCode1 = code1 || "";
+        const playerCode2 = code2 || "";
 
         j_addPlayer('p' + letter, name, playerCode1, playerCode2, wtype);
-        this.$panel.find('.wtype_checkbox').change(function () {
-            panel.changeWType($(this).prop('checked'));
-        });
+        this.enable();
     }
 
     changeWType(v) {
@@ -144,12 +184,31 @@ class PlayerPanel {
         }
 
         j_changedWType(label, v);
+    }
 
+    disable() {
+        this.$panel.find('.pl_close_icon').attr('disabled', true);
+        this.$panel.find('.player-check').prop('disabled', true);
+        this.$wtype.prop('disabled', true);
+        this.$wtype.off('change');
+        this.$panel.find('.pl_close_icon').off('click');
+        
+    }
+
+    enable() {
+        this.$panel.find('.pl_close_icon').attr('disabled', false);
+        this.$panel.find('.player-check').prop('disabled', false);
+        this.$wtype.prop('disabled', false);
+        
+        var playerPanel = this
+        this.$wtype.change(function () {
+            playerPanel.changeWType($(this).prop('checked'));
+        });
+        this.$panel.find('.pl_close_icon').click(function () {
+            window.player_container.remove(playerPanel);
+        });
     }
 }
-
-var g_nextLetter = 'A'
-var g_usedLetters = []
 
 function asciiAdd(letter, val) {
     return String.fromCharCode(letter.charCodeAt(0) + val)
@@ -162,7 +221,7 @@ function arrayRemove(arr, value) {
 }
 
 function triggerSrc(label, index) {
-    console.log(`${label} - ${index}`);
+    $(`#sel_code_w${index}_${label}`).prop('checked', true);
     j_srcSelectionChanged(label, index)
 }
 

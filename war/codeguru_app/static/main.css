@@ -77,11 +77,11 @@ button {
     box-shadow: initial;
 }
 
-.sc-btn[disabled="true"] {
+.sc-btn[disabled="true"] .sc-btn[disabled="disabled"] {
     box-shadow: initial;
     cursor: initial;
 }
-.sc-btn[disabled="true"] > .sc-span { /* comes after */
+.sc-btn[disabled="true"] > .sc-span .sc-btn[disabled="disabled"] > .sc-span { /* comes after */
     opacity: 0.3; /* for buttons with image*/
 }
 
@@ -92,7 +92,8 @@ input[type="range"]:disabled {
 input:disabled + .sc-btn,
 input:disabled + .sc-btn:hover,
 input:disabled + .sc-btn:active, 
-.sc-btn[disabled="true"] {
+.sc-btn[disabled="true"],
+.sc-btn[disabled="disabled"] {
   color:#ddd;
   background-image: linear-gradient(to bottom, white, #ebebeb);
   box-shadow: initial;
@@ -527,7 +528,7 @@ input:disabled + .sc-btn:active,
     color: red;
     background-color: rgba(255,255,255,0.7);
 }
-.pl_close_icon[disabled="true"] {
+.pl_close_icon[disabled="true"], .pl_close_icon[disabled="disabled"] {
     color:#818181;
     background-color: transparent;
     

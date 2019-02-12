@@ -9,39 +9,25 @@ function setUpDomEffects(){
 }
 
 function setUpTournamentPanel() {
-    var tournamentPanel = new window.SidePanel('tournament-btn', 'tournament-panel');
-
-    selectBox = $("#warrior-select");
-    selectBox.on('side-panel:open', function() {
-        newOptions = getCurrentPlayers();
-
-        selectBox.empty(); // remove old options
-        for (let [key, value] of Object.entries(newOptions))
-        {
-            selectBox.append($("<option></option>")
-                .attr("value", value)
-                .text(key));
-        }
-    });
-    tournamentPanel.addListener(selectBox);
+    new window.SidePanel('tournament-btn', 'tournament-panel');
 
     $("#submit-button").click(function() {
-        selectedWarrior = selectBox.find(":selected")
-        panel = $(`#pl_frame_${selectedWarrior.val()}`)
-        checkbox = panel.find(`#wtype_${selectedWarrior.val()}`)
+        selectedWarrior = window.player_container.getByName(username);
+        panel = selectedWarrior.$panel;
+        checkbox = selectedWarrior.$wtype;
 
         codes = []
 
-        triggerSrc(selectedWarrior.val(), 1);
+        triggerSrc(selectedWarrior.label, 1);
 
         code = $('#asm_edit').val();
-        codes.push({name: selectedWarrior.text() + '1', code: code});
+        codes.push({name: selectedWarrior.name + '1', code: code});
 
         if(checkbox.prop('checked')) {
-            triggerSrc(selectedWarrior.val(), 2);
+            triggerSrc(selectedWarrior.label, 2);
 
             code = $('#asm_edit').val()
-            codes.push({name: selectedWarrior.text() + '2', code: code});
+            codes.push({name: selectedWarrior.name + '2', code: code});
         }
 
         sendCodeToServer(JSON.stringify(codes));

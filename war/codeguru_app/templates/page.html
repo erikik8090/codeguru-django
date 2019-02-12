@@ -241,9 +241,6 @@
             Tournament
         </div>
         <div class="panel-body">
-            <select id="warrior-select">
-                <option>1</option>
-            </select>
             <button id="submit-button" class="sc-btn">
                 Submit
             </button>
@@ -278,11 +275,10 @@
 <template id="template_player_frame" style="display:none">
 <div id="pl_frame_pLETTER" class="toppic">
     <div class="famtitle">
-        <input class="fam_check_box hidden mycheck" id="player_check_pLETTER" type="checkbox" checked="" onchange="">
+        <input class="fam_check_box hidden mycheck player-check" id="player_check_pLETTER" type="checkbox" checked="" onchange="">
         <label class="fam_check mycheck_label" for="player_check_pLETTER"></label>
         <label id="player_name_lbl_pLETTER" class="fam_label">PNAME</label>
-        <label id="player_erase_pLETTER" class="fas fa-times pl_close_icon" ></label> {% comment 'onclick="triggerErasePlayer(pl_frame_pLETTER, 'LETTER')"' %}
-        {% endcomment %}
+        <label id="player_erase_pLETTER" class="fas fa-times pl_close_icon"></label> 
     </div>          
     <input class="fam_check_box hidden mycheck wtype_checkbox" id="wtype_pLETTER" type="checkbox" >
     <label class="fam_check mycheck_label wtype_label" for="wtype_pLETTER">Two Warriors</label>

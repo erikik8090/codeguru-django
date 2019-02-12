@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -68,3 +68,16 @@ def scores(request):
         table_content[user] = models.Result.objects.filter(team__user__username=user)
 
     return render(request, 'scores.html', {'rounds': range(1, models.Tournament.current().current_round), 'scores' : table_content})
+
+def codes(request, username = '', version = ''):
+    if username:
+        if version:
+            if version == 'current':
+                user = get_object_or_404(models.User, username=username)
+                return JsonResponse({'code': user.team.current_code.get_code()})
+            else:
+                return HttpResponse(status=500)
+        else:
+            return HttpResponse(status=500)
+    else:
+        return HttpResponse(status=500)

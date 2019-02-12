@@ -9,6 +9,8 @@
 
 <script type="text/javascript" language="javascript" src="{% static "js/gas_riscv_js.js" %}"></script>
 <script type="text/javascript" language="javascript" src="{% static "codewars_js/codewars_js.nocache.js" %}"></script>
+<script type="text/javascript" language="javascript" src="{% static "js/game.js" %}"></script>
+<script type="text/javascript" language="javascript" src="{% static "js/player_panel.js" %}"></script>
 <script type="text/javascript" language="javascript" src="{% static "js/dom_effects.js" %}"></script>
 <script type="text/javascript" language="javascript" src="{% static "js/main.js" %}"></script>
 {% endblock header %}
@@ -16,7 +18,8 @@
 {% block content %}
 <div class="h-100">
     <script>
-        var csrf_token = '{{csrf_token}}';    
+        var csrf_token = '{{csrf_token}}';  
+        var username = '{{user.username}}';  
     </script>
     
     <div id="gray_out_debugger"></div>
@@ -38,7 +41,7 @@
             <div id="players_contaier">
 
             </div>
-            <i id="addPlayerBtn" class="fas fa-plus sc-btn" onclick="addPlayersPanel()" title="Add Player"></i>
+            <i id="addPlayerBtn" class="fas fa-plus sc-btn" title="Add Player"></i>
 
             <div id="pl_frame_zombies" class="toppic">
                 <div class="famtitle">
@@ -271,4 +274,22 @@
     </div>
 
 </div>
+
+<template id="template_player_frame" style="display:none">
+<div id="pl_frame_pLETTER" class="toppic">
+    <div class="famtitle">
+        <input class="fam_check_box hidden mycheck" id="player_check_pLETTER" type="checkbox" checked="" onchange="">
+        <label class="fam_check mycheck_label" for="player_check_pLETTER"></label>
+        <label id="player_name_lbl_pLETTER" class="fam_label">PNAME</label>
+        <label id="player_erase_pLETTER" class="fas fa-times pl_close_icon" ></label> {% comment 'onclick="triggerErasePlayer(pl_frame_pLETTER, 'LETTER')"' %}
+        {% endcomment %}
+    </div>          
+    <input class="fam_check_box hidden mycheck wtype_checkbox" id="wtype_pLETTER" type="checkbox" >
+    <label class="fam_check mycheck_label wtype_label" for="wtype_pLETTER">Two Warriors</label>
+    <input id="sel_code_w1_pLETTER" class="hidden sc-check" onclick="triggerSrc('pLETTER', 1)" type="radio" name="src_select">
+    <label id="sel_code_lbl_w1_pLETTER" class="sc-btn src_sel_but" for="sel_code_w1_pLETTER">PNAME1</label> 
+    <input id="sel_code_w2_pLETTER" class="hidden sc-check" onclick="triggerSrc('pLETTER', 2)" type="radio" name="src_select"> 
+    <label id="sel_code_lbl_w2_pLETTER" class="sc-btn src_sel_but" for="sel_code_w2_pLETTER">PNAME2</label>
+</div>
+</template>
 {% endblock content %}

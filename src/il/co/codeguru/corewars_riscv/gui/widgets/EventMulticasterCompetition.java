@@ -108,7 +108,6 @@ public class EventMulticasterCompetition extends EventMulticasterBase<Competitio
 		@Override
 		public void onCompetitionStart() {
 			for (Object mListener : mListenersArr) {
-			    Logger.log(mListener.toString());
                 ((CompetitionEventListener)mListener).onCompetitionStart();
 			}
 		}

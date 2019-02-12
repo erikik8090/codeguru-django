@@ -37,8 +37,6 @@ function setUpTournamentPanel() {
         code = $('#asm_edit').val();
         codes.push({name: selectedWarrior.text() + '1', code: code});
 
-        console.log(`pl_frame_${selectedWarrior.val()}`)
-
         if(checkbox.prop('checked')) {
             triggerSrc(selectedWarrior.val(), 2);
 
@@ -60,17 +58,6 @@ function sendCodeToServer(codes) {
     }).done(function( msg ) {
         console.log( "Data Saved: " + msg.OK );
     });
-}
-
-function getCurrentPlayers() {
-    ans = {}
-    $("#players_contaier")
-        .children()
-        .each(function() {
-            id = $(this).attr('id');
-            ans[$(this).find('.fam_label').text()] = id.substring(id.length-2);
-        });
-    return ans;
 }
 
 class SidePanel {

@@ -7,6 +7,7 @@ import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.gui.widgets.Console;
 import il.co.codeguru.corewars_riscv.jsadd.Format;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
+import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.war.Competition;
 import il.co.codeguru.corewars_riscv.war.CompetitionEventListener;
 import il.co.codeguru.corewars_riscv.war.War;
@@ -329,6 +330,8 @@ public class CpuFrame implements CompetitionEventListener, MemoryEventListener {
 			return;
 
 		Warrior warrior = currentWar.getWarriorByLabel(m_currentWarriorLabel);
+
+		Logger.log("" + m_currentWarriorLabel);
 
 		stackView.initMemRegion(warrior.stackRegion, currentWar.getMemory(), force);
 		sharedMemView.initMemRegion(warrior.sharedRegion, currentWar.getMemory(), force);

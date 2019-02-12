@@ -227,26 +227,19 @@ function triggerGoToKey() {
 }
 
 
-
-
-
 // called when GWT finshed loading
 function gwtStart()
 {
     start();
     console.log("gwtStart()");
-   // start with two players
-    addPlayersPanel()
-    addPlayersPanel()
 
-    sel_code_w1_pA.checked = true
-    triggerSrc('pA', 1)
+    initPlayerPanel();
 
-    j_demoDebugPlayers();
+    //j_demoDebugPlayers();
+
+    initDefaultPlayers();
 
     addWatchLine();
-    //addWatchLine();
-    //addWatchLine();
 }
 
 
@@ -255,174 +248,6 @@ function addTextChild(elem, txt) {
     dummy.innerHTML = txt
     elem.appendChild(dummy.firstChild)
 }
-
-var g_nextLetter = 'A'
-var g_usedLetters = []
-var g_srcButtons = []  // ids of elements that are checkboxes that select a source file to be displayer
-var g_usedZnums = []
-
-function asciiAdd(letter, val) {
-    return String.fromCharCode(letter.charCodeAt(0) + val)
-}
-
-function arrayRemove(arr, value) {
-    var index = arr.indexOf(value);
-    console.assert(index > -1, "did not find " + value)
-    arr.splice(index, 1);
-}
-
-
-function addPlayersPanel() {
-    if (addPlayerBtn.getAttribute("disabled") == "true")
-        return;
-    if (g_usedLetters.length >= 20)
-        return; // max players
-
-    var text = '<div id="pl_frame_pLETTER" class="toppic">\
-          <div class="famtitle">\
-            <input class="fam_check_box hidden mycheck" id="player_check_pLETTER" type="checkbox" checked onchange="" >\
-            <label class="fam_check mycheck_label" for="player_check_pLETTER"></label>\
-            <label id="player_name_lbl_pLETTER" class="fam_label">Player LETTER</label>\
-            <label id="player_erase_pLETTER" class="fas fa-times pl_close_icon" onclick="triggerErasePlayer(this, pl_frame_pLETTER, \'LETTER\')"></label>\
-          </div>\
-          <input class="fam_check_box hidden mycheck" id="wtype_pLETTER" type="checkbox" onchange="changedWType(\'pLETTER\', this.checked)" >\
-          <label class="fam_check mycheck_label wtype_label" for="wtype_pLETTER">Two Warriors</label>\
-          <input id="sel_code_w1_pLETTER" class="hidden sc-check" onclick="triggerSrc(\'pLETTER\', 1)" type="radio" name="src_select">\
-          <label id="sel_code_lbl_w1_pLETTER" class="sc-btn src_sel_but" for="sel_code_w1_pLETTER" >Player_LETTER</label>\
-          <br>\
-          <input id="sel_code_w2_pLETTER" class="hidden sc-check" onclick="triggerSrc(\'pLETTER\', 2)" type="radio" name="src_select">\
-          <label id="sel_code_lbl_w2_pLETTER" class="sc-btn src_sel_but" for="sel_code_w2_pLETTER">Player_LETTER2</label>\
-        </div>'
-
-    addTextChild(players_contaier, text.replace(/LETTER/g, g_nextLetter))
-
-    var letter = g_nextLetter
-    g_srcButtons.push('sel_code_w1_p' + letter)
-    g_srcButtons.push('sel_code_w2_p' + letter)
-
-    j_addPlayer('p'+letter, "Player " + letter)
-    changedWType('p'+letter, false) // do update label
-
-    g_usedLetters.push(letter)
-    g_nextLetter = asciiAdd(g_nextLetter, 1)
-
-
-}
-
-function changedWType(label, v, move_ui)
-{
-    if (v === true)
-        v = 'TWO_DIFFERENT'
-    else if (v == false)
-        v = 'SINGLE'
-
-    if (move_ui) {
-        var checked = (v = 'TWO_DIFFERENT')
-        document.getElementById('wtype_' + label).checked = checked
-    }
-
-    var elem1 = document.getElementById('sel_code_lbl_w1_' + label)
-    var elem2 = document.getElementById('sel_code_lbl_w2_' + label)
-    var frame = document.getElementById('pl_frame_' + label)
-
-    if (v == 'SINGLE' || v == 'TWO_IDENTICAL') {
-        elem2.style.visibility = 'hidden'
-        elem2.style.opacity = 0.0
-        elem1.style.marginTop = '7px'
-        frame.style.height = '98px'
-    }
-    else if (v == 'TWO_DIFFERENT') {
-        elem2.style.visibility = 'visible'
-        elem2.style.opacity = 1
-        elem1.style.marginTop = '7px'
-        frame.style.height = ''
-    }
-
-    j_changedWType(label, v);
-
-}
-
-
-function triggerSrc(label, index)
-{
-    console.log(`${label} - ${index}`);
-    j_srcSelectionChanged(label, index)
-}
-
-function triggerErasePlayer(buttonElem, elem, letter)
-{
-    if (buttonElem.getAttribute("disabled") == "true")
-        return;
-    //elem.parentNode.removeChild(elem);
-    elem.addEventListener('animationend', function() {
-        elem.parentNode.removeChild(elem);
-    })
-    elem.classList.add('removed_anim')
-
-    arrayRemove(g_usedLetters, letter);
-    arrayRemove(g_srcButtons, 'sel_code_w1_p' + letter)
-    arrayRemove(g_srcButtons, 'sel_code_w2_p' + letter)
-
-    j_removePlayer('p'+letter)
-
-    if (g_usedLetters.length == 0) {
-        g_nextLetter = 'A'
-    }
-    else
-    {
-        // figure out what would be the next letter
-        var check = 'Z' // check from Z backwards
-        while(true) {
-            if (g_usedLetters.indexOf(check) > -1)
-                break;
-            check = asciiAdd(check, -1)
-        }
-        if (check != 'Z')
-            g_nextLetter = asciiAdd(check, 1)
-        else {  // all letters are used up, check for holes
-            check = 'A'
-            while(check != 'Z') {
-                if (g_usedLetters.indexOf(check) == -1)
-                    break;
-                check = asciiAdd(check, 1)
-            }
-            g_nextLetter = check // upper limit on number of players should avoid this causing a problem
-        }
-    }
-}
-
-var g_nextZombNum = 1
-
-function addZombieCode() {
-    if (addZombieBtn.getAttribute("disabled") == "true")
-        return;
-    var text = '<div id="zomb_line_zNUM">\
-        <input id="sel_code_w1_zNUM" class="hidden sc-check" onclick="triggerSrc(\'zNUM\', 1)" type="radio" name="src_select">\
-        <label id="player_name_lbl_zNUM" class="sc-btn src_sel_but zomb_sel_but" for="sel_code_w1_zNUM" >Zombie NUM</label>\
-        <label id="player_erase_zNUM" class="fas fa-times pl_close_icon za_close_icon" onclick="triggerEraseZombie(this, zomb_line_zNUM, \'NUM\')"></label>\
-        </div>'
-
-    addTextChild(zombies_container, text.replace(/NUM/g, g_nextZombNum))
-    var num = '' + g_nextZombNum  // turn to a string
-    g_nextZombNum += 1
-
-    g_usedZnums.push(num)
-
-    j_addPlayer('z'+num, "Zombie " + num) // players are identified by a letter, zombies by a number
-
-}
-
-function triggerEraseZombie(buttonElem, elem, num) {
-    if (buttonElem.getAttribute("disabled") == "true")
-        return;
-
-    elem.parentNode.removeChild(elem);
-    arrayRemove(g_usedZnums, num)
-
-    j_removePlayer('z'+num)
-}
-
-
 
 
 // in case there is a long line, when returning to a new line, the text will be still scrolled to the left, fix that
@@ -441,7 +266,6 @@ function fixhscroll(e) {
         asm_edit.scrollLeft = 0
     }
 }
-
 
 
 // called when a warning or error line in the editor is double clicked

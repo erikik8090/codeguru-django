@@ -8,7 +8,7 @@ body {
     -khtml-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
-     user-select: none;
+    user-select: none;
     background: #ffffff;
     font-family: Verdana;
 }
@@ -19,7 +19,7 @@ a {
 }
 
 button {
-    border:none;
+    border: none;
 }
 
 .hide {
@@ -27,51 +27,55 @@ button {
 }
 
 .sc-btn {
-  display: inline-block;
-  /*position: absolute;*/
+    display: inline-block;
+    /*position: absolute;*/
 
-  /*font-family: "Helvetica Neue", "Helvetica", sans-serif;*/
+    /*font-family: "Helvetica Neue", "Helvetica", sans-serif;*/
 
-  border-radius: 0.4em;
+    border-radius: 0.4em;
 
-  box-shadow: inset rgba(0, 0, 0, 0.1) 0px -0.15em 0px, inset rgba(255, 255, 255, 0.2) 0px 0.15em 0px, rgba(0, 0, 0, 0.3) 0px 0.1em 0.3em;
-  text-align: center;
-  cursor: pointer;
-  overflow: hidden; 
-  
-  color: #222;
-  text-shadow: rgba(127, 127, 127, 0.4) 0 1px 0;
-  background-color: #ebebeb;
-  background-image: linear-gradient(to bottom, white, #ebebeb);   
-  
-  width: 100px;
-  height: 40px;
-  line-height: 40px;
-  margin: 7px;
-  outline:none;  /* no focus outline */
-  font-size:110%;
+    box-shadow: inset rgba(0, 0, 0, 0.1) 0px -0.15em 0px, inset rgba(255, 255, 255, 0.2) 0px 0.15em 0px, rgba(0, 0, 0, 0.3) 0px 0.1em 0.3em;
+    text-align: center;
+    cursor: pointer;
+    overflow: hidden;
+
+    color: #222;
+    text-shadow: rgba(127, 127, 127, 0.4) 0 1px 0;
+    background-color: #ebebeb;
+    background-image: linear-gradient(to bottom, white, #ebebeb);
+
+    width: 100px;
+    height: 40px;
+    line-height: 40px;
+    margin: 7px;
+    outline: none;
+    /* no focus outline */
+    font-size: 110%;
 }
 
 .sc-btn:hover {
-  color: #222;
-  background-image: linear-gradient(to bottom, white, #d2d2d2);
-  background-color: #fdfdfd;   
+    color: #222;
+    background-image: linear-gradient(to bottom, white, #d2d2d2);
+    background-color: #fdfdfd;
 }
 
-.sc-btn:active, .sc-check:checked+.sc-btn {
-    box-shadow: rgba(255, 255, 255, 0.2) 0 0.1em 0, inset rgba(0, 0, 0, 0.3) 0px 0.25em 1em; 
+.sc-btn:active,
+.sc-check:checked+.sc-btn {
+    box-shadow: rgba(255, 255, 255, 0.2) 0 0.1em 0, inset rgba(0, 0, 0, 0.3) 0px 0.25em 1em;
     color: #fff;
     background-color: #dfdfdf;
-    background-image: linear-gradient(to bottom, #479ceb, #1067c1); 
+    background-image: linear-gradient(to bottom, #479ceb, #1067c1);
 }
-.sc-btn:checked  {
 
-  background-color: #dfdfdf;
-  background-image: linear-gradient(to bottom, #479ceb, #1067c1); 
+.sc-btn:checked {
+
+    background-color: #dfdfdf;
+    background-image: linear-gradient(to bottom, #479ceb, #1067c1);
 }
+
 .sc-btn:disabled {
-   color: #ddd;
-   opacity: 0.65; 
+    color: #ddd;
+    opacity: 0.65;
     pointer-events: none;
     cursor: initial;
     box-shadow: initial;
@@ -81,25 +85,29 @@ button {
     box-shadow: initial;
     cursor: initial;
 }
-.sc-btn[disabled="true"] > .sc-span .sc-btn[disabled="disabled"] > .sc-span { /* comes after */
-    opacity: 0.3; /* for buttons with image*/
+
+.sc-btn[disabled="true"]>.sc-span .sc-btn[disabled="disabled"]>.sc-span {
+    /* comes after */
+    opacity: 0.3;
+    /* for buttons with image*/
 }
 
 input[type="range"]:disabled {
     opacity: 0.4;
 }
 
-input:disabled + .sc-btn,
-input:disabled + .sc-btn:hover,
-input:disabled + .sc-btn:active, 
+input:disabled+.sc-btn,
+input:disabled+.sc-btn:hover,
+input:disabled+.sc-btn:active,
 .sc-btn[disabled="true"],
 .sc-btn[disabled="disabled"] {
-  color:#ddd;
-  background-image: linear-gradient(to bottom, white, #ebebeb);
-  box-shadow: initial;
+    color: #ddd;
+    background-image: linear-gradient(to bottom, white, #ebebeb);
+    box-shadow: initial;
 }
-.sc-btn:disabled + span {
-  opacity:0.6
+
+.sc-btn:disabled+span {
+    opacity: 0.6
 }
 
 /* ---------------- asm ---------------------- */
@@ -107,36 +115,43 @@ input:disabled + .sc-btn:active,
 .codearea {
     font-size: 16px;
     font-family: courier;
-    outline: none; /* don't show focus border */
+    outline: none;
+    /* don't show focus border */
     overflow: auto;
     /*border: 1px solid #000000;*/
     /*border-radius: 4px;*/
     display: inline-block;
     padding: 9px 8px;
-    white-space: pre;  /* needed for multiple spaces */
-    box-sizing: border-box; /* size includes margins and border */
+    white-space: pre;
+    /* needed for multiple spaces */
+    box-sizing: border-box;
+    /* size includes margins and border */
 }
+
 .codearea:disabled {
-    background-color: rgb(255,255,255);
+    background-color: rgb(255, 255, 255);
     color: rgb(0, 0, 0);
 }
 
 .allow_select {
-    -moz-user-select: text; /* user can select here, override body */
+    -moz-user-select: text;
+    /* user can select here, override body */
     -khtml-user-select: text;
     -webkit-user-select: text;
     -ms-user-select: text;
-     user-select: text;
+    user-select: text;
 }
 
 #opcodes_edit {
     position: absolute;
     left: 0;
 
-    width:200px;
-    overflow: hidden; /* remove scroll bar */
+    width: 200px;
+    overflow: hidden;
+    /* remove scroll bar */
     background: white;
 }
+
 #asm_linenums {
     position: absolute;
     left: 200px;
@@ -152,7 +167,8 @@ input:disabled + .sc-btn:active,
     background: #eeeeee;
     border-right: 1px solid #cccccc;
 
-    margin: 0 0 1px 0; /* without this the editor is off by 1 pixel in chrome. no idea */
+    margin: 0 0 1px 0;
+    /* without this the editor is off by 1 pixel in chrome. no idea */
 }
 
 .dbg_breakpoint:after {
@@ -169,24 +185,28 @@ input:disabled + .sc-btn:active,
 
 #edit_area {
     display: inline-block;
-    position:relative;
+    position: relative;
 
-    width:600px;
+    width: 600px;
     height: 518px;
-    vertical-align: top; /* othewise the scroll bar hides the border */
+    vertical-align: top;
+    /* othewise the scroll bar hides the border */
     overflow: hidden;
 }
 
 #debug_area {
-    position: relative; /* for the absolute positiond gray address bar */
+    position: relative;
+    /* for the absolute positiond gray address bar */
 }
+
 #debug_text {
     display: inline-block;
-    position:relative;
+    position: relative;
 
-    width:600px;
+    width: 600px;
     height: 518px;
-    vertical-align: top; /* othewise the scroll bar hides the border */
+    vertical-align: top;
+    /* othewise the scroll bar hides the border */
     border: 1px solid black;
     border-radius: 6px;
     overflow: auto;
@@ -196,14 +216,17 @@ input:disabled + .sc-btn:active,
     padding: 0 0 0 3px;
     cursor: default;
 }
-.dplace { /* placeholdr for dlines */
+
+.dplace {
+    /* placeholdr for dlines */
     height: 0;
 }
+
 #dbg_box_addr {
     position: absolute;
     top: 31px;
     width: 50px;
-    height: calc( 100% - 31px);
+    height: calc(100% - 31px);
     background: #eeeeee;
     border-right: 1px solid #cccccc;
 }
@@ -215,7 +238,7 @@ input:disabled + .sc-btn:active,
     height: 100%;
     width: calc(100% - 240px);
     overflow-x: auto;
-    border:none;
+    border: none;
     background: transparent;
     outline: none;
     resize: none;
@@ -225,6 +248,7 @@ input:disabled + .sc-btn:active,
     color: transparent;
     caret-color: black;
 }
+
 #asm_pre {
     /*pointer-events: none;*/
     position: absolute;
@@ -234,12 +258,13 @@ input:disabled + .sc-btn:active,
     bottom: 0;
     overflow-x: hidden;
     overflow-y: hidden;
-    border:none;
+    border: none;
     margin: 0;
     box-sizing: border-box;
     padding: 0;
 
 }
+
 #asm_show {
     position: absolute;
     display: inline-block;
@@ -257,14 +282,15 @@ input:disabled + .sc-btn:active,
     /*width: calc(600px - 240px);*/
     /*height: 500px;*/
     vertical-align: top;
-   /* overflow: hidden;*/
+    /* overflow: hidden;*/
 }
 
 #asm_edit_and_lines {
     border: 1px solid #000000;
     border-radius: 4px;
     display: inline-block;
-    height: 518px; /* 500 + padding of 9 */
+    height: 518px;
+    /* 500 + padding of 9 */
 }
 
 
@@ -276,9 +302,11 @@ input:disabled + .sc-btn:active,
     height: 100%;
     border: 1px solid #000;
     border-radius: 6px;
-    pointer-events: none;  /* want these boxes to be transparent to the mouse */
+    pointer-events: none;
+    /* want these boxes to be transparent to the mouse */
     box-sizing: border-box;
 }
+
 #box_edit {
     position: absolute;
     top: 0;
@@ -290,6 +318,7 @@ input:disabled + .sc-btn:active,
     pointer-events: none;
     box-sizing: border-box;
 }
+
 #box_numbers {
     position: absolute;
     top: 0;
@@ -306,18 +335,21 @@ input:disabled + .sc-btn:active,
 .edit_error {
     background-color: #ffd7d7;
 }
+
 .edit_warning {
     background-color: #fff8ab;
 }
-#asm_output { 
-    width:600px;
-    height:100px;
+
+#asm_output {
+    width: 600px;
+    height: 100px;
     white-space: normal;
     padding: 9px 0 9px 0;
     border: 1px solid #000000;
     border-radius: 4px;
     margin: 8px 0 0 0;
 }
+
 #asm_options {
     margin: 8px 0 0 0;
 }
@@ -329,13 +361,14 @@ input:disabled + .sc-btn:active,
 }
 
 .edit_text_error {
-    background-color: rgb(255,140,140);
+    background-color: rgb(255, 140, 140);
 }
 
 .stdout_line_w:nth-child(even) {
     background: #ffeb8b;
     cursor: pointer;
 }
+
 .stdout_line_w:nth-child(odd) {
     background: #ffffaf;
     cursor: pointer;
@@ -345,26 +378,30 @@ input:disabled + .sc-btn:active,
     background: #ffcece;
     cursor: pointer;
 }
+
 .stdout_line_e:nth-child(odd) {
     background: #ffbcb4;
     cursor: pointer;
 }
 
 
-.stdout_line_e, .stdout_line_w {
+.stdout_line_e,
+.stdout_line_w {
     padding: 0 0 0 8px;
 }
 
 .current_dbg {
     background-color: #ddddff;
 }
+
 .current_dbg_dead {
     background-image: url("img/dbg_fail_red_ex.png");
     background-color: #ffc7c7;
     background-repeat: no-repeat;
-    background-position: calc( 100% - 5px) 1px;
+    background-position: calc(100% - 5px) 1px;
 }
-.current_dbg_dead > .dbg_backfill {
+
+.current_dbg_dead>.dbg_backfill {
     color: #000000;
 }
 
@@ -372,6 +409,7 @@ input:disabled + .sc-btn:active,
     display: inline-block;
     width: 200px;
 }
+
 .dbg_backfill {
     color: #c1c1c1;
 }
@@ -380,7 +418,7 @@ input:disabled + .sc-btn:active,
 
 #players_panel {
     height: 100%;
-    float:left;
+    float: left;
     background: #ececec;
     width: 190px;
     border-right: 1px solid #008800;
@@ -389,24 +427,26 @@ input:disabled + .sc-btn:active,
 
 #action_panel {
     height: 100%;
-  overflow: auto;
+    overflow: auto;
 }
+
 #action_rel {
-  position: relative;
+    position: relative;
 }
 
 
 #edit_panel {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 600px;
-  margin: 8px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 600px;
+    margin: 8px;
 }
+
 #memory_panel {
-  position: absolute;
-  left: 630px;
-  top: 0;
+    position: absolute;
+    left: 630px;
+    top: 0;
 
 }
 
@@ -424,12 +464,23 @@ input:disabled + .sc-btn:active,
 }
 
 @keyframes fadeIn {
-    from {opacity:0;}
-    to {opacity:1;}
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
+
 @keyframes fadeOut {
-    from { opacity:1;  }
-    to {opacity:0; }
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 
@@ -446,6 +497,7 @@ input:disabled + .sc-btn:active,
     line-height: 26px;
     overflow: hidden;
 }
+
 .removed_anim {
     animation: fadeOut 100ms;
 }
@@ -455,18 +507,21 @@ input:disabled + .sc-btn:active,
     line-height: 26px;
 }
 
-.mycheck + .mycheck_label {
+.mycheck+.mycheck_label {
     background-image: url(img/check_none.png);
     background-repeat: no-repeat;
     display: inline-block;
 }
-.mycheck:checked + .mycheck_label {
+
+.mycheck:checked+.mycheck_label {
     background-image: url(img/check_checked.png);
 }
-.mycheck:indeterminate + .mycheck_label {
+
+.mycheck:indeterminate+.mycheck_label {
     background-image: url(img/check_int.png);
 }
-.mycheck[disabled="true"] + .mycheck_label {
+
+.mycheck[disabled="true"]+.mycheck_label {
     filter: brightness(90%);
 }
 
@@ -476,17 +531,21 @@ input:disabled + .sc-btn:active,
     margin: -4px 4px 0 2px;
     vertical-align: middle;
 }
+
 .fam_label {
     display: inline-block;
     width: calc(100% - 60px);
     max-width: calc(100% - 60px);
     overflow: hidden;
-    vertical-align: bottom; /* needed becaue overflow hidden changed the baseline https://stackoverflow.com/questions/22421782/css-overflow-hidden-increases-height-of-container */
+    vertical-align: bottom;
+    /* needed becaue overflow hidden changed the baseline https://stackoverflow.com/questions/22421782/css-overflow-hidden-increases-height-of-container */
 }
+
 .sel_wtype {
     margin: 0 0 7px 3px;
     width: calc(100% - 7px);
 }
+
 .wtype_label {
     width: 200px;
     text-indent: 20px;
@@ -499,6 +558,7 @@ input:disabled + .sc-btn:active,
 .opt_single {
     background: url(img/check_none.png) no-repeat;
 }
+
 .src_sel_but {
     height: 30px;
     line-height: 30px;
@@ -518,36 +578,41 @@ input:disabled + .sc-btn:active,
 .pl_close_icon {
     width: 1em;
     height: 1em;
-    text-align:center;
+    text-align: center;
     color: #c38c8c;
     float: right;
     border-radius: 6px;
     padding: 2px;
 }
+
 .pl_close_icon:hover {
     color: red;
-    background-color: rgba(255,255,255,0.7);
+    background-color: rgba(255, 255, 255, 0.7);
 }
-.pl_close_icon[disabled="true"], .pl_close_icon[disabled="disabled"] {
-    color:#818181;
+
+.pl_close_icon[disabled="true"],
+.pl_close_icon[disabled="disabled"] {
+    color: #818181;
     background-color: transparent;
-    
+
 }
 
 #pl_frame_zombies {
-    height:initial;
+    height: initial;
     padding-bottom: 0px;
 }
+
 #addZombieBtn {
     width: auto;
     height: auto;
-    padding:0.4em;
+    padding: 0.4em;
     margin: 4px 7px 7px 15px;
 }
 
 .zomb_sel_but {
     width: calc(100% - 40px);
 }
+
 .za_close_icon {
     margin-top: 6px;
 }
@@ -574,14 +639,17 @@ input:disabled + .sc-btn:active,
     vertical-align: 1px;
     width: 100px;
 }
+
 #fixed_load_addr {
     visibility: hidden;
     opacity: 0;
     transition: all 0.12s ease-in-out;
 }
+
 #seed_edit {
-    float:right;
+    float: right;
 }
+
 #seed {
     margin-left: 3px;
     width: 160px;
@@ -597,6 +665,7 @@ input:disabled + .sc-btn:active,
     border: 1px solid #000000;
     padding: 2px;
 }
+
 #btnGoTo {
     height: 22px;
     line-height: 18px;
@@ -607,9 +676,10 @@ input:disabled + .sc-btn:active,
     margin: 0;
     font-size: 14px;
 }
+
 #stepnum_cont {
-    float:right;
-    display:inline-block;
+    float: right;
+    display: inline-block;
     width: 8em;
     margin: 5px;
 }
@@ -637,12 +707,13 @@ input:disabled + .sc-btn:active,
     vertical-align: -8px;
 }
 
-#competeRunBtn{
+#competeRunBtn {
     width: 120px;
     height: 35px;
     line-height: 35px;
 
 }
+
 #competeRunBtnIn {
     display: inline-block;
     background-image: url(img/green_play.png);
@@ -653,6 +724,7 @@ input:disabled + .sc-btn:active,
     background-repeat: no-repeat;
 
 }
+
 /* --------------------- cpuPanel --------------------- */
 
 #cpuPanel {
@@ -660,6 +732,7 @@ input:disabled + .sc-btn:active,
     left: 0;
     top: 630px;
 }
+
 .reg_name {
     display: inline-block;
     text-align: right;
@@ -667,9 +740,11 @@ input:disabled + .sc-btn:active,
     font-family: courier;
     font-weight: bold;
 }
+
 .reg_long_name {
     width: 75px;
 }
+
 .reg_input {
     width: 5.3em;
     text-align: center;
@@ -682,12 +757,14 @@ input:disabled + .sc-btn:active,
     padding: 1px 0 1px 0px;
     font-size: 16px;
 }
+
 #reg_flags_table {
     border: 1px solid #000000;
     /*border-collapse: collapse;*/
     margin: 5px;
     border-radius: 5px;
 }
+
 .flag_check {
     width: 17px;
     height: 17px;
@@ -698,18 +775,23 @@ input:disabled + .sc-btn:active,
     width: 25px;
     text-align: center;
 }
+
 #reg_flags_table td:first-child {
     border-left: none;
 }
+
 #reg_flags_table .bytesep {
     border-left: 2px solid #000000;
 }
+
 .flag_unsed {
     background-color: #cccccc;
 }
+
 #reg_flags_table tr:first-child td:first-child {
     border-top-left-radius: 5px;
 }
+
 #reg_flags_table tr:last-child td:first-child {
     border-bottom-left-radius: 5px;
 }
@@ -724,7 +806,9 @@ input:disabled + .sc-btn:active,
     width: 70px;
     height: 90px;
 }
-#hexBtn, #decBtn {
+
+#hexBtn,
+#decBtn {
     width: 45px;
     height: 35px;
     line-height: 35px;
@@ -732,7 +816,8 @@ input:disabled + .sc-btn:active,
     border: 1px solid #cccccc;
 }
 
-.base-btn:active, .sc-check:checked+.base-btn {
+.base-btn:active,
+.sc-check:checked+.base-btn {
     background-image: linear-gradient(to bottom, #479ceb, #1067c1);
 }
 
@@ -744,9 +829,11 @@ input:disabled + .sc-btn:active,
     font-size: 17px;
     margin: 0;
 }
+
 #dbgButtons {
     margin: 0 0 6px 7px;
 }
+
 #speedSliderCont {
     vertical-align: 10px;
     margin-left: 4px;
@@ -758,13 +845,16 @@ input:disabled + .sc-btn:active,
     padding: 0 5px 0 5px;
     box-shadow: inset rgba(0, 0, 0, 0.1) 0px -0.15em 0px, inset rgba(255, 255, 255, 0.2) 0px 0.15em 0px;
 }
+
 #speedSliderVal {
     width: 2.5em;
     display: inline-block;
 }
+
 #speedSlider {
     vertical-align: 1px;
 }
+
 #speedZero {
     width: 18px;
     height: 18px;
@@ -789,6 +879,7 @@ input:disabled + .sc-btn:active,
     -webkit-transition: .2s;
     transition: opacity .2s;
 }
+
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -827,40 +918,49 @@ input:disabled + .sc-btn:active,
     margin: 5px;
     position: relative;
 }
+
 #stackArea {
     width: 160px;
 }
+
 #sharedMemArea {
     width: 160px;
 }
+
 .submem_title {
     background: #eaeaea;
-    border-radius: 6px 6px 0 0;;
+    border-radius: 6px 6px 0 0;
+    ;
     border-bottom: 1px solid #000000;
     padding: 3px;
     text-align: center;
 }
+
 .submem_list {
     overflow: auto;
-    height: calc( 100% - 28px );  /* minus header height */
+    height: calc(100% - 28px);
+    /* minus header height */
     font-family: courier;
     font-size: 16px;
     padding: 2px 0 0 4px;
     white-space: pre;
 }
+
 .submem_box_addr {
     position: absolute;
     top: 26px;
     width: 58px;
-    height: calc( 100% - 26px);
+    height: calc(100% - 26px);
     background: #eeeeee;
     border-right: 1px solid #cccccc;
-    z-index: -1; /* don't know why */
+    z-index: -1;
+    /* don't know why */
 }
 
 .atStackLine {
     background-color: #ddddff;
 }
+
 #watch_container {
     display: inline-block;
     height: 180px;
@@ -870,19 +970,22 @@ input:disabled + .sc-btn:active,
 }
 
 #watchArea {
-    overflow-x:hidden;
-    overflow-y:auto;
-    height: calc( 100% - 26px); /* needed so that the scrollbar would show at the bottom */
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: calc(100% - 26px);
+    /* needed so that the scrollbar would show at the bottom */
     position: relative;
 }
 
 .watch_row {
-    white-space:nowrap;
+    white-space: nowrap;
     height: 21px;
-    position: relative; /* for X placement */
+    position: relative;
+    /* for X placement */
 }
 
-.watch_expr, .watch_val  {
+.watch_expr,
+.watch_val {
     position: relative;
     border: 1px solid #000000;
     font-family: courier;
@@ -898,27 +1001,29 @@ input:disabled + .sc-btn:active,
     padding: 0 0 0 3px;
     box-sizing: border-box;
 }
+
 .watch_val {
     border-right: none;
     width: 200px;
-    overflow:hidden;
+    overflow: hidden;
 }
 
 .watch_expr_edit {
     visibility: hidden;
     position: absolute;
-    width: calc( 100% - 8px);
+    width: calc(100% - 8px);
     top: 0;
     left: 3px;
     height: 100%;
-    font-family:courier;
+    font-family: courier;
     font-size: 16px;
     border: none;
     padding: 0;
 
 }
+
 .watch_expr_content {
-    overflow:hidden;
+    overflow: hidden;
 }
 
 .watch_grip {
@@ -938,8 +1043,8 @@ input:disabled + .sc-btn:active,
     background: url(img/small_plus.png) no-repeat;
     background-position: 3px 3px;
     background-color: #d5d5ff;
-    line-height:18px;
-    border-radius:3px;
+    line-height: 18px;
+    border-radius: 3px;
     position: absolute;
     /* position from top set in code */
 }
@@ -948,16 +1053,17 @@ input:disabled + .sc-btn:active,
 .watch_del_but {
     width: 1em;
     height: 1em;
-    line-height:18px;
-    border-radius:3px;
-    font-size:1.25em;
+    line-height: 18px;
+    border-radius: 3px;
+    font-size: 1.25em;
     position: absolute;
     left: calc(100% - 21px);
     margin: 0;
     display: none !important;
 }
-.watch_row:hover > .watch_del_but {
-    display:initial !important;
+
+.watch_row:hover>.watch_del_but {
+    display: initial !important;
 }
 
 #uploadBinBut {
@@ -968,10 +1074,12 @@ input:disabled + .sc-btn:active,
     width: 46px;
     border-radius: 5px;
 }
+
 #uploadBinBut:active {
     background-position: 3px 4px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)), url(img/upload_bin.png);
-    background-repeat: repeat, no-repeat; /* needed to avoid strange shadow when pressed */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url(img/upload_bin.png);
+    background-repeat: repeat, no-repeat;
+    /* needed to avoid strange shadow when pressed */
 }
 
 #aboutBtn {
@@ -982,21 +1090,24 @@ input:disabled + .sc-btn:active,
     width: 33px;
     border-radius: 5px;
 }
+
 #aboutBtn:active {
     background-position: 9px 4px;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)), url(img/q_mark.png);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url(img/q_mark.png);
     background-repeat: repeat, no-repeat;
 }
+
 .popupBack {
     visibility: hidden;
     opacity: 0;
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(20,20,20, 0.82);
+    background: rgba(20, 20, 20, 0.82);
     top: 0;
     left: 0;
-    z-index: 1; /* above the export button which is an appended child */
+    z-index: 1;
+    /* above the export button which is an appended child */
 }
 
 .popupBack:target {
@@ -1017,19 +1128,25 @@ input:disabled + .sc-btn:active,
     border-radius: 15px;
     padding: 20px;
 }
-h1, h2, h3 {
+
+h1,
+h2,
+h3 {
     margin: 0;
     font-family: Tahoma;
 }
+
 h1 {
     font-size: 30px;
     margin: 0 0 0 30px;
     font-family: monospace;
 }
+
 h2 {
     font-size: 18px;
     font-weight: normal;
 }
+
 h3 {
     font-size: 16px;
     margin: 30px 0 0 0;
@@ -1044,7 +1161,7 @@ h3 {
 
 #gray_out_debugger {
     position: absolute;
-    background: rgba(200,200,200,0.8);
+    background: rgba(200, 200, 200, 0.8);
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
     left: 190px;
@@ -1057,6 +1174,7 @@ h3 {
 #gray_out_debugger.active {
     display: block;
     opacity: 1;
+    z-index: 10;
 }
 
 .side-panel {
@@ -1065,7 +1183,8 @@ h3 {
     left: 191px;
     width: 0px;
     opacity: 0;
-    background: linear-gradient(to right, #c9c9c9 0%,#fdfdfd 20px); /* http://www.colorzilla.com/gradient-editor/ */
+    background: linear-gradient(to right, #c9c9c9 0%, #fdfdfd 20px);
+    /* http://www.colorzilla.com/gradient-editor/ */
     border: 1px solid;
     border-left: none;
     border-radius: 0 15px 15px 0;
@@ -1073,12 +1192,14 @@ h3 {
 
     transition: width 0.3s cubic-bezier(0.36, 0.29, 0.79, 1.07), opacity 0.3s cubic-bezier(0.32, 0.57, 0.15, 1);
     box-sizing: border-box;
-    overflow: hidden; /* when the panel is hidden, hide its content */
+    overflow: hidden;
+    /* when the panel is hidden, hide its content */
 }
 
 .side-panel.active {
     width: 710px;
     opacity: 1;
+    z-index: 20;
 }
 
 .side-panel.after-transition {
@@ -1094,7 +1215,7 @@ h3 {
     text-align: center;
     padding: 5px;
     font-size: 120%;
-    background: linear-gradient(to right, #c9c9c9 0%,#eeeeee 20px);
+    background: linear-gradient(to right, #c9c9c9 0%, #eeeeee 20px);
     overflow: hidden;
     width: 709px;
 }
@@ -1103,12 +1224,14 @@ h3 {
     overflow: hidden;
     position: relative;
     width: 709px;
-    
+
 }
 
 #tournament-panel .panel-body {
     padding: 1em;
     text-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 #battlesPerGroupField {
@@ -1121,12 +1244,14 @@ h3 {
     border: 1px solid #000000;
     vertical-align: top;
 }
+
 #battlesLabel {
     display: inline-block;
     vertical-align: top;
     margin: 12px 0 0 20px;
     line-height: 30px;
 }
+
 #battlesRan {
     display: inline-block;
     vertical-align: top;
@@ -1135,6 +1260,7 @@ h3 {
     position: absolute;
     right: 0;
 }
+
 #top-bar {
     width: 100%;
     display: flex;

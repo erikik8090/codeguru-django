@@ -1,12 +1,18 @@
 
+var loader = undefined;
+
 function playGame() {
     csrftoken = getCookie('csrftoken');
+    if(loader)
+        loader.delete();
+    loader = new window.Loader($('#play-btn'));
     $.ajax({
         headers: {"X-CSRFToken": csrftoken },
         method: "POST",
         url: "/admin/play/",
     }).done(function( msg ) {
         console.log( "Data Saved: " + msg.OK );
+        loader.done();
     });
 }
 

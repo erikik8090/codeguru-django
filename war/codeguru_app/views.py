@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.views.generic import TemplateView
 
 from codeguru_extreme import settings
 from . import models, game
@@ -69,6 +70,13 @@ def scores(request):
         table_content[user] = models.Result.objects.filter(team__user__username=user)
 
     return render(request, 'scores.html', {'rounds': range(1, models.Tournament.current().current_round), 'scores' : table_content})
+
+class GameAdminView(TemplateView):
+    template_name = 'game-admin.html'
+
+    def current_turnament_name(self):
+        print('here')
+        return models.Tournament.current().name
 
 def codes(request, username = '', version = ''):
     if username:

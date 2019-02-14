@@ -7,7 +7,7 @@
 <div class="container h-75">
     <div class="row justify-content-center align-items-center h-100">
         <table class="table">
-            <thead>
+            <thead class="thead-light">
                 {% if scores %}
                 <tr>
                     <th scope="col">#</th>
@@ -19,7 +19,7 @@
                 {% endif %}
             </thead>
             <tbody>
-                {# Change this to order by current winner #}
+                {# TODO: Change this to order by current winner #}
                 {% for user, rounds in scores.items %}
                     <tr>
                         <th scope="row"> {{forloop.counter}} </th>

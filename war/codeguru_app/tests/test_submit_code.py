@@ -75,7 +75,7 @@ class SubmitCodeTestCase(TestCase):
             data={'codes': codes}
         )
 
-        codes = json.dumps([{'name': code_name, 'code': code_content}])
+        codes = json.dumps([{'name': code_name, 'code': other_content}])
         response = self.client.post(
             reverse('submit'),
             data={'codes': codes}

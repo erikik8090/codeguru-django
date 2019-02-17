@@ -46,6 +46,7 @@ def submit(request):
 
         if request.user.team.current_code:
             request.user.team.current_code.delete()
+        
         new_code = models.Code.create(request.user.username, codes)
         request.user.team.current_code = new_code
         request.user.save()
@@ -77,7 +78,11 @@ def codes(request, username = '', version = ''):
                 return JsonResponse({'code': user.team.current_code.get_code()})
             else:
                 return HttpResponse(status=500)
-        else:
-            return HttpResponse(status=500)
+        elif username == 'current':
+            if request.user.is_superuser:
+                code_ids = models.Team.objects.values_list('current_code', flat=True)
+                return JsonResponse({'code': [models.Code.objects.get(id=code).get_code() for code in code_ids if code]})
+            else: 
+                return HttpResponse(status=403)
     else:
         return HttpResponse(status=500)

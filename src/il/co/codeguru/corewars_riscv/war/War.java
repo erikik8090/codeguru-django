@@ -275,7 +275,6 @@ public class War {
                     m_numWarriors,
                     useNewMemory);
             m_warriors[m_numWarriors++] = w;
-            Logger.log("Warrior creation: " + w);
 
             // load warrior to arena
             if (m_core.getListener() != null)

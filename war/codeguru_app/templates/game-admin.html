@@ -19,6 +19,18 @@
 
             <div class="card-header"> {{view.current_turnament_name}} </div>
             <div class="card-body">
+                <label class="radio-inline p-2"><input type="radio" name="round-type" checked>All</label>
+                {% if view.current_tournament_rounds > 1 %}
+                <label class="radio-inline p-2"><input type="radio" name="round-type">Top 8</label>
+                <label class="radio-inline p-2"><input type="radio" name="round-type">Top 4</label>
+                {% else %}
+                <span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="No rounds were run yet!">
+                    <label class="radio-inline p-2"><input type="radio" name="round-type" disabled>Top 8</label>
+                    <label class="radio-inline p-2"><input type="radio" name="round-type" disabled>Top 4</label>
+                </span>
+                {% endif %}
+
+                <br>
                 <button type="button" id="play-btn" class="btn btn-primary btn-lg" onclick="playGame()"> Play Round </button>
             </div>
         </div>

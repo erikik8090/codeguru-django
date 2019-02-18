@@ -214,7 +214,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
                 .toArray(PlayersPanel.Code[]::new);
         if (!repo.loadWarriors(playerFiles , m_playersPanel.getZombies(), isInDebug))
             return false;
-        columnGraph.clear(repo.getGroupNames());
+        clear(repo.getGroupNames());
 
         int numOfGroups = repo.getNumberOfGroups();
         if (numOfGroups == 0) {
@@ -242,9 +242,19 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
         return false;
     }
 
+    public native void clear(String[] names) /*-{
+        $wnd.competitionGraph.clear(names);
+    }-*/;
+
     public void scoreChanged(String name, float addedValue, int groupIndex, int subIndex) {
-        columnGraph.addToValue(groupIndex, subIndex, addedValue);
+        //columnGraph.addToValue(groupIndex, subIndex, addedValue);
+        addToValue(name, subIndex, addedValue);
+
     }
+
+    public native void addToValue(String name, int subIndex, float addedValue) /*-{
+        $wnd.competitionGraph.addToValue(name, subIndex, addedValue);
+    }-*/;
 
     private void setDebugMode(boolean v) {
         m_codeEditor.setDebugMode(v);

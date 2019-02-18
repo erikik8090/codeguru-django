@@ -29,7 +29,7 @@ def register(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect(login)
+            return redirect('index')
     else:
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
@@ -75,8 +75,11 @@ class GameAdminView(TemplateView):
     template_name = 'game-admin.html'
 
     def current_turnament_name(self):
-        print('here')
         return models.Tournament.current().name
+    
+    def current_tournament_rounds(self):
+        print('here', models.Tournament.current().current_round)
+        return models.Tournament.current().current_round
 
 def codes(request, username = '', version = ''):
     if username:

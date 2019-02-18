@@ -38,6 +38,7 @@ function start()
     console.log("start()");
 
     setUpDomEffects()
+    window.competitionGraph = new window.ScoreGraph(document.getElementById('graphs_canvas'));
 
     run_gas = Module.cwrap('run_gas', null, ['string', 'string'])
 

@@ -331,8 +331,6 @@ public class CpuFrame implements CompetitionEventListener, MemoryEventListener {
 
 		Warrior warrior = currentWar.getWarriorByLabel(m_currentWarriorLabel);
 
-		Logger.log("" + m_currentWarriorLabel);
-
 		stackView.initMemRegion(warrior.stackRegion, currentWar.getMemory(), force);
 		sharedMemView.initMemRegion(warrior.sharedRegion, currentWar.getMemory(), force);
 

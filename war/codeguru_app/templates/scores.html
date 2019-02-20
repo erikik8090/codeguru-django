@@ -6,6 +6,7 @@
 
 <div class="container h-75">
     <div class="row justify-content-center align-items-center h-100">
+        {% if rounds %}
         <table class="table">
             <thead class="thead-light">
                 {% if scores %}
@@ -33,6 +34,9 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% else %}
+        No tournament running yet. Ask an administrator to run a game!
+        {% endif %}
     </div>
 </div>
 

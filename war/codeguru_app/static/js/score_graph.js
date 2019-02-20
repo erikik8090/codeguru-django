@@ -14,7 +14,6 @@ class ScoreGraph {
     }
 
     clear(names) {
-        this.availableColors = colors.slice(0);
         names.forEach(name => {
             this.data.set(name, {
                 score: [0, 0],
@@ -24,7 +23,6 @@ class ScoreGraph {
     }
 
     addToValue(name, subIndex, addedValue) {
-        console.log(this.data);
         // TODO: Improve this - prohibiting users from having a username with 1/2 on the end
         if (name.endsWith('1') || name.endsWith('2')) name = name.slice(0, -1);
         this.data.get(name).score[subIndex] += addedValue;
@@ -44,7 +42,6 @@ class ScoreGraph {
             this.ctx.fillStyle = scoreData.color.toString();
             this.ctx.fillRect(curr_index, this.height - 20, colWidth, scoreData.score[0] * colHeightStep * (-1));
             this.ctx.fillStyle = scoreData.color.darken().toString();
-            console.log(scoreData.color.darken());
             this.ctx.fillRect(curr_index, this.height - 20 + (scoreData.score[0] * colHeightStep * (-1)), colWidth, scoreData.score[1] * colHeightStep * (-1))
 
             this.ctx.fillText(name, curr_index + 0.5 * colWidth, this.height - 5);

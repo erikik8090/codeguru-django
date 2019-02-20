@@ -33,7 +33,10 @@ class TournamentAdmin(admin.ModelAdmin):
     
     def tournament_actions(self, obj):
         template = loader.get_template('admin/tournament/tournament_action.html')
-        return template.render({'url': reverse('admin:reset_tournament',args=[obj.id]) })
+        if obj.id:
+            return template.render({'url': reverse('admin:reset_tournament',args=[obj.id]) })
+        else:
+            return template.render({'url': '#'})
 
     tournament_actions.short_description = 'Tournament Actions'
     tournament_actions.allow_tags = True

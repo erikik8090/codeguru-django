@@ -13,8 +13,8 @@ from codeguru_extreme import settings
 class Code(models.Model):
     
     #creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    warrior1 = models.FileField(upload_to='codes/')
-    warrior2 = models.FileField(upload_to='codes/')
+    warrior1 = models.FileField(upload_to='codes/', default='codes/default.s')
+    warrior2 = models.FileField(upload_to='codes/', default='codes/default.s')
 
     @classmethod
     def create_from_code(cls, old_code, username, name ):
@@ -138,11 +138,13 @@ class Team(models.Model):
     def __str__(self):
         return f'User:{self.user}'
 
-
 @receiver(post_save, sender=User)
 def create_user_team(sender, instance, created, **kwargs):
     if created:
-        Team.objects.create(user=instance)
+        team = Team.objects.create(user=instance)
+        team.current_code = Code.objects.create()
+        team.current_code.save()
+        team.save()
 
 @receiver(post_save, sender=User)
 def save_user_team(sender, instance, **kwargs):

@@ -69,13 +69,18 @@ def scores(request):
     for user in models.Result.objects.values_list('team__user__username', flat=True):
         table_content[user] = models.Result.objects.filter(team__user__username=user)
 
-    return render(request, 'scores.html', {'rounds': range(1, models.Tournament.current().current_round), 'scores' : table_content})
+    try:
+        current_round = models.Tournament.current().current_round
+    except AttributeError:
+        current_round = 1
+    
+    return render(request, 'scores.html', {'rounds': range(1, current_round), 'scores' : table_content})
 
 class GameAdminView(TemplateView):
     template_name = 'game-admin.html'
 
-    def current_turnament_name(self):
-        return models.Tournament.current().name
+    def current_turnament(self):
+        return models.Tournament.current()
     
     def current_tournament_rounds(self):
         print('here', models.Tournament.current().current_round)

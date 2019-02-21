@@ -32,7 +32,13 @@ ant gwtc console
 ```
 #### Run Django
 Go to the war directory  
-FIrs, apply migrations:
+You will need to setup the location of the RISC-V assembler, and the objcopy binary. They are both in the RISC-V GNU toolchain.
+```sh
+RISC_V_AS=[path\to\risc-v\as] (Usually called riscv32-unknown-elf-as)
+RISC_V_OBJ_COPY=[path\to\risc-v\objcopy] ( Usually called riscv32-unknown-elf-objcopy)
+```
+
+Apply migrations:
 ```sh
 manage.py migrate
 ```

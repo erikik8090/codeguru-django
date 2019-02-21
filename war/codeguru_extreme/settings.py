@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,13 +29,27 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 STATIC_URL = '/static/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 
-ASSEMBLER = os.environ['RISC_V_AS']
-OBJ_COPY = os.environ['RISC_V_OBJ_COPY']
-ENGINE = os.environ['RISC_V_CODE_GURU']
+try:
+    ASSEMBLER = os.environ['RISC_V_AS']
+    OBJ_COPY = os.environ['RISC_V_OBJ_COPY']
+except KeyError:
+    raise RuntimeError(
+        'No path configured for the RISC-V assembler and objcopy, Have you defined the appropriate environment variables, RISC_V_AS and RISC_V_OBJ_COPY ?'
+    ) from None
+
+
+ENGINE = os.environ.get('RISC_V_CODE_GURU') or os.path.join(
+    BASE_DIR, '..', 'console', 'corewars-risc-v.jar'
+)
+if not os.path.exists(ENGINE):
+    raise RuntimeError(
+        'No engine cofigured, Have you run `ant console` or change the engine directory?'
+    )
+
 
 # Application definition
 

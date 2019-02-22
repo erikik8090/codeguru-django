@@ -24,7 +24,6 @@ ENGINE = /home/myuser/workspace/codeguru-risc-v
 RISC_V_AS = /usr/bin/riscv32-unknown-elf-as
 RISC_V_OBJ_COPY = /usr/bin/riscv32-unknown-elf-objcopy
 ```
-
 ### Running
 
 #### Manually

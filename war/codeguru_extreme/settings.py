@@ -32,9 +32,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 
-ASSEMBLER = os.environ['RISC_V_AS']
-OBJ_COPY = os.environ['RISC_V_OBJ_COPY']
-ENGINE = os.environ['RISC_V_CODE_GURU']
+# ASSEMBLER = os.environ['RISC_V_AS']
+# OBJ_COPY = os.environ['RISC_V_OBJ_COPY']
+# ENGINE = os.environ['RISC_V_CODE_GURU']
 
 # Application definition
 

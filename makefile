@@ -24,4 +24,6 @@ migrate:
 
 clean:
 	rm -rf $(engine_output)
+	rm -rf **/*.pyc
+	rm -rf *.egg-info
 

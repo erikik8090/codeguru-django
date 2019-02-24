@@ -11,3 +11,4 @@ jacoco.prod.exec
 www-test/
 **/WEB-INF/classes
 console/
+*.egg-info/

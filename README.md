@@ -20,15 +20,42 @@ This is optional, you can specify those environment variables manually when runn
 In this repo there is a `makefile.variables` file. The variables inside it define the locations of the prerequisites mentioned above. It should look something like this (Linux):
 
 ``` makefile
-ENGINE = /home/myuser/workspace/codeguru-risc-v
-RISC_V_AS = /usr/bin/riscv32-unknown-elf-as
-RISC_V_OBJ_COPY = /usr/bin/riscv32-unknown-elf-objcopy
+engine_dir := ../corewars-risc-v
+assembler := /usr/bin/riscv32-unknown-elf-as
+obj_copy := /usr/bin/riscv32-unknown-elf-objcopy
 ```
 ### Running
 
+#### Using makefile
+
+Apply migrations
+
+```sh
+$ make migrate
+```
+
+Build engine
+
+```sh
+$ make build-engine
+```
+
+Run server
+
+```sh
+make run-server
+```
+
+You can build & run the server together through
+
+``` sh
+$ make # or
+$ make all
+```
+
 #### Manually
 
-Apply migrations:
+Apply migrations
 ```sh
 manage.py migrate
 ```

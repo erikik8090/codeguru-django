@@ -24,6 +24,23 @@ engine_dir := ../corewars-risc-v
 assembler := /usr/bin/riscv32-unknown-elf-as
 obj_copy := /usr/bin/riscv32-unknown-elf-objcopy
 ```
+
+### Install Packages
+Simply run _one_ of the next commands
+
+```sh
+$ python setup.py develop # --user
+```
+
+```sh
+$ pip install -r requirements.txt
+```
+
+```sh
+$ pipenv shell
+$ pip install -e .
+```
+
 ### Running
 
 #### Using makefile
@@ -81,8 +98,11 @@ This project is licensed under the GPL v3.0 License - see the LICENSE file for d
 References
 ----------
 https://codeguru.co.il/Xtreme/  
+
 https://github.com/codeguru-il/corewars_riscv
+
 https://github.com/YoavKa/corewars_riscv (disassembler)
+
 https://github.com/kimwalisch/calculator (watch language)
 
 

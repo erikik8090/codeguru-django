@@ -138,11 +138,19 @@ class Team(models.Model):
     def __str__(self):
         return f'User:{self.user}'
 
+default_code = """# Welcome to CodeGuru RISC-V!
+j x1
+
+"""
+
 @receiver(post_save, sender=User)
 def create_user_team(sender, instance, created, **kwargs):
     if created:
         team = Team.objects.create(user=instance)
-        team.current_code = Code.objects.create()
+        team.current_code = Code.create(instance.username, [
+            {'code': default_code},
+            {'code': default_code}
+        ])
         team.current_code.save()
         team.save()
 

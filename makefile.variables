@@ -1,0 +1,4 @@
+engine_dir := ../corewars-risc-v
+assembler := /usr/bin/riscv32-unknown-elf-as
+obj_copy := /usr/bin/riscv32-unknown-elf-objcopy
+

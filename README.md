@@ -1,44 +1,78 @@
-corewars_js - RISCV
-===========
+codeguru-django
+===============
 
+This is a browser wrapper and a server framework to the codeguru-engine. It is intended to be used in future codeguru competetions.
 
-[![Build Status](https://travis-ci.com/westerndigitalcorporation/corewars-risc-v.svg?branch=master)](https://travis-ci.com/westerndigitalcorporation/corewars-risc-v)
-
-This is a fork of corewars8086 Javascript engine + debugger that uses RISC-V assembly instead of x86.
-
- Getting Started
---------
- ### Prerequisites:
+Getting Started
+---------------
+### Prerequisites:
 You will need to install:
-#### Apache Ant:
-For windows, follow the instructions in here: https://www.mkyong.com/ant/how-to-install-apache-ant-on-windows/
-For mac or linux, use your package manager.
+
 #### RISC-V GNU Toolchain
 Follow the instructions here: https://gnu-mcu-eclipse.github.io/toolchain/riscv/install/
 
- ### Installing
- #### Setup GWT
- First, to install `ivy` - the dependency manager for this project run the following:
-```sh
-ant bootstrap
-```
-Run the test suite for GWT:
-```sh
-ant test
-```
- To build:
-```sh
-ant gwtc console
-```
-#### Run Django
-Go to the war directory  
-You will need to setup the location of the RISC-V assembler, and the objcopy binary. They are both in the RISC-V GNU toolchain.
-```sh
-RISC_V_AS=[path\to\risc-v\as] (Usually called riscv32-unknown-elf-as)
-RISC_V_OBJ_COPY=[path\to\risc-v\objcopy] ( Usually called riscv32-unknown-elf-objcopy)
+#### Codeguru Engine
+The engine itself isn't a package yet, so you'll have to download the source code and link it to the build process in this repo. Clone the repo from [https://github.com/westerndigitalcorporation/corewars-risc-v](here). Save it wherever you'd like.
+
+### Variables
+This is optional, you can specify those environment variables manually when running the server.
+
+In this repo there is a `makefile.variables` file. The variables inside it define the locations of the prerequisites mentioned above. It should look something like this (Linux):
+
+``` makefile
+engine_dir := ../corewars-risc-v
+assembler := /usr/bin/riscv32-unknown-elf-as
+obj_copy := /usr/bin/riscv32-unknown-elf-objcopy
 ```
 
-Apply migrations:
+### Install Packages
+Simply run _one_ of the next commands
+
+```sh
+$ python setup.py develop # --user
+```
+
+```sh
+$ pip install -r requirements.txt
+```
+
+```sh
+$ pipenv shell
+$ pip install -e .
+```
+
+### Running
+
+#### Using makefile
+
+Apply migrations
+
+```sh
+$ make migrate
+```
+
+Build engine
+
+```sh
+$ make build-engine
+```
+
+Run server
+
+```sh
+make run-server
+```
+
+You can build & run the server together through
+
+``` sh
+$ make # or
+$ make all
+```
+
+#### Manually
+
+Apply migrations
 ```sh
 manage.py migrate
 ```
@@ -57,15 +91,18 @@ Run the test suite for the server:
 ```sh
 manage.py test
 ```
-
- ## Licence
+ 
+## Licence
 This project is licensed under the GPL v3.0 License - see the LICENSE file for details
 
- References:  
----------- 
+References
+----------
 https://codeguru.co.il/Xtreme/  
-https://github.com/codeguru-il/corewars_riscv  
-https://github.com/YoavKa/corewars_riscv    (disassembler)   
-https://github.com/kimwalisch/calculator  (watch language)   
+
+https://github.com/codeguru-il/corewars_riscv
+
+https://github.com/YoavKa/corewars_riscv (disassembler)
+
+https://github.com/kimwalisch/calculator (watch language)
 
 

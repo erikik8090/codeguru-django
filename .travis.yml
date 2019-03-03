@@ -1,7 +1,0 @@
-language: java
-install: 
-  - ant bootstrap 
-  - ant resolve
-script:
-  - ant test
-  - ant clean gwtc

@@ -21,11 +21,6 @@ class SubmitCodeTestCase(TestCase):
             username=self.username, password='secret')
         self.user.save()
 
-    def tearDown(self):
-        codes = Code.objects.all()
-        for code in codes:
-            code.delete()
-
     @mock.patch('codeguru_app.models.Code.create', wraps=Code.create)
     def test_submit_single_code(self, create_mock):
         code_name = 'test'
@@ -42,7 +37,7 @@ class SubmitCodeTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(self.user.team.current_code)
-        create_mock.assert_called_with(self.username, json.loads(codes))
+        create_mock.assert_called_with(self.user.team, json.loads(codes))
     
     @mock.patch('codeguru_app.models.Code.create', wraps=Code.create)
     def test_submit_two_codes(self, create_mock):
@@ -60,7 +55,7 @@ class SubmitCodeTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(self.user.team.current_code)
-        create_mock.assert_called_with(self.username, json.loads(codes))
+        create_mock.assert_called_with(self.user.team, json.loads(codes))
 
     @mock.patch('codeguru_app.models.Code.create', wraps=Code.create)
     def test_client_already_has_code(self, create_mock):
@@ -85,7 +80,7 @@ class SubmitCodeTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(self.user.team.current_code)
-        create_mock.assert_called_with(self.username, json.loads(codes))
+        create_mock.assert_called_with(self.user.team, json.loads(codes))
 
 
     def test_submit_three_codes(self):

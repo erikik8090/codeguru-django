@@ -65,9 +65,7 @@ def create_user_team(sender, instance, created, **kwargs):
     if created:
         team = Team.objects.create(user=instance)
         team.save()
-        initail_code = Code.create(team, [
-            {'code': default_code}
-        ])
+        initail_code = Code.create(team, [default_code])
         initail_code.save()
 
 
@@ -80,6 +78,8 @@ class Code(models.Model):
 
     creator = models.ForeignKey(Team, on_delete=models.CASCADE)
     creation_date = models.DateTimeField(auto_now_add=True)
+    revision = models.PositiveIntegerField(default=0)
+    name = models.CharField(max_length=20)
     warrior1 = models.FileField(upload_to='codes/')
     warrior2 = models.FileField(upload_to='codes/')
 
@@ -90,10 +90,10 @@ class Code(models.Model):
         model = cls(creator=team)
 
         if len(codes) == 1:
-            cls._save_file(model.warrior1, team.user.username, 'current', codes[0]['code'])
+            cls._save_file(model.warrior1, team.user.username, 'current', codes[0])
         else:
-            cls._save_file(model.warrior1, team.user.username, 'current1', codes[0]['code'])
-            cls._save_file(model.warrior2, team.user.username, 'current2', codes[1]['code'])
+            cls._save_file(model.warrior1, team.user.username, 'current1', codes[0])
+            cls._save_file(model.warrior2, team.user.username, 'current2', codes[1])
         model.save()
         return model
 

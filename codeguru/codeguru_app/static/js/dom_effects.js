@@ -21,19 +21,12 @@ function setUpTournamentPanel() {
         triggerSrc(selectedWarrior.label, 1);
 
         code = $('#asm_edit').val();
-        codes.push({
-            name: selectedWarrior.name + '1',
-            code: code
-        });
+        codes.push(code);
 
         if (checkbox.prop('checked')) {
             triggerSrc(selectedWarrior.label, 2);
-
             code = $('#asm_edit').val()
-            codes.push({
-                name: selectedWarrior.name + '2',
-                code: code
-            });
+            codes.push(code);
         }
 
         
@@ -46,7 +39,11 @@ function setUpTournamentPanel() {
         });
         window.tournamet_panel.addListener(loader.$loader);
 
-        sendCodeToServer(JSON.stringify(codes), loader);
+        sendCodeToServer(JSON.stringify({
+            name: selectedWarrior.name,
+            codes: codes,
+        }), 
+        loader);
     });
 }
 
@@ -60,7 +57,7 @@ function sendCodeToServer(codes, loader) {
         url: "/submit/",
         dataType: 'json',
         data: {
-            codes: codes
+            codes-data: codes
         }
     }).done(function (msg) {
         console.log("Data Saved: " + msg.OK);

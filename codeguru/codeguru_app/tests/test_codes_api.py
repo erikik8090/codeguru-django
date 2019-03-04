@@ -43,11 +43,11 @@ class CodesViewTest(TestCase):
 
     def test_get_current_code(self):
         code_content = 'random content'
-        codes = json.dumps([{'name': 'name', 'code': code_content}] * 2)
+        codes = json.dumps({'codes': [code_content] * 2})
         self.client.login(**self.creds)
         self.client.post(
             reverse('submit'),
-            data={'codes': codes}
+            data={'codes-data': codes}
         )
 
         response = self.client.get(
@@ -61,9 +61,9 @@ class CodesViewTest(TestCase):
         code1 = 'random_code_content'
         code2 = 'Other CODE content'
         code3 = 'admin code'
-        Code.create(self.user1.team, [{'name':'name', 'code': code1}]).save()
-        Code.create(self.user2.team, [{'name':'name', 'code': code2}]).save()
-        Code.create(self.admin.team, [{'name':'name', 'code': code3}]).save()
+        Code.create(self.user1.team, [code1]).save()
+        Code.create(self.user2.team, [code2]).save()
+        Code.create(self.admin.team, [code3]).save()
         self.client.login(**self.admin_creds)
 
         response = self.client.get(
@@ -76,7 +76,7 @@ class CodesViewTest(TestCase):
     @SkipTest
     def test_get_all_current_code_with_not_everyone_submitted(self):
         code1 = 'random_code'
-        Code.create(self.user1.team, [{'name':'name', 'code': code1}]).save()
+        Code.create(self.user1.team, [code1]).save()
         self.client.login(**self.admin_creds)
 
         response = self.client.get(
@@ -84,13 +84,13 @@ class CodesViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertListEqual(response.json()['code'], [[code1]])
+        self.assertListEqual(response.json()['codes'], [[code1]])
     
     def test_get_all_current_code_not_superuser(self):
         code1 = 'random_code_content'
         code2 = 'Other CODE content'
-        Code.create(self.user1.team, [{'name':'name', 'code': code1}]).save()
-        Code.create(self.user2.team, [{'name':'name', 'code': code2}]).save()
+        Code.create(self.user1.team, [code1]).save()
+        Code.create(self.user2.team, [code2]).save()
         self.client.login(**self.creds)
 
         response = self.client.get(

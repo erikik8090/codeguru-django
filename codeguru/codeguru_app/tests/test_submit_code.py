@@ -25,74 +25,74 @@ class SubmitCodeTestCase(TestCase):
     def test_submit_single_code(self, create_mock):
         code_name = 'test'
         code_content = 'random content'
-        codes = json.dumps([{'name': code_name, 'code': code_content}])
+        codes = json.dumps({'codes': [code_content]})
 
         login = self.client.login(username=self.username, password='secret')
 
         response = self.client.post(
             reverse('submit'),
-            data={'codes': codes}
+            data={'codes-data': codes}
         )
         self.user.refresh_from_db()
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(self.user.team.current_code)
-        create_mock.assert_called_with(self.user.team, json.loads(codes))
+        create_mock.assert_called_with(self.user.team, [code_content])
     
     @mock.patch('codeguru_app.models.Code.create', wraps=Code.create)
     def test_submit_two_codes(self, create_mock):
         code_name = 'test'
         code_content = 'random content'
-        codes = json.dumps([{'name': code_name, 'code': code_content}] * 2)
+        codes = json.dumps({'codes': [code_content] * 2})
 
         login = self.client.login(username=self.username, password='secret')
 
         response = self.client.post(
             reverse('submit'),
-            data={'codes': codes}
+            data={'codes-data': codes}
         )
         self.user.refresh_from_db()
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(self.user.team.current_code)
-        create_mock.assert_called_with(self.user.team, json.loads(codes))
+        create_mock.assert_called_with(self.user.team, [code_content] * 2)
 
     @mock.patch('codeguru_app.models.Code.create', wraps=Code.create)
     def test_client_already_has_code(self, create_mock):
         code_name = 'test'
         code_content = 'random content'
         other_content = 'other content'
-        codes = json.dumps([{'name': code_name, 'code': code_content}] * 2)
+        codes = json.dumps({'codes': [code_content] * 2})
 
         login = self.client.login(username=self.username, password='secret')
         response = self.client.post(
             reverse('submit'),
-            data={'codes': codes}
+            data={'codes-data': codes}
         )
 
-        codes = json.dumps([{'name': code_name, 'code': other_content}])
+        codes = json.dumps({'codes': [other_content]})
         response = self.client.post(
             reverse('submit'),
-            data={'codes': codes}
+            data={'codes-data': codes}
         )
         self.user.refresh_from_db()
 
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(self.user.team.current_code)
-        create_mock.assert_called_with(self.user.team, json.loads(codes))
+        create_mock.assert_called_with(self.user.team, [other_content])
 
 
     def test_submit_three_codes(self):
         code_name = 'test1'
         code_content = 'random content'
-        codes = json.dumps([{'name': code_name, 'code': code_content}] * 3)
+        codes = json.dumps({'codes': [code_content] * 3})
 
         login = self.client.login(username=self.username, password='secret')
 
         response = self.client.post(
             reverse('submit'),
-            data={'codes': codes}
+            data={'codes-data': codes}
         )
 
         self.assertContains(response, 'Error', status_code=409)
@@ -101,11 +101,11 @@ class SubmitCodeTestCase(TestCase):
     def test_not_logged_in(self):
         code_name = 'test'
         code_content = 'random content'
-        codes = json.dumps([{'name': code_name, 'code': code_content}])
+        codes = json.dumps({'code': [code_content]})
 
         response = self.client.post(
             reverse('submit'),
-            data={'codes': codes}
+            data={'codes-data': codes}
         )
 
         self.assertNotEqual(response, 200)

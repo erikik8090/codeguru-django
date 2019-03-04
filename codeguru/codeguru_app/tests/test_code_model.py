@@ -17,7 +17,7 @@ class CodeModelTestCase(TestCase):
     def test_create_single_code(self):
         code_content = 'very cool code'
 
-        code = Code.create(self.user.team, [{'code': code_content}])
+        code = Code.create(self.user.team, [code_content])
         code.save()
 
         #TODO: Return these
@@ -30,7 +30,7 @@ class CodeModelTestCase(TestCase):
         code_content1 = 'very cool code'
         code_content2 = 'cooler code'
 
-        code = Code.create(self.user.team, [{'code': code_content1}, {'code': code_content2}])
+        code = Code.create(self.user.team, [code_content1, code_content2])
         code.save()
 
         #self.assertPathsEqual(code.warrior1.name, os.path.join('codes', self.username ,'current1.s'))
@@ -44,7 +44,7 @@ class CodeModelTestCase(TestCase):
     def test_create_three_codes(self):
         code_content = 'content'
 
-        self.assertRaises(RuntimeError, Code.create, self.username, [{'code': code_content}, {'code': code_content}, {'code': code_content}])
+        self.assertRaises(RuntimeError, Code.create, self.username, [code_content] * 3)
 
     def assertPathsEqual(self, path1, path2):
         self.assertEqual(os.path.normpath(path1), 

@@ -40,7 +40,7 @@ class ScoresViewTest(TestCase):
     
     def test_one_score(self):
         self.client.login(**self.creds)
-        Code.create(self.user.team, [{'code':'asdf'}]).save()
+        Code.create(self.user.team, ['asdf']).save()
         result = Result.create(self.user.team, self.tournament, 15)
         result.save()
         self.tournament.rounds += 1
@@ -56,8 +56,8 @@ class ScoresViewTest(TestCase):
     
     def test_two_users(self):
         self.client.login(**self.creds)
-        Code.create(self.user.team, [{'code':'asdf'}]).save()
-        Code.create(self.user2.team, [{'code':'asdf'}]).save()
+        Code.create(self.user.team, ['asdf']).save()
+        Code.create(self.user2.team, ['asdf']).save()
         result = Result.create(self.user.team, self.tournament, 15)
         result.save()
         result2 = Result.create(self.user2.team, self.tournament, 32)
@@ -77,7 +77,7 @@ class ScoresViewTest(TestCase):
     
     def test_two_rounds(self):
         self.client.login(**self.creds)
-        Code.create(self.user.team, [{'code':'asdf'}]).save()
+        Code.create(self.user.team, ['asdf']).save()
         result = Result.create(self.user.team, self.tournament, 15)
         result.save()
         self.tournament.rounds += 1
@@ -100,8 +100,8 @@ class ScoresViewTest(TestCase):
 
     def test_multiple_rounds_with_multiple_users(self):
         self.client.login(**self.creds)
-        Code.create(self.user.team, [{'code':'asdf'}]).save()
-        Code.create(self.user2.team, [{'code':'asdf'}]).save()
+        Code.create(self.user.team, ['asdf']).save()
+        Code.create(self.user2.team, ['asdf']).save()
         result = Result.create(self.user.team, self.tournament, 15)
         result.save()
         result2 = Result.create(self.user2.team, self.tournament, 32)
@@ -130,7 +130,7 @@ class ScoresViewTest(TestCase):
 
 
     def test_not_logged_in(self):
-        Code.create(self.user.team, [{'code':'asdf'}]).save()
+        Code.create(self.user.team, ['asdf']).save()
         result = Result.create(self.user.team, self.tournament, 15)
         result.save()
         self.tournament.rounds += 1

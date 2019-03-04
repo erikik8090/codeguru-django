@@ -41,22 +41,23 @@ def logout_view(request):
 @login_required
 def submit(request):
     if request.method == 'POST':
-        codes = json.loads(request.POST['codes'])
-        if len(codes) > 2:
+        codes = json.loads(request.POST['codes_data'])
+        if len(codes['codes']) > 2:
             return HttpResponse('Error: You may not upload more than 2 warriors', status=409)
-
-        if request.user.team.current_code:
-            request.user.team.current_code.delete()
         
-        new_code = models.Code.create(request.user.username, codes)
-        request.user.team.current_code = new_code
-        request.user.save()
+        if request.user.team.current_code.name == codes['name']:
+            revision = request.user.team.current_code.revision + 1
+        else:
+            revision = 0
+
+        new_code = models.Code.create(request.user.team, codes['codes'], codes['name'], revision)
+        new_code.save()
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()
 
 def play_game(request):
     if request.method == 'POST':
-        results = game.play()
+        results = game.play([team.current_code.get_paths() for team in models.Team.objects.all()])
         models.Tournament.current().save_round_results(results)
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()
@@ -83,7 +84,6 @@ class GameAdminView(TemplateView):
         return models.Tournament.current()
     
     def current_tournament_rounds(self):
-        print('here', models.Tournament.current().current_round)
         return models.Tournament.current().current_round
 
 def codes(request, username = '', version = ''):
@@ -96,8 +96,7 @@ def codes(request, username = '', version = ''):
                 return HttpResponse(status=500)
         elif username == 'current':
             if request.user.is_superuser:
-                code_ids = models.Team.objects.values_list('current_code', flat=True)
-                return JsonResponse({'code': [models.Code.objects.get(id=code).get_code() for code in code_ids if code]})
+                return JsonResponse({'code': [team.current_code.get_code() for team in models.Team.objects.all()]})
             else: 
                 return HttpResponse(status=403)
     else:

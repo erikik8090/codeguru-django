@@ -41,11 +41,16 @@ def logout_view(request):
 @login_required
 def submit(request):
     if request.method == 'POST':
-        codes = json.loads(request.POST['codes-data'])
+        codes = json.loads(request.POST['codes_data'])
         if len(codes['codes']) > 2:
             return HttpResponse('Error: You may not upload more than 2 warriors', status=409)
         
-        new_code = models.Code.create(request.user.team, codes['codes'])
+        if request.user.team.current_code.name == codes['name']:
+            revision = request.user.team.current_code.revision + 1
+        else:
+            revision = 0
+
+        new_code = models.Code.create(request.user.team, codes['codes'], codes['name'], revision)
         new_code.save()
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()

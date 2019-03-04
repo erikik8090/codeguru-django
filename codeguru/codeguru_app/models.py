@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.core.files.base import File
+from django.core.files.base import File, ContentFile
 
 import os
 import shutil
@@ -75,7 +75,6 @@ def save_user_team(sender, instance, **kwargs):
 
 
 class Code(models.Model):
-
     creator = models.ForeignKey(Team, on_delete=models.CASCADE)
     creation_date = models.DateTimeField(auto_now_add=True)
     revision = models.PositiveIntegerField(default=0)
@@ -84,16 +83,16 @@ class Code(models.Model):
     warrior2 = models.FileField(upload_to='codes/')
 
     @classmethod
-    def create(cls, team, codes):
+    def create(cls, team, codes, name='', revision=0):
         if len(codes) > 2:
             raise RuntimeError('Tried to create a Code instance with more than 2 warriors')
-        model = cls(creator=team)
+        model = cls(creator=team, name=name, revision=revision)
 
         if len(codes) == 1:
-            cls._save_file(model.warrior1, team.user.username, 'current', codes[0])
+            cls._save_file(model.warrior1, team.user.username, name + str(revision), codes[0])
         else:
-            cls._save_file(model.warrior1, team.user.username, 'current1', codes[0])
-            cls._save_file(model.warrior2, team.user.username, 'current2', codes[1])
+            cls._save_file(model.warrior1, team.user.username, name + str(revision) + '-1', codes[0])
+            cls._save_file(model.warrior2, team.user.username, name + str(revision) + '-2', codes[1])
         model.save()
         return model
 
@@ -101,17 +100,8 @@ class Code(models.Model):
     def _save_file(file_field, username, name, content):
         path = [settings.MEDIA_ROOT, 'codes', username]
         filename = os.path.join(username, name + '.s')
-
         Code._dir_exists(path)
-        temp = os.path.join(*path, 'temp.s')
-
-        # TODO: Change this to work with tempfile
-        with open(temp, 'w') as f:
-            f.write(content)
-
-        with open(temp, 'r') as f:
-            file_field.save(filename, File(f), save=True)
-        os.remove(temp)
+        file_field.save(filename, ContentFile(content), save=True)
 
     """
     Makes sure that the dir at this path exists, and if not - creates it.
@@ -125,14 +115,10 @@ class Code(models.Model):
             if not os.path.exists(current_path):
                 os.mkdir(current_path)
 
-    def get_code(self, i=None):
-        if i:
-            return None
+    def get_code(self):
         return [read_file(warrior.path) for warrior in [self.warrior1, self.warrior2] if warrior]
     
-    def get_paths(self, i=None):
-        if i:
-            return None
+    def get_paths(self):
         return [warrior.path for warrior in [self.warrior1, self.warrior2] if warrior]
 
 

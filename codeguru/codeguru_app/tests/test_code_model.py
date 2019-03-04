@@ -14,15 +14,18 @@ class CodeModelTestCase(TestCase):
             username=self.username, password='secret')
         self.user.save()
 
+    def tearDown(self):
+        for code in Code.objects.all():
+            code.delete()
+
     def test_create_single_code(self):
         code_content = 'very cool code'
 
-        code = Code.create(self.user.team, [code_content])
+        code = Code.create(self.user.team, [code_content], 'warrior_name')
         code.save()
 
-        #TODO: Return these
-        #self.assertPathsEqual(code.warrior1.name, os.path.join('codes', self.username ,'current.s'))
-        #self.assertPathsEqual(code.warrior1.path, os.path.join(settings.MEDIA_ROOT, 'codes', self.username, 'current.s'))
+        self.assertPathsEqual(code.warrior1.name, os.path.join('codes', self.username ,'warrior_name0.s'))
+        self.assertPathsEqual(code.warrior1.path, os.path.join(settings.MEDIA_ROOT, 'codes', self.username, 'warrior_name0.s'))
         self.assertFalse(code.warrior2)
         self.assertEqual(read_file(code.warrior1.path), code_content)
     
@@ -30,13 +33,13 @@ class CodeModelTestCase(TestCase):
         code_content1 = 'very cool code'
         code_content2 = 'cooler code'
 
-        code = Code.create(self.user.team, [code_content1, code_content2])
+        code = Code.create(self.user.team, [code_content1, code_content2], 'warrior_name')
         code.save()
 
-        #self.assertPathsEqual(code.warrior1.name, os.path.join('codes', self.username ,'current1.s'))
-        #self.assertPathsEqual(code.warrior1.path, os.path.join(settings.MEDIA_ROOT, 'codes', self.username, 'current1.s'))
-        #self.assertPathsEqual(code.warrior2.name, os.path.join('codes', self.username ,'current2.s'))
-        #self.assertPathsEqual(code.warrior2.path, os.path.join(settings.MEDIA_ROOT, 'codes', self.username, 'current2.s'))
+        self.assertPathsEqual(code.warrior1.name, os.path.join('codes', self.username ,'warrior_name0-1.s'))
+        self.assertPathsEqual(code.warrior1.path, os.path.join(settings.MEDIA_ROOT, 'codes', self.username, 'warrior_name0-1.s'))
+        self.assertPathsEqual(code.warrior2.name, os.path.join('codes', self.username ,'warrior_name0-2.s'))
+        self.assertPathsEqual(code.warrior2.path, os.path.join(settings.MEDIA_ROOT, 'codes', self.username, 'warrior_name0-2.s'))
         self.assertEqual(read_file(code.warrior1.path), code_content1)
         self.assertEqual(read_file(code.warrior2.path), code_content2)
 

@@ -57,7 +57,7 @@ function sendCodeToServer(codes, loader) {
         url: "/submit/",
         dataType: 'json',
         data: {
-            codes-data: codes
+            codes_data: codes
         }
     }).done(function (msg) {
         console.log("Data Saved: " + msg.OK);

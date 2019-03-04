@@ -43,13 +43,9 @@ class CodesViewTest(TestCase):
 
     def test_get_current_code(self):
         code_content = 'random content'
-        codes = json.dumps({'codes': [code_content] * 2})
+        Code.create(self.user.team, [code_content] * 2).save()
         self.client.login(**self.creds)
-        self.client.post(
-            reverse('submit'),
-            data={'codes-data': codes}
-        )
-
+        
         response = self.client.get(
             reverse('specific-code', kwargs={'username':self.user.username, 'version':'current'})
         )

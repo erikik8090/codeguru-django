@@ -10,11 +10,10 @@ class SettingsModal {
     }
 
     isEnabled(option) {
-        this.$modal.find('#'+option).prop("checked");
+        return this.$modal.find('#'+option).prop("checked");
     }
 }
 
 function setUpSettingsMenu() {
     window.settings_menu = new SettingsModal();
-    settings_menu.addOption("new-memory");
 }

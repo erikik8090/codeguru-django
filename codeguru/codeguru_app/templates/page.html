@@ -10,10 +10,11 @@
 
 <script type="text/javascript" language="javascript" src="{% static "js/gas_riscv_js.js" %}"></script>
 <script type="text/javascript" language="javascript" src="{% static "codewars_js/codewars_js.nocache.js" %}"></script>
+<script type="text/javascript" language="javascript" src="{% static "js/dom_effects.js" %}"></script>
 <script type="text/javascript" language="javascript" src="{% static "js/game.js" %}"></script>
 <script type="text/javascript" language="javascript" src="{% static "js/player_panel.js" %}"></script>
-<script type="text/javascript" language="javascript" src="{% static "js/dom_effects.js" %}"></script>
 <script type="text/javascript" language="javascript" src="{% static "js/score_graph.js" %}"></script>
+<script type="text/javascript" language="javascript" src="{% static "js/settings_menu.js" %}"></script>
 <script type="text/javascript" language="javascript" src="{% static "js/main.js" %}"></script>
 {% endblock header %}
 
@@ -267,9 +268,8 @@
     </div>
 
     <div id="settings" class="popupBack" onclick="hidePopup(event);">
-        <div class="popupWin">
-            <input type="checkbox" id="new-memory">
-            Enable new memory mode
+        <div class="popupWin" id="settings-modal">
+        
         </div>
     </div>
 

@@ -8,6 +8,7 @@ import os
 import shutil
 
 from codeguru_extreme import settings
+from . import game
 
 
 class Tournament(models.Model):
@@ -163,3 +164,16 @@ class Result(models.Model):
 
     def __str__(self):
         return f'{self.team.user.username} - {self.round}, Score: {self.score}'
+
+
+try:
+    from dataclasses import dataclass
+
+    @dataclass
+    class Feature:
+        name: str
+        enabled: bool
+
+except:
+    pass
+features = [Feature(name, False) for name in game.get_registerd_features()]

@@ -14,6 +14,7 @@ urlpatterns = [
     path('codes/' , views.codes, name='all-codes'),
     path('codes/<str:username>' , views.codes, name='username-codes'),
     path('codes/<str:username>/<str:version>', views.codes, name='specific-code'),
+    path('admin/game/features', views.FeaturesMenuView.as_view(), name='feature-menu'),
     #TODO: Make these views require the 'run_round' permission
     path('admin/game/' , views.GameAdminView.as_view(), name='game-admin'),
     path('admin/play/' , views.play_game, name='play'),

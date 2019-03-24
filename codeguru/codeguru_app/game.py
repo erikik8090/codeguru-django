@@ -51,3 +51,11 @@ def parse_results():
             results[username] += float(score)
     os.remove(os.path.join(settings.BASE_DIR, 'output.txt'))
     return results
+
+def get_registerd_features():
+    output = subprocess.check_output([
+        'java',
+        '-jar', settings.ENGINE,
+        '--list-features'
+    ])
+    return [s.strip() for s in output.decode('ascii').strip().split('\n')]

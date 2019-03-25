@@ -127,3 +127,6 @@ class FeaturesMenuView(TemplateView):
 
     def registered_features(self):
         return models.features
+
+def enabledFeatures(request):
+    return JsonResponse({'features': [f.name for f in models.features if f.enabled]})

@@ -16,4 +16,14 @@ class SettingsModal {
 
 function setUpSettingsMenu() {
     window.settings_menu = new SettingsModal();
+    $.ajax({
+        headers: {"X-CSRFToken": csrf_token },
+        method: "GET",
+        url: `/api/features`,
+    }).done(function( msg ) {
+        let features = msg.features;
+        for(var i = 0; i<features.length; i++) {
+            window.settings_menu.addOption(features[i]);
+        }
+    });
 }

@@ -5,13 +5,18 @@ import collections
 
 from codeguru_extreme import settings
 
-def play():
-    for root, dirs, files in os.walk(os.path.join(settings.MEDIA_ROOT, 'codes')):
-        for file in files:
-            if file.startswith('current') and file.endswith('.s'):
-                assemble(root, file[:-2])
-                objcopy(root, file[:-2])
+def play(warriors):
+    for paths in warriors:
+        for warrior_path in paths:
+            path, name = os.path.split(warrior_path)
+            assemble(path, name[:-2])
+            objcopy(path, name[:-2])
     run_engine()
+    for paths in warriors:
+        for warrior_path in paths:
+            path, name = os.path.split(warrior_path)
+            os.remove(os.path.join(path, name[:-2] + '.elf'))
+            os.remove(os.path.join(path, name[:-2] + '.bin'))
     return parse_results()
     
 
@@ -46,3 +51,11 @@ def parse_results():
             results[username] += float(score)
     os.remove(os.path.join(settings.BASE_DIR, 'output.txt'))
     return results
+
+def get_registerd_features():
+    output = subprocess.check_output([
+        'java',
+        '-jar', settings.ENGINE,
+        '--list-features'
+    ])
+    return [s.strip() for s in output.decode('ascii').strip().split('\n')]

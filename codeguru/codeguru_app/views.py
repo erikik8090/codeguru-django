@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
-from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpResponseRedirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -12,6 +12,7 @@ import json
 import os
 import subprocess
 import collections
+import itertools
 
 
 def index(request):
@@ -34,32 +35,39 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
 
+
 def logout_view(request):
     logout(request)
     return redirect('index')
 
+
 @login_required
 def submit(request):
     if request.method == 'POST':
-        codes = json.loads(request.POST['codes'])
-        if len(codes) > 2:
+        codes = json.loads(request.POST['codes_data'])
+        if len(codes['codes']) > 2:
             return HttpResponse('Error: You may not upload more than 2 warriors', status=409)
 
-        if request.user.team.current_code:
-            request.user.team.current_code.delete()
-        
-        new_code = models.Code.create(request.user.username, codes)
-        request.user.team.current_code = new_code
-        request.user.save()
+        if request.user.team.current_code.name == codes['name']:
+            revision = request.user.team.current_code.revision + 1
+        else:
+            revision = 0
+
+        new_code = models.Code.create(
+            request.user.team, codes['codes'], codes['name'], revision)
+        new_code.save()
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()
+
 
 def play_game(request):
     if request.method == 'POST':
-        results = game.play()
+        results = game.play([team.current_code.get_paths()
+                             for team in models.Team.objects.all()])
         models.Tournament.current().save_round_results(results)
         return JsonResponse(data={'OK': True})
     return HttpResponseNotFound()
+
 
 @login_required
 def scores(request):
@@ -67,26 +75,28 @@ def scores(request):
 
     table_content = dict()
     for user in models.Result.objects.values_list('team__user__username', flat=True):
-        table_content[user] = models.Result.objects.filter(team__user__username=user)
+        table_content[user] = models.Result.objects.filter(
+            team__user__username=user)
 
     try:
         current_round = models.Tournament.current().current_round
     except AttributeError:
         current_round = 1
-    
-    return render(request, 'scores.html', {'rounds': range(1, current_round), 'scores' : table_content})
+
+    return render(request, 'scores.html', {'rounds': range(1, current_round), 'scores': table_content})
+
 
 class GameAdminView(TemplateView):
     template_name = 'game-admin.html'
 
     def current_turnament(self):
         return models.Tournament.current()
-    
+
     def current_tournament_rounds(self):
-        print('here', models.Tournament.current().current_round)
         return models.Tournament.current().current_round
 
-def codes(request, username = '', version = ''):
+
+def codes(request, username='', version=''):
     if username:
         if version:
             if version == 'current':
@@ -96,9 +106,27 @@ def codes(request, username = '', version = ''):
                 return HttpResponse(status=500)
         elif username == 'current':
             if request.user.is_superuser:
-                code_ids = models.Team.objects.values_list('current_code', flat=True)
-                return JsonResponse({'code': [models.Code.objects.get(id=code).get_code() for code in code_ids if code]})
-            else: 
+                return JsonResponse({'code': [team.current_code.get_code() for team in models.Team.objects.all()]})
+            else:
                 return HttpResponse(status=403)
     else:
         return HttpResponse(status=500)
+
+
+class FeaturesMenuView(TemplateView):
+    template_name = 'features-menu.html'
+
+    def post(self, request):
+        for feature in models.features:
+            feature.enabled = feature.name in request.POST
+        print(models.features)
+        return HttpResponseRedirect(self.request.path_info)
+
+    def current_turnament(self):
+        return models.Tournament.current()
+
+    def registered_features(self):
+        return models.features
+
+def enabledFeatures(request):
+    return JsonResponse({'features': [f.name for f in models.features if f.enabled]})
